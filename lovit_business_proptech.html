@@ -1,0 +1,2562 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="lovit-light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lovit Business — Платформа управления бизнес-центром класса A</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* ===================================================================== */
+    /* LOVIT DESIGN SYSTEM TOKENS: LIGHT (DEFAULT) & DARK                    */
+    /* ===================================================================== */
+    :root,
+    [data-theme="lovit-light"] {
+      --bg-page: #F3F4F6;
+      --bg-card: #FFFFFF;
+      --bg-subtle: #F8F9FA;
+      --bg-muted: #EBEDF0;
+      --bg-header: #FFFFFF;
+      --border-color: #E5E7EB;
+      --border-strong: #D1D5DB;
+      --text-main: #1E2023;
+      --text-muted: #6B7280;
+
+      --accent-primary: #FF441F;
+      --accent-primary-hover: #E03512;
+      --accent-primary-soft: rgba(255, 68, 31, 0.10);
+
+      --accent-secondary: #00C2E8;
+      --accent-secondary-hover: #00A5C7;
+      --accent-secondary-soft: rgba(0, 194, 232, 0.12);
+
+      --accent-emerald: #1F6E58;
+      --accent-emerald-hover: #175745;
+      --accent-emerald-bright: #10B981;
+      --accent-emerald-soft: rgba(31, 110, 88, 0.10);
+
+      --btn-dark-bg: #1E2023;
+      --btn-dark-hover: #32353B;
+      --btn-dark-text: #FFFFFF;
+
+      --seg-track: #ECEEF1;
+      --seg-active-bg: #FFFFFF;
+      --seg-active-text: #1E2023;
+      --seg-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+
+      /* Parking Map Tokens */
+      --slot-free-bg: #FAFAFB;
+      --slot-free-border: #E5E7EB;
+      --slot-free-bar: #D1D5DB;
+      --slot-free-text: #6B7280;
+
+      --slot-occ-bg: #EBEDF0;
+      --slot-occ-border: #DCDFE4;
+      --slot-occ-bar: #9CA3AF;
+      --slot-occ-text: #6B7280;
+
+      --slot-quota-bg: #ECF6F1;
+      --slot-quota-border: #9ED3BE;
+      --slot-quota-bar: #7AB89F;
+      --slot-quota-text: #1F6E58;
+
+      --slot-guest-bg: #EEF4FF;
+      --slot-guest-border: #9CC2F5;
+      --slot-guest-bar: #7FA9E8;
+      --slot-guest-text: #2563EB;
+
+      --card-shadow: 0 2px 10px rgba(17, 24, 39, 0.04);
+    }
+
+    [data-theme="lovit-dark"] {
+      --bg-page: #151618;
+      --bg-card: #1F2125;
+      --bg-subtle: #191B1F;
+      --bg-muted: #282B30;
+      --bg-header: #1A1C20;
+      --border-color: #2E3138;
+      --border-strong: #3E424C;
+      --text-main: #F9FAFB;
+      --text-muted: #9CA3AF;
+
+      --accent-primary: #FF441F;
+      --accent-primary-hover: #FF5B3A;
+      --accent-primary-soft: rgba(255, 68, 31, 0.18);
+
+      --accent-secondary: #00C2E8;
+      --accent-secondary-hover: #2AD1F2;
+      --accent-secondary-soft: rgba(0, 194, 232, 0.18);
+
+      --accent-emerald: #10B981;
+      --accent-emerald-hover: #059669;
+      --accent-emerald-bright: #10B981;
+      --accent-emerald-soft: rgba(16, 185, 129, 0.16);
+
+      --btn-dark-bg: #2E3138;
+      --btn-dark-hover: #3D414A;
+      --btn-dark-text: #F9FAFB;
+
+      --seg-track: #151618;
+      --seg-active-bg: #2B2E35;
+      --seg-active-text: #F9FAFB;
+      --seg-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
+
+      /* Parking Map Tokens (Dark) */
+      --slot-free-bg: #1B1D21;
+      --slot-free-border: #2E3138;
+      --slot-free-bar: #4B5563;
+      --slot-free-text: #9CA3AF;
+
+      --slot-occ-bg: #272A30;
+      --slot-occ-border: #373B44;
+      --slot-occ-bar: #6B7280;
+      --slot-occ-text: #6B7280;
+
+      --slot-quota-bg: rgba(16, 185, 129, 0.13);
+      --slot-quota-border: rgba(16, 185, 129, 0.45);
+      --slot-quota-bar: #10B981;
+      --slot-quota-text: #34D399;
+
+      --slot-guest-bg: rgba(0, 194, 232, 0.13);
+      --slot-guest-border: rgba(0, 194, 232, 0.45);
+      --slot-guest-bar: #00C2E8;
+      --slot-guest-text: #38BDF8;
+
+      --card-shadow: 0 4px 18px rgba(0, 0, 0, 0.32);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      transition: background-color 0.2s ease, color 0.2s ease;
+      -webkit-font-smoothing: antialiased;
+      margin: 0;
+    }
+
+    .l-header {
+      background-color: var(--bg-header);
+      border-bottom: 1px solid var(--border-color);
+      transition: background-color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .l-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      box-shadow: var(--card-shadow);
+      transition: background-color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .l-subtle {
+      background-color: var(--bg-subtle);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+    }
+
+    .l-text-main { color: var(--text-main); }
+    .l-text-muted { color: var(--text-muted); }
+    .l-border { border-color: var(--border-color); }
+
+    .l-input {
+      background-color: var(--bg-subtle);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      border-radius: 9px;
+      transition: border-color 0.15s ease, background-color 0.2s ease;
+    }
+    .l-input:focus {
+      outline: none;
+      border-color: var(--accent-primary);
+      background-color: var(--bg-card);
+    }
+    .l-input::placeholder { color: var(--text-muted); opacity: 0.75; }
+
+    .l-btn-primary {
+      background-color: var(--accent-primary);
+      color: #FFFFFF;
+      border-radius: 9px;
+      font-weight: 600;
+      transition: background-color 0.15s ease, transform 0.1s ease, opacity 0.15s ease;
+    }
+    .l-btn-primary:hover:not(:disabled) { background-color: var(--accent-primary-hover); }
+    .l-btn-primary:active:not(:disabled) { transform: scale(0.985); }
+    .l-btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    .l-btn-emerald {
+      background-color: var(--accent-emerald);
+      color: #FFFFFF;
+      border-radius: 10px;
+      font-weight: 600;
+      transition: background-color 0.15s ease, transform 0.1s ease, opacity 0.15s ease;
+    }
+    .l-btn-emerald:hover:not(:disabled) { background-color: var(--accent-emerald-hover); }
+    .l-btn-emerald:active:not(:disabled) { transform: scale(0.99); }
+    .l-btn-emerald:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    .l-btn-dark {
+      background-color: var(--btn-dark-bg);
+      color: var(--btn-dark-text);
+      border-radius: 9px;
+      font-weight: 600;
+      transition: background-color 0.15s ease;
+    }
+    .l-btn-dark:hover { background-color: var(--btn-dark-hover); }
+
+    .l-btn-outline {
+      background-color: transparent;
+      border: 1px solid var(--border-strong);
+      color: var(--text-main);
+      border-radius: 9px;
+      font-weight: 600;
+      transition: background-color 0.15s ease, border-color 0.15s ease;
+    }
+    .l-btn-outline:hover {
+      background-color: var(--bg-subtle);
+      border-color: var(--accent-primary);
+    }
+
+    /* Segmented Tabs */
+    .l-seg-track {
+      background-color: var(--seg-track);
+      border-radius: 10px;
+      padding: 3px;
+    }
+    .l-seg-btn {
+      border-radius: 8px;
+      color: var(--text-muted);
+      font-weight: 600;
+      transition: all 0.15s ease;
+    }
+    .l-seg-btn:hover { color: var(--text-main); }
+    .l-seg-btn.active {
+      background-color: var(--seg-active-bg);
+      color: var(--seg-active-text);
+      box-shadow: var(--seg-shadow);
+    }
+
+    /* Compact Sun/Moon Toggle Switch */
+    .theme-switch {
+      position: relative;
+      width: 48px;
+      height: 26px;
+      border-radius: 9999px;
+      background-color: var(--seg-track);
+      border: 1px solid var(--border-strong);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      padding: 2px;
+      transition: background-color 0.2s ease, border-color 0.2s ease;
+    }
+    .theme-switch-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 9999px;
+      background-color: var(--bg-card);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform: translateX(0);
+      transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s ease;
+      color: #F59E0B;
+    }
+    [data-theme="lovit-dark"] .theme-switch-thumb {
+      transform: translateX(22px);
+      background-color: #2B2E35;
+      color: #00C2E8;
+    }
+
+    /* Parking Slot Card Styles */
+    .p-slot {
+      border-radius: 11px;
+      border: 1.5px solid var(--slot-free-border);
+      background-color: var(--slot-free-bg);
+      color: var(--slot-free-text);
+      transition: all 0.15s ease;
+      position: relative;
+      user-select: none;
+    }
+    .p-slot:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.07);
+    }
+    .p-slot-bar {
+      width: 22px;
+      height: 3.5px;
+      border-radius: 9999px;
+      background-color: var(--slot-free-bar);
+      margin: 0 auto 10px;
+    }
+    .p-slot.status-occupied {
+      background-color: var(--slot-occ-bg);
+      border-color: var(--slot-occ-border);
+      color: var(--slot-occ-text);
+    }
+    .p-slot.status-occupied .p-slot-bar { background-color: var(--slot-occ-bar); }
+
+    .p-slot.status-quota {
+      background-color: var(--slot-quota-bg);
+      border-color: var(--slot-quota-border);
+      color: var(--slot-quota-text);
+    }
+    .p-slot.status-quota .p-slot-bar { background-color: var(--slot-quota-bar); }
+
+    .p-slot.status-guest {
+      background-color: var(--slot-guest-bg);
+      border-color: var(--slot-guest-border);
+      color: var(--slot-guest-text);
+    }
+    .p-slot.status-guest .p-slot-bar { background-color: var(--slot-guest-bar); }
+
+    .p-slot.is-selected {
+      border-width: 2px;
+      border-color: var(--accent-emerald);
+      box-shadow: 0 0 0 3px var(--accent-emerald-soft);
+      transform: translateY(-1px);
+    }
+    .p-slot.status-guest.is-selected {
+      border-color: var(--accent-secondary);
+      box-shadow: 0 0 0 3px var(--accent-secondary-soft);
+    }
+    .p-slot.status-occupied.is-selected {
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 3px var(--accent-primary-soft);
+    }
+
+    .vertical-label {
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+      letter-spacing: 0.18em;
+    }
+
+    .tabular-nums { font-variant-numeric: tabular-nums; }
+
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 9999px; }
+
+    @keyframes pulseDot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+    .animate-dot { animation: pulseDot 1.3s ease-in-out infinite; }
+
+    @keyframes slideInRight {
+      from { transform: translateX(16px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    .toast-enter { animation: slideInRight 0.2s ease-out forwards; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- ===================================================================== -->
+  <!-- TOP HEADER: LOGO, ACCOUNT SWITCHER (RBAC), ACS SIM & THEME TOGGLE     -->
+  <!-- ===================================================================== -->
+  <header class="sticky top-0 z-40 l-header">
+    <div class="max-w-[1440px] mx-auto px-4 sm:px-6">
+      <!-- Top Row -->
+      <div class="flex flex-wrap items-center justify-between gap-3 py-3 border-b l-border">
+        <!-- Left: Lovit Brand Logo -->
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-sm border" style="background-color: #FFFFFF; border-color: var(--border-color);">
+            <svg class="w-6 h-6" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M11 8.5C13.8 10.7 13.8 17.3 11 19.5" stroke="#1E2023" stroke-width="2.8" stroke-linecap="round"/>
+              <path d="M16.2 5.5C20.5 9.2 20.5 18.8 16.2 22.5" stroke="#1E2023" stroke-width="2.8" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div>
+            <div class="text-[16px] font-extrabold tracking-tight leading-tight l-text-main">Lovit Business</div>
+            <div class="text-[11px] font-medium leading-tight l-text-muted">БЦ класса A · 42 000 м² · 55 арендаторов · 420 м/м</div>
+          </div>
+        </div>
+
+        <!-- Right: Master ACS Sim (Master only) + Account Switcher + Small Theme Toggle -->
+        <div class="flex items-center gap-2.5 sm:gap-3 flex-wrap">
+          <!-- ACS Online/Offline Button (Visible for Master Admin only) -->
+          <button
+            id="btn-toggle-acs"
+            type="button"
+            onclick="toggleAcsConnection()"
+            class="hidden items-center gap-2 px-3 py-1.5 text-xs font-bold rounded-lg cursor-pointer transition-all"
+          ></button>
+
+          <!-- Account Selector (RBAC) -->
+          <div class="relative" id="account-menu-wrapper">
+            <button
+              type="button"
+              onclick="toggleAccountDropdown()"
+              class="flex items-center gap-2.5 pl-2 pr-3 py-1.5 l-subtle hover:border-[#FF441F] transition-colors cursor-pointer"
+              aria-haspopup="true"
+              aria-expanded="false"
+              id="account-trigger-btn"
+            >
+              <!-- Populated by JS -->
+            </button>
+
+            <!-- Dropdown List -->
+            <div id="account-dropdown" class="hidden absolute right-0 mt-2 w-72 l-card p-1.5 shadow-2xl z-50">
+              <div class="px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-widest l-text-muted">
+                Переключение учётной записи (RBAC)
+              </div>
+              <div id="account-dropdown-list" class="space-y-1"></div>
+            </div>
+          </div>
+
+          <!-- Compact Light/Dark Toggle Switch -->
+          <button
+            type="button"
+            onclick="toggleTheme()"
+            class="theme-switch"
+            role="switch"
+            aria-label="Переключить светлую или тёмную тему"
+            title="Светлая / Тёмная тема Lovit"
+            id="theme-toggle-btn"
+          >
+            <span class="theme-switch-thumb" id="theme-toggle-icon">
+              <!-- Sun icon by default -->
+              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+            </span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Navigation Row (Role-Filtered Tabs) -->
+      <div class="py-2.5 flex items-center justify-between gap-3 overflow-x-auto">
+        <nav id="workspace-tabs" class="l-seg-track inline-flex items-center gap-1 min-w-max" aria-label="Разделы платформы">
+          <!-- Populated dynamically based on RBAC -->
+        </nav>
+
+        <div id="acs-status-caption" class="hidden lg:flex items-center gap-2 text-xs font-medium l-text-muted shrink-0">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===================================================================== -->
+  <!-- MAIN WORKSPACE CONTAINER                                              -->
+  <!-- ===================================================================== -->
+  <main id="app-main" class="flex-1 max-w-[1440px] w-full mx-auto px-4 sm:px-6 py-6">
+    <!-- Rendered dynamically by JS -->
+  </main>
+
+  <!-- ===================================================================== -->
+  <!-- LEGAL DISCLAIMER FOOTER                                               -->
+  <!-- ===================================================================== -->
+  <footer class="mt-auto border-t l-border" style="background-color: var(--bg-card);">
+    <div class="max-w-[1440px] mx-auto px-4 sm:px-6 py-3.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs l-text-muted">
+      <div class="flex items-start sm:items-center gap-2">
+        <svg class="w-4 h-4 shrink-0 mt-0.5 sm:mt-0 text-[#FF441F]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+        <span>Платформа не является единственным каналом экстренной связи и не заменяет сертифицированные системы оповещения при ЧС и пожаре (СОУЭ). Источник истины по физическому проходу — СКУД объекта. Изоляция данных: PostgreSQL RLS (152-ФЗ).</span>
+      </div>
+      <span class="font-mono text-[11px] shrink-0">Lovit Business · MVP v2.1</span>
+    </div>
+  </footer>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 1: MOBILE-FRAME GUEST QR PASS                                   -->
+  <!-- ===================================================================== -->
+  <div id="qr-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 backdrop-blur-[2px] p-4" onclick="closeModal('qr-modal', event)">
+    <div class="l-card max-w-[360px] w-full overflow-hidden shadow-2xl" style="border-radius: 22px;" onclick="event.stopPropagation()">
+      <div class="px-5 py-4 flex items-center justify-between text-white bg-[#FF441F]">
+        <div>
+          <div class="text-[10px] uppercase tracking-widest font-bold opacity-85">Гостевой пропуск · Web PWA</div>
+          <div class="text-base font-extrabold mt-0.5">Lovit Business · БЦ класса A</div>
+        </div>
+        <button onclick="closeModal('qr-modal')" class="p-1.5 rounded-lg hover:bg-white/20 transition-colors cursor-pointer" aria-label="Закрыть">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+      </div>
+      <div id="qr-modal-body" class="p-5"></div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 2: PARKING BOOKING FORM (FLOOR P1)                              -->
+  <!-- ===================================================================== -->
+  <div id="parking-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 backdrop-blur-[2px] p-4" onclick="closeModal('parking-modal', event)">
+    <div class="l-card max-w-md w-full overflow-hidden shadow-2xl" onclick="event.stopPropagation()">
+      <div id="parking-modal-body" class="p-5 sm:p-6"></div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 3: UK REQUEST DETAIL (TWO-LAYER SLA + PRIVATE NOTES)            -->
+  <!-- ===================================================================== -->
+  <div id="uk-req-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 backdrop-blur-[2px] p-4" onclick="closeModal('uk-req-modal', event)">
+    <div class="l-card max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl" onclick="event.stopPropagation()">
+      <div id="uk-req-modal-body"></div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- TOAST NOTIFICATION CONTAINER                                          -->
+  <!-- ===================================================================== -->
+  <div id="toast-container" class="fixed bottom-16 right-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none"></div>
+
+  <!-- ===================================================================== -->
+  <!-- REACTIVE STATE & FULL APPLICATION LOGIC                               -->
+  <!-- ===================================================================== -->
+  <script>
+    // =========================================================================
+    // 1. ACCOUNTS & RBAC DEFINITIONS
+    // =========================================================================
+    const ACCOUNTS = {
+      master: {
+        id: 'master',
+        title: 'Мастер-администратор',
+        userName: 'А. Соколов',
+        subtitle: 'Полный доступ ко всем модулям',
+        initials: 'АС',
+        color: '#FF441F',
+        allowedTabs: ['tenant', 'parking', 'uk', 'security', 'audit'],
+      },
+      tenant: {
+        id: 'tenant',
+        title: 'Арендатор',
+        userName: 'ООО «ТехноВектор»',
+        subtitle: 'Кабинет арендатора и парковка',
+        initials: 'ТВ',
+        color: '#1F6E58',
+        allowedTabs: ['tenant', 'parking'],
+      },
+      uk: {
+        id: 'uk',
+        title: 'УК / Эксплуатация',
+        userName: 'И. Громова',
+        subtitle: 'Диспетчер УК · SLA и парковка',
+        initials: 'ИГ',
+        color: '#00C2E8',
+        allowedTabs: ['uk', 'parking'],
+      },
+      security: {
+        id: 'security',
+        title: 'Охрана (КПП / СБ)',
+        userName: 'С. Петров',
+        subtitle: 'Старший смены КПП',
+        initials: 'СП',
+        color: '#374151',
+        allowedTabs: ['security', 'parking'],
+      },
+    };
+
+    const TAB_META = {
+      tenant: { label: 'Кабинет арендатора', icon: '<svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="20" x="5" y="2" rx="2"/><path d="M12 18h.01"/></svg>' },
+      parking: { label: 'Парковка (Схема P1)', icon: '<svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="3"/><path d="M9 17V7h4a3 3 0 0 1 0 6H9"/></svg>' },
+      uk: { label: 'УК / Эксплуатация', icon: '<svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>' },
+      security: { label: 'Пост охраны (КПП)', icon: '<svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>' },
+      audit: { label: 'Аудит и СКУД (ИБ)', icon: '<svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>' },
+    };
+
+    // =========================================================================
+    // 2. SHARED REACTIVE STATE WITH RICH TEST DATA
+    // =========================================================================
+    const state = {
+      theme: 'lovit-light',       // 'lovit-light' | 'lovit-dark'
+      account: 'master',          // 'master' | 'tenant' | 'uk' | 'security'
+      activeTab: 'tenant',        // 'tenant' | 'parking' | 'uk' | 'security' | 'audit'
+      accountMenuOpen: false,
+
+      // Sub-role inside Tenant Workspace (Russian labels only!)
+      tenantSubRole: 'admin',     // 'admin' (Администратор арендатора) | 'employee' (Сотрудник арендатора)
+      delegationEnabled: true,
+
+      // Global ACS / Integration Hub
+      acsOnline: true,
+      lastReconciliation: '14:25:00',
+      reconciliationRunning: false,
+
+      // Current Tenant Company
+      currentTenant: {
+        id: 'tenant_01',
+        name: 'ООО «ТехноВектор»',
+        floor: '14 этаж, офис 1402',
+        monthlyQuotaTotal: 20,
+        monthlyQuotaBaseUsed: 11, // + active bookings in upcoming list = 14 / 20 initially
+      },
+
+      // Building-level Parking Accounting (Separate from Bookings)
+      buildingParkingTotal: 420,
+      buildingParkingBasePhysical: 312,
+      parkingBufferTotal: 20,
+      parkingBufferUsed: 4,
+
+      // Floor P1 Interactive Map: 20 Spots (A-01 .. A-20)
+      selectedSlotId: 'A-18',
+      parkingSlots: [
+        { id: 'A-01', status: 'quota',    company: 'ООО «ТехноВектор»',    driver: 'Резерв квоты',       plate: '',           time: 'Свободно по квоте' },
+        { id: 'A-02', status: 'free',     company: '',                     driver: '',                   plate: '',           time: '' },
+        { id: 'A-03', status: 'occupied', company: 'АО «Прайм Консалтинг»', driver: 'Мельников Д.А.',    plate: 'К404МН799',  time: '09:00–18:00' },
+        { id: 'A-04', status: 'free',     company: '',                     driver: '',                   plate: '',           time: '' },
+        { id: 'A-05', status: 'quota',    company: 'ООО «ТехноВектор»',    driver: 'Резерв квоты',       plate: '',           time: 'Свободно по квоте' },
+
+        { id: 'A-06', status: 'free',     company: '',                     driver: '',                   plate: '',           time: '' },
+        { id: 'A-07', status: 'occupied', company: 'Бюро «Вектор Права»',  driver: 'Лавров И.С.',        plate: 'Е771КХ777',  time: '10:00–17:00' },
+        { id: 'A-08', status: 'guest',    company: 'ООО «ТехноВектор»',    driver: 'Гостевое место',     plate: '',           time: 'Доступно для гостя' },
+        { id: 'A-09', status: 'free',     company: '',                     driver: '',                   plate: '',           time: '' },
+        { id: 'A-10', status: 'occupied', company: 'ГК «Атлант Финанс»',   driver: 'Сафронов В.П.',      plate: 'О505ОО977',  time: '08:30–19:00' },
+
+        { id: 'A-11', status: 'free',     company: '',                     driver: '',                   plate: '',           time: '' },
+        { id: 'A-12', status: 'quota',    company: 'ООО «ТехноВектор»',    driver: 'Коновалов А.',       plate: 'А123ВС777',  time: '10:30–13:30' },
+        { id: 'A-13', status: 'free',     company: '',                     driver: '',                   plate: '',           time: '' },
+        { id: 'A-14', status: 'quota',    company: 'ООО «ТехноВектор»',    driver: 'Смирнова Е.В.',      plate: 'Е120КХ777',  time: '14:00–17:00' },
+        { id: 'A-15', status: 'guest',    company: 'ООО «ТехноВектор»',    driver: 'Гостевое место',     plate: '',           time: 'Доступно для гостя' },
+
+        { id: 'A-16', status: 'occupied', company: 'ООО «Норд Логистик»',  driver: 'Тихонов С.В.',       plate: 'М901АВ799',  time: '11:00–16:00' },
+        { id: 'A-17', status: 'free',     company: '',                     driver: '',                   plate: '',           time: '' },
+        { id: 'A-18', status: 'quota',    company: 'ООО «ТехноВектор»',    driver: 'Доступно по квоте',  plate: '',           time: 'Выбрано' },
+        { id: 'A-19', status: 'free',     company: '',                     driver: '',                   plate: '',           time: '' },
+        { id: 'A-20', status: 'free',     company: '',                     driver: '',                   plate: '',           time: '' },
+      ],
+
+      // Parking Bookings & KPP Physical Presence (6+ vehicles)
+      parkingBookings: [
+        {
+          id: 'PK-501',
+          slotId: 'A-12',
+          tenantId: 'tenant_01',
+          tenantName: 'ООО «ТехноВектор»',
+          dateDay: '25',
+          dateMonth: 'ноя',
+          timeRange: '10:30–13:30',
+          driverName: 'Коновалов А.',
+          plate: 'А123ВС777',
+          type: 'quota', // 'quota' | 'guest'
+          physicalStatus: 'На территории (Факт)', // 'Ожидается на КПП' | 'На территории (Факт)' | 'Выехал (Факт)'
+          checkInTime: '10:22',
+        },
+        {
+          id: 'PK-502',
+          slotId: 'A-14',
+          tenantId: 'tenant_01',
+          tenantName: 'ООО «ТехноВектор»',
+          dateDay: '25',
+          dateMonth: 'ноя',
+          timeRange: '14:00–17:00',
+          driverName: 'Смирнова Е.В.',
+          plate: 'Е120КХ777',
+          type: 'quota',
+          physicalStatus: 'Ожидается на КПП',
+          checkInTime: null,
+        },
+        {
+          id: 'PK-503',
+          slotId: 'A-08',
+          tenantId: 'tenant_01',
+          tenantName: 'ООО «ТехноВектор»',
+          dateDay: '26',
+          dateMonth: 'ноя',
+          timeRange: '11:00–14:00',
+          driverName: 'Захаров М.П.',
+          plate: 'Т882ОР799',
+          type: 'guest',
+          physicalStatus: 'Ожидается на КПП',
+          checkInTime: null,
+        },
+        {
+          id: 'PK-504',
+          slotId: 'A-03',
+          tenantId: 'tenant_02',
+          tenantName: 'АО «Прайм Консалтинг»',
+          dateDay: '25',
+          dateMonth: 'ноя',
+          timeRange: '09:00–18:00',
+          driverName: 'Мельников Д.А.',
+          plate: 'К404МН799',
+          type: 'quota',
+          physicalStatus: 'На территории (Факт)',
+          checkInTime: '08:54',
+        },
+        {
+          id: 'PK-505',
+          slotId: 'A-07',
+          tenantId: 'tenant_03',
+          tenantName: 'Бюро «Вектор Права»',
+          dateDay: '25',
+          dateMonth: 'ноя',
+          timeRange: '10:00–17:00',
+          driverName: 'Лавров И.С.',
+          plate: 'Е771КХ777',
+          type: 'quota',
+          physicalStatus: 'На территории (Факт)',
+          checkInTime: '10:05',
+        },
+        {
+          id: 'PK-506',
+          slotId: 'A-10',
+          tenantId: 'tenant_05',
+          tenantName: 'ГК «Атлант Финанс»',
+          dateDay: '25',
+          dateMonth: 'ноя',
+          timeRange: '08:30–19:00',
+          driverName: 'Сафронов В.П.',
+          plate: 'О505ОО977',
+          type: 'quota',
+          physicalStatus: 'На территории (Факт)',
+          checkInTime: '08:28',
+        },
+        {
+          id: 'PK-507',
+          slotId: 'A-16',
+          tenantId: 'tenant_04',
+          tenantName: 'ООО «Норд Логистик»',
+          dateDay: '25',
+          dateMonth: 'ноя',
+          timeRange: '11:00–16:00',
+          driverName: 'Тихонов С.В.',
+          plate: 'М901АВ799',
+          type: 'guest',
+          physicalStatus: 'Ожидается на КПП',
+          checkInTime: null,
+        },
+      ],
+
+      // 8 Pre-populated Guest QR Passes in various states
+      passes: [
+        {
+          id: 'QR-2611-0901',
+          tenantId: 'tenant_01',
+          tenantName: 'ООО «ТехноВектор»',
+          guestName: 'Смирнова Елена Викторовна',
+          phone: '+7 (916) 442-19-08',
+          plate: 'Е120КХ777',
+          isVip: true,
+          status: 'ACTIVE',
+          createdBy: 'Е. Морозова (Администратор арендатора)',
+          acsAckTime: '13:52:14 (0.8с)',
+        },
+        {
+          id: 'QR-2611-0902',
+          tenantId: 'tenant_01',
+          tenantName: 'ООО «ТехноВектор»',
+          guestName: 'Коновалов Андрей Сергеевич',
+          phone: '+7 (925) 810-33-12',
+          plate: 'А123ВС777',
+          isVip: false,
+          status: 'ACTIVE',
+          createdBy: 'Д. Волков (Сотрудник арендатора)',
+          acsAckTime: '10:15:02 (1.1с)',
+        },
+        {
+          id: 'QR-2611-0903',
+          tenantId: 'tenant_01',
+          tenantName: 'ООО «ТехноВектор»',
+          guestName: 'Захаров Максим Павлович',
+          phone: '+7 (903) 551-04-90',
+          plate: 'Т882ОР799',
+          isVip: false,
+          status: 'PENDING_SYNC',
+          createdBy: 'Е. Морозова (Администратор арендатора)',
+          acsAckTime: 'В очереди Outbox...',
+        },
+        {
+          id: 'QR-2611-0904',
+          tenantId: 'tenant_01',
+          tenantName: 'ООО «ТехноВектор»',
+          guestName: 'Кузнецова Наталья Игоревна',
+          phone: '+7 (985) 204-77-15',
+          plate: '',
+          isVip: false,
+          status: 'REVOKED',
+          createdBy: 'Е. Морозова (Администратор арендатора)',
+          acsAckTime: 'Отозван за 12 сек',
+        },
+        {
+          id: 'QR-2611-0905',
+          tenantId: 'tenant_01',
+          tenantName: 'ООО «ТехноВектор»',
+          guestName: 'Романов Игорь Олегович',
+          phone: '+7 (910) 311-62-40',
+          plate: 'В330УУ799',
+          isVip: false,
+          status: 'FAILED',
+          createdBy: 'Д. Волков (Сотрудник арендатора)',
+          acsAckTime: 'Таймаут адаптера СКУД',
+        },
+        {
+          id: 'QR-2611-0906',
+          tenantId: 'tenant_02',
+          tenantName: 'АО «Прайм Консалтинг»',
+          guestName: 'Белозёрова Ольга Дмитриевна',
+          phone: '+7 (916) 774-20-11',
+          plate: 'К404МН799',
+          isVip: true,
+          status: 'ACTIVE',
+          createdBy: 'Н. Крылова (Администратор арендатора)',
+          acsAckTime: '12:40:18 (0.7с)',
+        },
+        {
+          id: 'QR-2611-0907',
+          tenantId: 'tenant_03',
+          tenantName: 'Бюро «Вектор Права»',
+          guestName: 'Лавров Иван Сергеевич',
+          phone: '+7 (905) 602-88-31',
+          plate: 'Е771КХ777',
+          isVip: false,
+          status: 'ACTIVE',
+          createdBy: 'К. Орлов (Администратор арендатора)',
+          acsAckTime: '09:55:41 (0.9с)',
+        },
+        {
+          id: 'QR-2611-0908',
+          tenantId: 'tenant_05',
+          tenantName: 'ГК «Атлант Финанс»',
+          guestName: 'Сафронов Виктор Петрович',
+          phone: '+7 (926) 919-45-00',
+          plate: 'О505ОО977',
+          isVip: true,
+          status: 'ACTIVE',
+          createdBy: 'Т. Лебедева (Администратор арендатора)',
+          acsAckTime: '08:20:09 (0.6с)',
+        },
+      ],
+
+      // SignalR Alerts for Security Post (VIP & REVOKE_FAILED)
+      signalRAlerts: [
+        {
+          id: 'ALR-VIP-1',
+          type: 'VIP',
+          passId: 'QR-2611-0901',
+          guestName: 'Смирнова Елена Викторовна',
+          company: 'ООО «ТехноВектор»',
+          plate: 'Е120КХ777',
+          time: '14:15:00',
+          message: 'VIP-визит через 15 мин. Выделено место A-14 (буфер/квота). Сопровождение от ресепшен.',
+          resolved: false,
+        },
+      ],
+      securitySearch: '',
+
+      // 7 Pre-populated UK Service Requests
+      requests: [
+        {
+          id: 'REQ-2047',
+          tenantId: 'tenant_01',
+          tenantName: 'ООО «ТехноВектор»',
+          office: '14 эт., оф. 1402',
+          category: 'Климат / Фанкойл',
+          description: 'Повышенная температура в переговорной «Север» (+26°C), фанкойл не реагирует на панель.',
+          status: 'Пауза SLA',
+          pauseReason: 'Ожидание доступа в офис',
+          slaRemaining: '02ч 15м (на паузе)',
+          createdAt: '25.11.2026 11:10',
+          attachment: { name: 'fancoil_1402.jpg', s3Badge: 'Presigned URL 5 мин' },
+          privateNotes: [
+            { author: 'Ковалёв С. (Инженер)', time: '11:45', text: 'В переговорной совет директоров, попросили зайти после 16:00. Поставил валидную паузу SLA.' },
+          ],
+        },
+        {
+          id: 'REQ-2046',
+          tenantId: 'tenant_01',
+          tenantName: 'ООО «ТехноВектор»',
+          office: '14 эт., оф. 1402',
+          category: 'Освещение',
+          description: 'Мигает потолочный LED-светильник в зоне ресепшен.',
+          status: 'В работе',
+          pauseReason: '',
+          slaRemaining: '01ч 40м до дедлайна',
+          createdAt: '25.11.2026 12:30',
+          attachment: null,
+          privateNotes: [
+            { author: 'Макаров И. (Электрик)', time: '13:05', text: 'Взял запасной драйвер со склада, поднимаюсь на 14 этаж.' },
+          ],
+        },
+        {
+          id: 'REQ-2045',
+          tenantId: 'tenant_02',
+          tenantName: 'АО «Прайм Консалтинг»',
+          office: '9 эт., оф. 905',
+          category: 'Электрика',
+          description: 'Отключилась группа розеток на рабочих местах у окна (сектор B).',
+          status: 'Новая',
+          pauseReason: '',
+          slaRemaining: '03ч 50м до дедлайна',
+          createdAt: '25.11.2026 14:12',
+          attachment: { name: 'panel_905.jpg', s3Badge: 'Presigned URL 5 мин' },
+          privateNotes: [],
+        },
+        {
+          id: 'REQ-2044',
+          tenantId: 'tenant_03',
+          tenantName: 'Бюро «Вектор Права»',
+          office: '11 эт., оф. 1108',
+          category: 'СКУД / Дверь',
+          description: 'Медленно срабатывает доводчик входной стеклянной двери, магнитный замок не всегда фиксируется.',
+          status: 'В работе',
+          pauseReason: '',
+          slaRemaining: '00ч 55м до дедлайна',
+          createdAt: '25.11.2026 10:20',
+          attachment: { name: 'door_lock_1108.jpg', s3Badge: 'Presigned URL 5 мин' },
+          privateNotes: [
+            { author: 'Фёдоров П. (Слаботочка)', time: '11:10', text: 'Проверил контроллер СКУД — проблема механическая, регулирую доводчик.' },
+          ],
+        },
+        {
+          id: 'REQ-2043',
+          tenantId: 'tenant_04',
+          tenantName: 'ООО «Норд Логистик»',
+          office: '6 эт., оф. 612',
+          category: 'Клининг',
+          description: 'Внеплановая уборка кофе-пойнта после презентации для клиентов.',
+          status: 'Выполнена',
+          pauseReason: '',
+          slaRemaining: 'Выполнена в SLA',
+          createdAt: '25.11.2026 09:05',
+          attachment: null,
+          privateNotes: [
+            { author: 'И. Громова (Диспетчер УК)', time: '09:42', text: 'Бригада клининга закрыла задачу за 37 минут.' },
+          ],
+        },
+        {
+          id: 'REQ-2042',
+          tenantId: 'tenant_05',
+          tenantName: 'ГК «Атлант Финанс»',
+          office: '18 эт., оф. 1801',
+          category: 'Сантехника',
+          description: 'Слабый напор воды в кухонной зоне офиса.',
+          status: 'Пауза SLA',
+          pauseReason: 'Закупка комплектующих',
+          slaRemaining: '04ч 10м (на паузе)',
+          createdAt: '24.11.2026 16:40',
+          attachment: null,
+          privateNotes: [
+            { author: 'Семёнов А. (Сантехник)', time: '17:20', text: 'Заказали картридж редуктора давления, поставка завтра до 11:00.' },
+          ],
+        },
+        {
+          id: 'REQ-2041',
+          tenantId: 'tenant_02',
+          tenantName: 'АО «Прайм Консалтинг»',
+          office: 'Лифтовой холл, 9 эт.',
+          category: 'Лифт',
+          description: 'Не горит индикатор вызова на пассажирском лифте №3 (правая группа).',
+          status: 'В работе',
+          pauseReason: '',
+          slaRemaining: '02ч 05м до дедлайна',
+          createdAt: '25.11.2026 13:15',
+          attachment: null,
+          privateNotes: [
+            { author: 'И. Громова (Диспетчер УК)', time: '13:20', text: 'Заявка передана механику лифтовой службы по договору обслуживания.' },
+          ],
+        },
+      ],
+
+      // 12 Pre-populated Append-Only Audit Events
+      auditLog: [
+        { id: 'AUD-9012', time: '14:25:00', role: 'Система (ИБ)', actor: 'Сверка Reconciliation', action: 'RECONCILE_SYNC', entity: 'СКУД ACL', details: 'Плановая сверка каждые 5 мин: 1 расхождение (QR-2611-0905 FAILED).', level: 'warn' },
+        { id: 'AUD-9011', time: '14:15:00', role: 'Система (SignalR)', actor: 'Шина уведомлений', action: 'VIP_ALERT_SENT', entity: 'QR-2611-0901', details: 'Отправлено приоритетное VIP-уведомление на Пост охраны (Смирнова Е.В.).', level: 'info' },
+        { id: 'AUD-9010', time: '14:12:08', role: 'Арендатор', actor: 'Н. Крылова (АО «Прайм Консалтинг»)', action: 'REQUEST_CREATED', entity: 'REQ-2045', details: 'Создана заявка «Электрика» с вложением в приватный S3 (Presigned URL).', level: 'ok' },
+        { id: 'AUD-9009', time: '13:52:14', role: 'Шина СКУД (ACL)', actor: 'Адаптер СКУД', action: 'PASS_ACK_ACTIVE', entity: 'QR-2611-0901', details: 'СКУД подтвердил пропуск Смирновой Е.В. (VIP) за 0.8с.', level: 'ok' },
+        { id: 'AUD-9008', time: '13:20:04', role: 'УК / Эксплуатация', actor: 'И. Громова (Диспетчер УК)', action: 'PRIVATE_NOTE_ADDED', entity: 'REQ-2041', details: 'Добавлена приватная заметка «Только для УК» (скрыта от арендатора RLS).', level: 'info' },
+        { id: 'AUD-9007', time: '12:40:18', role: 'Шина СКУД (ACL)', actor: 'Адаптер СКУД', action: 'PASS_ACK_ACTIVE', entity: 'QR-2611-0906', details: 'СКУД подтвердил пропуск Белозёровой О.Д. (VIP) за 0.7с.', level: 'ok' },
+        { id: 'AUD-9006', time: '11:45:03', role: 'УК / Эксплуатация', actor: 'Ковалёв С. (Инженер УК)', action: 'SLA_PAUSED', entity: 'REQ-2047', details: 'Поставлена валидная пауза SLA: «Ожидание доступа в офис».', level: 'warn' },
+        { id: 'AUD-9005', time: '11:12:44', role: 'Арендатор', actor: 'Е. Морозова (Администратор арендатора)', action: 'PASS_REVOKED', entity: 'QR-2611-0904', details: 'Пропуск Кузнецовой Н.И. отозван в СКУД за 12 сек.', level: 'warn' },
+        { id: 'AUD-9004', time: '10:22:19', role: 'Охрана (КПП)', actor: 'С. Петров (Старший смены КПП)', action: 'PARKING_FACT_IN', entity: 'PK-501 (A-12)', details: 'Зафиксирован фактический въезд авто А123ВС777 на этаж P1.', level: 'ok' },
+        { id: 'AUD-9003', time: '10:15:02', role: 'Арендатор', actor: 'Д. Волков (Сотрудник арендатора)', action: 'PASS_ISSUED_DELEGATED', entity: 'QR-2611-0902', details: 'Оформлен делегированный разовый QR-пропуск (Коновалов А.С.).', level: 'info' },
+        { id: 'AUD-9002', time: '09:42:10', role: 'УК / Эксплуатация', actor: 'И. Громова (Диспетчер УК)', action: 'REQUEST_CLOSED', entity: 'REQ-2043', details: 'Заявка ООО «Норд Логистик» закрыта в рамках SLA.', level: 'ok' },
+        { id: 'AUD-9001', time: '08:28:11', role: 'Охрана (КПП)', actor: 'С. Петров (Старший смены КПП)', action: 'PARKING_FACT_IN', entity: 'PK-506 (A-10)', details: 'Зафиксирован фактический въезд авто О505ОО977 (ГК «Атлант Финанс»).', level: 'ok' },
+      ],
+
+      tempUploadedFile: null,
+      selectedUkReqId: null,
+    };
+
+    // =========================================================================
+    // 3. HELPERS & PERMISSIONS
+    // =========================================================================
+    function nowTimeStr() {
+      return new Date().toTimeString().split(' ')[0];
+    }
+
+    function canManageCorporateQuota() {
+      if (state.account === 'master') return true;
+      if (state.account === 'tenant' && state.tenantSubRole === 'admin') return true;
+      return false;
+    }
+
+    function getTenantQuotaInfo() {
+      const myBookings = state.parkingBookings.filter(b => b.tenantId === state.currentTenant.id);
+      const used = state.currentTenant.monthlyQuotaBaseUsed + myBookings.length;
+      const total = state.currentTenant.monthlyQuotaTotal;
+      const remaining = Math.max(0, total - used);
+      const physicalOnSite = state.parkingBookings.filter(b => b.physicalStatus === 'На территории (Факт)').length;
+      const tenantPhysicalOnSite = myBookings.filter(b => b.physicalStatus === 'На территории (Факт)').length;
+      return { used, total, remaining, myBookings, physicalOnSite, tenantPhysicalOnSite };
+    }
+
+    function addAudit(role, actor, action, entity, details, level = 'info') {
+      const nextNum = 9001 + state.auditLog.length;
+      state.auditLog.unshift({
+        id: `AUD-${nextNum}`,
+        time: nowTimeStr(),
+        role,
+        actor,
+        action,
+        entity,
+        details,
+        level,
+      });
+    }
+
+    function showToast(title, message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const colors = { success: '#10B981', error: '#FF441F', warn: '#F59E0B', info: '#00C2E8' };
+      const el = document.createElement('div');
+      el.className = 'toast-enter pointer-events-auto l-card p-3.5 flex items-start gap-3 shadow-xl';
+      el.style.borderLeft = `4px solid ${colors[type] || colors.info}`;
+      el.innerHTML = `
+        <span class="w-2.5 h-2.5 rounded-full mt-1 shrink-0" style="background-color: ${colors[type] || colors.info};"></span>
+        <div class="text-xs leading-relaxed">
+          <div class="font-bold text-[13px] l-text-main">${title}</div>
+          <div class="l-text-muted mt-0.5">${message}</div>
+        </div>
+      `;
+      container.appendChild(el);
+      setTimeout(() => {
+        el.style.opacity = '0';
+        el.style.transition = 'opacity 0.25s ease';
+        setTimeout(() => el.remove(), 260);
+      }, 4200);
+    }
+
+    function getPassStatusBadge(status) {
+      const map = {
+        PENDING_SYNC: `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold rounded-md bg-amber-500/15 text-amber-600 border border-amber-500/30"><span class="w-2 h-2 rounded-full bg-amber-500 animate-dot"></span>PENDING_SYNC</span>`,
+        ACTIVE: `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold rounded-md bg-emerald-500/15 text-emerald-600 border border-emerald-500/30"><span class="w-2 h-2 rounded-full bg-emerald-500"></span>ACTIVE · СКУД OK</span>`,
+        USED: `<span class="inline-flex items-center px-2.5 py-1 text-[11px] font-semibold rounded-md l-subtle l-text-muted">Проход выполнен</span>`,
+        REVOKED: `<span class="inline-flex items-center px-2.5 py-1 text-[11px] font-semibold rounded-md l-subtle l-text-muted line-through">REVOKED</span>`,
+        FAILED: `<span class="inline-flex items-center px-2.5 py-1 text-[11px] font-bold rounded-md bg-[#FF441F]/15 text-[#FF441F] border border-[#FF441F]/30">FAILED · Ошибка СКУД</span>`,
+        REVOKE_FAILED: `<span class="inline-flex items-center px-2.5 py-1 text-[11px] font-extrabold rounded-md bg-[#FF441F] text-white animate-pulse">REVOKE_FAILED!</span>`,
+      };
+      return map[status] || status;
+    }
+
+    function getRequestStatusBadge(status) {
+      const map = {
+        'Новая': `<span class="px-2.5 py-1 text-[11px] font-bold rounded-md bg-[#00C2E8]/15 text-[#00A5C7]">Новая</span>`,
+        'В работе': `<span class="px-2.5 py-1 text-[11px] font-bold rounded-md bg-emerald-500/15 text-emerald-600">В работе</span>`,
+        'Пауза SLA': `<span class="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-bold rounded-md bg-amber-500/15 text-amber-600">⏸ Пауза SLA</span>`,
+        'Выполнена': `<span class="px-2.5 py-1 text-[11px] font-semibold rounded-md l-subtle l-text-muted">Выполнена</span>`,
+      };
+      return map[status] || status;
+    }
+
+    // =========================================================================
+    // 4. HEADER, THEME TOGGLE & ACCOUNT SWITCHING (RBAC)
+    // =========================================================================
+    function toggleTheme() {
+      state.theme = state.theme === 'lovit-light' ? 'lovit-dark' : 'lovit-light';
+      document.documentElement.setAttribute('data-theme', state.theme);
+      updateThemeIcon();
+    }
+
+    function updateThemeIcon() {
+      const iconWrap = document.getElementById('theme-toggle-icon');
+      if (!iconWrap) return;
+      if (state.theme === 'lovit-light') {
+        iconWrap.innerHTML = `<svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>`;
+      } else {
+        iconWrap.innerHTML = `<svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>`;
+      }
+    }
+
+    function toggleAccountDropdown() {
+      state.accountMenuOpen = !state.accountMenuOpen;
+      const dd = document.getElementById('account-dropdown');
+      if (dd) dd.classList.toggle('hidden', !state.accountMenuOpen);
+    }
+
+    function switchAccount(accId) {
+      if (!ACCOUNTS[accId]) return;
+      state.account = accId;
+      state.accountMenuOpen = false;
+      const dd = document.getElementById('account-dropdown');
+      if (dd) dd.classList.add('hidden');
+
+      // Enforce RBAC tab restriction: if current tab not allowed, switch to first allowed tab
+      const allowed = ACCOUNTS[accId].allowedTabs;
+      if (!allowed.includes(state.activeTab)) {
+        state.activeTab = allowed[0];
+      }
+
+      showToast(
+        `Аккаунт: ${ACCOUNTS[accId].title}`,
+        `Пользователь: ${ACCOUNTS[accId].userName}. Доступно разделов: ${allowed.length}.`,
+        'info'
+      );
+      render();
+    }
+
+    function switchTab(tabId) {
+      const allowed = ACCOUNTS[state.account].allowedTabs;
+      if (!allowed.includes(tabId)) return;
+      state.activeTab = tabId;
+      render();
+    }
+
+    function toggleAcsConnection() {
+      if (state.account !== 'master') return;
+      state.acsOnline = !state.acsOnline;
+      if (!state.acsOnline) {
+        addAudit('Мастер-администратор', 'А. Соколов', 'ACS_LINK_LOST', 'СКУД ACL', 'Симулирован обрыв канала СКУД (Offline). Активирован аварийный режим.', 'error');
+        showToast('СКУД: Обрыв связи (Offline)', 'Новые пропуска получат FAILED. Отзыв вызовет SignalR-алерт REVOKE_FAILED на КПП.', 'error');
+      } else {
+        addAudit('Мастер-администратор', 'А. Соколов', 'ACS_LINK_RESTORED', 'СКУД ACL', 'Связь с адаптером СКУД восстановлена (Online).', 'ok');
+        showToast('СКУД: Связь восстановлена (Online)', 'Канал в норме. Можно запустить сверку Reconciliation в контуре ИБ.', 'success');
+      }
+      render();
+    }
+
+    function renderHeader() {
+      const acc = ACCOUNTS[state.account];
+
+      // 1. Account trigger button
+      const trigger = document.getElementById('account-trigger-btn');
+      trigger.innerHTML = `
+        <span class="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-extrabold text-white shrink-0" style="background-color: ${acc.color};">${acc.initials}</span>
+        <div class="text-left leading-tight hidden sm:block">
+          <div class="text-xs font-bold l-text-main">${acc.title}</div>
+          <div class="text-[10px] l-text-muted">${acc.userName}</div>
+        </div>
+        <svg class="w-4 h-4 l-text-muted ml-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+      `;
+
+      // 2. Account dropdown items
+      const ddList = document.getElementById('account-dropdown-list');
+      ddList.innerHTML = Object.values(ACCOUNTS).map(a => {
+        const isActive = a.id === state.account;
+        return `
+          <button
+            type="button"
+            onclick="switchAccount('${a.id}')"
+            class="w-full flex items-center gap-2.5 p-2 rounded-lg text-left transition-colors cursor-pointer ${isActive ? 'l-subtle border-[#FF441F]' : 'hover:bg-black/5 dark:hover:bg-white/5'}"
+          >
+            <span class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-extrabold text-white shrink-0" style="background-color: ${a.color};">${a.initials}</span>
+            <div class="flex-1 min-w-0">
+              <div class="text-xs font-bold l-text-main flex items-center justify-between gap-1">
+                <span class="truncate">${a.title}</span>
+                ${isActive ? `<span class="text-[10px] font-bold text-[#FF441F]">● Активен</span>` : ''}
+              </div>
+              <div class="text-[11px] l-text-muted truncate">${a.userName} · ${a.allowedTabs.length} вкл.</div>
+            </div>
+          </button>
+        `;
+      }).join('');
+
+      // 3. Master-only ACS Simulation Toggle
+      const acsBtn = document.getElementById('btn-toggle-acs');
+      if (state.account === 'master') {
+        acsBtn.classList.remove('hidden');
+        acsBtn.classList.add('inline-flex');
+        if (state.acsOnline) {
+          acsBtn.style.backgroundColor = 'rgba(16, 185, 129, 0.14)';
+          acsBtn.style.color = '#10B981';
+          acsBtn.style.border = '1px solid rgba(16, 185, 129, 0.35)';
+          acsBtn.innerHTML = `<span class="w-2 h-2 rounded-full bg-[#10B981] animate-dot"></span><span>СКУД: Online · Симуляция</span>`;
+        } else {
+          acsBtn.style.backgroundColor = '#FF441F';
+          acsBtn.style.color = '#FFFFFF';
+          acsBtn.style.border = '1px solid #FF441F';
+          acsBtn.innerHTML = `<span class="w-2 h-2 rounded-full bg-white animate-dot"></span><span>СКУД: OFFLINE · Включить</span>`;
+        }
+      } else {
+        acsBtn.classList.add('hidden');
+        acsBtn.classList.remove('inline-flex');
+      }
+
+      // 4. Role-filtered Navigation Tabs
+      const nav = document.getElementById('workspace-tabs');
+      const openReqs = state.requests.filter(r => r.status !== 'Выполнена').length;
+      const activeAlerts = state.signalRAlerts.filter(a => !a.resolved).length;
+
+      nav.innerHTML = acc.allowedTabs.map(tabId => {
+        const meta = TAB_META[tabId];
+        const active = state.activeTab === tabId;
+        let badgeHtml = '';
+        if (tabId === 'uk') {
+          badgeHtml = `<span class="px-1.5 py-0.5 text-[10px] font-bold rounded tabular-nums" style="background-color: var(--accent-primary-soft); color: var(--accent-primary);">${openReqs}</span>`;
+        } else if (tabId === 'security' && (activeAlerts > 0 || !state.acsOnline)) {
+          badgeHtml = `<span class="px-1.5 py-0.5 text-[10px] font-extrabold rounded bg-[#FF441F] text-white animate-pulse">${activeAlerts > 0 ? activeAlerts : 'OFF'}</span>`;
+        } else if (tabId === 'audit') {
+          badgeHtml = `<span class="px-1.5 py-0.5 text-[10px] font-mono font-bold rounded tabular-nums" style="background-color: var(--accent-secondary-soft); color: var(--accent-secondary);">${state.auditLog.length}</span>`;
+        }
+
+        return `
+          <button
+            type="button"
+            onclick="switchTab('${tabId}')"
+            class="l-seg-btn px-3.5 py-2 text-xs sm:text-sm cursor-pointer flex items-center gap-2 ${active ? 'active' : ''}"
+          >
+            ${meta.icon}
+            <span>${meta.label}</span>
+            ${badgeHtml}
+          </button>
+        `;
+      }).join('');
+
+      // 5. Right live caption
+      const cap = document.getElementById('acs-status-caption');
+      if (state.acsOnline) {
+        cap.innerHTML = `<span class="w-2 h-2 rounded-full bg-[#10B981]"></span><span>СКУД Online · RLS: ${acc.title}</span>`;
+      } else {
+        cap.innerHTML = `<span class="w-2 h-2 rounded-full bg-[#FF441F] animate-dot"></span><span class="text-[#FF441F] font-bold">АВАРИЙНЫЙ РЕЖИМ OFFLINE</span>`;
+      }
+    }
+
+    // Close dropdown on outside click
+    document.addEventListener('click', (e) => {
+      const wrap = document.getElementById('account-menu-wrapper');
+      if (state.accountMenuOpen && wrap && !wrap.contains(e.target)) {
+        state.accountMenuOpen = false;
+        const dd = document.getElementById('account-dropdown');
+        if (dd) dd.classList.add('hidden');
+      }
+    });
+
+    // =========================================================================
+    // 5. TAB 1: КАБИНЕТ АРЕНДАТОРА (RUSSIAN ROLES ONLY)
+    // =========================================================================
+    function renderTenantTab() {
+      const isAdmin = state.account === 'master' || state.tenantSubRole === 'admin';
+      const myPasses = state.passes.filter(p => p.tenantId === state.currentTenant.id);
+      const myRequests = state.requests.filter(r => r.tenantId === state.currentTenant.id);
+      const pk = getTenantQuotaInfo();
+
+      const activeCount = myPasses.filter(p => p.status === 'ACTIVE').length;
+      const pendingCount = myPasses.filter(p => p.status === 'PENDING_SYNC').length;
+      const failedCount = myPasses.filter(p => p.status === 'FAILED' || p.status === 'REVOKE_FAILED').length;
+
+      return `
+        <div class="space-y-6">
+          <!-- Workspace Header & Russian Sub-role Switcher -->
+          <div class="l-card p-4 sm:p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+            <div>
+              <div class="text-[11px] font-bold uppercase tracking-widest l-text-muted">КАБИНЕТ АРЕНДАТОРА (WEB/PWA)</div>
+              <div class="flex items-center gap-2.5 mt-1 flex-wrap">
+                <h1 class="text-xl font-extrabold l-text-main">${state.currentTenant.name}</h1>
+                <span class="px-2 py-0.5 text-[11px] font-mono l-subtle l-text-muted">${state.currentTenant.floor}</span>
+              </div>
+              <div class="text-xs l-text-muted mt-1">
+                Текущий профиль: <strong class="l-text-main">${isAdmin ? 'Администратор арендатора (Офис-менеджер, Е. Морозова)' : 'Сотрудник арендатора (Д. Волков)'}</strong>
+              </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+              <!-- Russian-only Sub-role Switcher -->
+              <div class="l-seg-track inline-flex text-xs">
+                <button type="button" onclick="setTenantSubRole('admin')" class="l-seg-btn px-3 py-1.5 cursor-pointer ${isAdmin ? 'active' : ''}">
+                  Администратор арендатора
+                </button>
+                <button type="button" onclick="setTenantSubRole('employee')" class="l-seg-btn px-3 py-1.5 cursor-pointer ${!isAdmin ? 'active' : ''}">
+                  Сотрудник арендатора
+                </button>
+              </div>
+
+              ${isAdmin ? `
+                <label class="inline-flex items-center gap-2 px-3 py-1.5 l-subtle cursor-pointer select-none">
+                  <input type="checkbox" ${state.delegationEnabled ? 'checked' : ''} onchange="toggleDelegation(this.checked)" class="w-4 h-4 accent-[#FF441F] cursor-pointer" />
+                  <span class="text-xs font-semibold l-text-main">Делегирование сотрудникам</span>
+                </label>
+              ` : ''}
+            </div>
+          </div>
+
+          <!-- Lovit Vibrant Hero Metric Cards -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="p-5 sm:p-6 rounded-[14px] text-white flex flex-col justify-between shadow-sm" style="background-color: #FF441F;">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <div class="text-[11px] font-bold uppercase tracking-widest opacity-85">ГОСТЕВЫЕ ПРОПУСКА КОМПАНИИ</div>
+                  <div class="text-3xl sm:text-4xl font-extrabold mt-2 tabular-nums">${activeCount} <span class="text-base font-semibold opacity-90">активных QR</span></div>
+                </div>
+                <span class="px-2.5 py-1 rounded-md bg-white/20 text-xs font-bold">СКУД ACL</span>
+              </div>
+              <div class="grid grid-cols-3 gap-3 mt-5 pt-4 border-t border-white/25 text-xs">
+                <div><div class="opacity-80">Подтверждено</div><div class="text-lg font-extrabold tabular-nums mt-0.5">${activeCount}</div></div>
+                <div><div class="opacity-80">В синхронизации</div><div class="text-lg font-extrabold tabular-nums mt-0.5">${pendingCount}</div></div>
+                <div><div class="opacity-80">Ошибки СКУД</div><div class="text-lg font-extrabold tabular-nums mt-0.5">${failedCount}</div></div>
+              </div>
+            </div>
+
+            <div class="p-5 sm:p-6 rounded-[14px] text-white flex flex-col justify-between shadow-sm" style="background-color: #00C2E8;">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <div class="text-[11px] font-bold uppercase tracking-widest opacity-90">ПАРКОВКА · КВОТА И ФАКТ КПП</div>
+                  <div class="text-3xl sm:text-4xl font-extrabold mt-2 tabular-nums">${pk.used} <span class="text-base font-semibold opacity-90">/ ${pk.total} мест</span></div>
+                </div>
+                <button type="button" onclick="switchTab('parking')" class="px-3 py-1 rounded-md bg-white/20 hover:bg-white/30 text-xs font-bold cursor-pointer transition-colors">
+                  Схема P1 →
+                </button>
+              </div>
+              <div class="grid grid-cols-3 gap-3 mt-5 pt-4 border-t border-white/25 text-xs">
+                <div><div class="opacity-85">Остаток квоты</div><div class="text-lg font-extrabold tabular-nums mt-0.5">${pk.remaining}</div></div>
+                <div><div class="opacity-85">Броней сегодня</div><div class="text-lg font-extrabold tabular-nums mt-0.5">${pk.myBookings.length}</div></div>
+                <div><div class="opacity-85">Факт на КПП</div><div class="text-lg font-extrabold tabular-nums mt-0.5">${pk.tenantPhysicalOnSite} авто</div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Main Two-Column Grid -->
+          <div class="grid grid-cols-1 xl:grid-cols-12 gap-6">
+            <!-- Left (7 cols): Guest Pass Form & Registry -->
+            <div class="xl:col-span-7 space-y-5">
+              ${(!isAdmin && !state.delegationEnabled) ? `
+                <div class="l-card p-6 text-center">
+                  <div class="w-12 h-12 rounded-full mx-auto mb-3 flex items-center justify-center" style="background-color: var(--accent-primary-soft); color: var(--accent-primary);">
+                    <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                  </div>
+                  <h2 class="text-base font-extrabold l-text-main">Оформление пропусков сотрудниками отключено</h2>
+                  <p class="text-xs l-text-muted mt-1.5 max-w-md mx-auto">
+                    Администратор арендатора (Е. Морозова) выключил делегирование. Вы можете просматривать схему парковки P1 или обратиться к офис-менеджеру.
+                  </p>
+                  <button type="button" onclick="switchTab('parking')" class="l-btn-emerald mt-4 px-4 py-2 text-xs cursor-pointer">
+                    Открыть схему парковки P1
+                  </button>
+                </div>
+              ` : `
+                <div class="l-card p-5">
+                  <div class="flex items-center justify-between mb-4">
+                    <div>
+                      <div class="text-[11px] font-bold uppercase tracking-widest l-text-muted">ОФОРМЛЕНИЕ ПРОПУСКА</div>
+                      <h2 class="text-base font-extrabold l-text-main mt-0.5">Новый гостевой QR-пропуск</h2>
+                    </div>
+                    <span class="px-2 py-1 text-[11px] font-mono l-subtle l-text-muted">Outbox → СКУД</span>
+                  </div>
+
+                  <form onsubmit="handleCreatePass(event)" class="space-y-3.5">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label class="block text-xs font-semibold l-text-muted mb-1">ФИО гостя *</label>
+                        <input id="pass-name" type="text" required placeholder="Орлов Алексей Дмитриевич" class="l-input w-full px-3.5 py-2.5 text-sm" />
+                      </div>
+                      <div>
+                        <label class="block text-xs font-semibold l-text-muted mb-1">Телефон *</label>
+                        <input id="pass-phone" type="tel" required placeholder="+7 (999) 123-45-67" class="l-input w-full px-3.5 py-2.5 text-sm" />
+                      </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 items-end">
+                      <div>
+                        <label class="block text-xs font-semibold l-text-muted mb-1">Госномер авто (опционально)</label>
+                        <input id="pass-plate" type="text" placeholder="А777МР799" class="l-input w-full px-3.5 py-2.5 text-sm uppercase font-mono" />
+                      </div>
+                      ${isAdmin ? `
+                        <label class="flex items-center gap-2.5 px-3.5 py-2.5 l-subtle cursor-pointer select-none">
+                          <input id="pass-vip" type="checkbox" class="w-4 h-4 accent-[#FF441F] cursor-pointer" />
+                          <span class="text-xs font-semibold l-text-main">Отметить как VIP-визит (алерт на КПП)</span>
+                        </label>
+                      ` : `
+                        <div class="px-3.5 py-2.5 l-subtle text-xs l-text-muted">Разовый гостевой QR (делегированный доступ)</div>
+                      `}
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
+                      <span class="text-[11px] l-text-muted">152-ФЗ: паспортные данные не собираются</span>
+                      <button type="submit" class="l-btn-primary px-5 py-2.5 text-sm cursor-pointer">
+                        Выдать пропуск в СКУД
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              `}
+
+              <!-- Passes Registry -->
+              <div class="l-card p-5">
+                <div class="flex items-center justify-between mb-4">
+                  <div class="text-[11px] font-bold uppercase tracking-widest l-text-muted">ПРОПУСКА ООО «ТЕХНОВЕКТОР» (${myPasses.length})</div>
+                </div>
+                <div class="space-y-3">
+                  ${myPasses.map(p => `
+                    <div class="p-4 l-subtle flex flex-col gap-3">
+                      <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-2">
+                        <div>
+                          <div class="flex items-center gap-2 flex-wrap">
+                            <span class="text-sm font-bold l-text-main">${p.guestName}</span>
+                            ${p.isVip ? `<span class="px-1.5 py-0.5 text-[10px] font-extrabold rounded bg-amber-500/20 text-amber-600">VIP</span>` : ''}
+                            ${p.plate ? `<span class="px-2 py-0.5 text-[11px] font-mono font-bold rounded l-card">${p.plate}</span>` : ''}
+                          </div>
+                          <div class="text-xs l-text-muted mt-1">${p.id} · ${p.phone} · ${p.acsAckTime}</div>
+                        </div>
+                        <div>${getPassStatusBadge(p.status)}</div>
+                      </div>
+
+                      ${p.status === 'FAILED' ? `
+                        <div class="text-xs text-[#FF441F] font-medium">
+                          Сбой синхронизации со СКУД — активный QR заблокирован. Повторите отправку или обратитесь на КПП.
+                        </div>
+                      ` : ''}
+
+                      <div class="flex items-center justify-between gap-2 flex-wrap pt-2 border-t l-border">
+                        <span class="text-[11px] l-text-muted">Оформил: ${p.createdBy}</span>
+                        <div class="flex items-center gap-2">
+                          ${p.status === 'ACTIVE' ? `
+                            <button type="button" onclick="openQrModal('${p.id}')" class="l-btn-primary px-3.5 py-1.5 text-xs cursor-pointer">Открыть QR</button>
+                            ${isAdmin ? `<button type="button" onclick="revokePass('${p.id}', 'Администратор арендатора')" class="l-btn-outline px-3 py-1.5 text-xs cursor-pointer">Отозвать</button>` : ''}
+                          ` : ''}
+                          ${p.status === 'FAILED' ? `
+                            <button type="button" onclick="retryPassSync('${p.id}')" class="l-btn-dark px-3 py-1.5 text-xs cursor-pointer">Повторить</button>
+                          ` : ''}
+                        </div>
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            </div>
+
+            <!-- Right (5 cols): Corporate Service Requests (Admin only for creation) -->
+            <div class="xl:col-span-5 space-y-5">
+              ${isAdmin ? `
+                <div class="l-card p-5">
+                  <div class="text-[11px] font-bold uppercase tracking-widest l-text-muted">ЗАЯВКИ В УК</div>
+                  <h2 class="text-base font-extrabold l-text-main mt-0.5 mb-4">Создать корпоративную заявку</h2>
+                  <form onsubmit="handleCreateRequest(event)" class="space-y-3">
+                    <div>
+                      <label class="block text-xs font-semibold l-text-muted mb-1">Категория</label>
+                      <select id="req-category" class="l-input w-full px-3 py-2.5 text-sm">
+                        <option>Климат / Фанкойл</option>
+                        <option>Электрика</option>
+                        <option>Освещение</option>
+                        <option>Клининг</option>
+                        <option>СКУД / Дверь</option>
+                        <option>Сантехника</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label class="block text-xs font-semibold l-text-muted mb-1">Описание проблемы *</label>
+                      <textarea id="req-desc" rows="2" required placeholder="Укажите переговорную или кабинет и суть проблемы..." class="l-input w-full px-3 py-2 text-sm"></textarea>
+                    </div>
+                    <div>
+                      ${state.tempUploadedFile ? `
+                        <div class="p-2.5 l-subtle flex items-center justify-between text-xs">
+                          <span class="font-semibold l-text-main">📎 ${state.tempUploadedFile.name} <span class="l-text-muted">(S3 · 5 мин)</span></span>
+                          <button type="button" onclick="clearTempFile()" class="text-[#FF441F] font-bold px-1.5 cursor-pointer">✕</button>
+                        </div>
+                      ` : `
+                        <button type="button" onclick="simulateS3Upload()" class="l-btn-outline w-full py-2 text-xs cursor-pointer">
+                          + Прикрепить фото (Приватный S3 РФ)
+                        </button>
+                      `}
+                    </div>
+                    <button type="submit" class="l-btn-dark w-full py-2.5 text-sm cursor-pointer">
+                      Отправить заявку в УК
+                    </button>
+                  </form>
+                </div>
+              ` : `
+                <div class="l-card p-5">
+                  <div class="text-[11px] font-bold uppercase tracking-widest l-text-muted">КОРПОРАТИВНЫЕ ЗАЯВКИ В УК</div>
+                  <p class="text-xs l-text-muted mt-2 leading-relaxed">
+                    Создание заявок по офису доступно только <strong>Администратору арендатора</strong> (для исключения дублей в диспетчерской УК). Ниже отображаются текущие статусы заявок вашей компании.
+                  </p>
+                </div>
+              `}
+
+              <!-- Tenant Requests (External SLA only, Private UK notes hidden) -->
+              <div class="l-card p-5">
+                <div class="text-[11px] font-bold uppercase tracking-widest l-text-muted mb-3">ЗАЯВКИ КОМПАНИИ · ВНЕШНИЙ SLA (${myRequests.length})</div>
+                <div class="space-y-3">
+                  ${myRequests.map(r => `
+                    <div class="p-3.5 l-subtle space-y-2">
+                      <div class="flex items-start justify-between gap-2">
+                        <div>
+                          <div class="text-xs font-bold l-text-main">${r.id} · ${r.category}</div>
+                          <p class="text-xs l-text-muted mt-0.5">${r.description}</p>
+                        </div>
+                        <div class="shrink-0">${getRequestStatusBadge(r.status)}</div>
+                      </div>
+                      ${r.status === 'Пауза SLA' ? `
+                        <div class="px-2.5 py-1.5 rounded bg-amber-500/10 border border-amber-500/25 text-[11px] text-amber-600 font-medium">
+                          Причина паузы: <strong>${r.pauseReason}</strong>
+                        </div>
+                      ` : ''}
+                      <div class="flex items-center justify-between text-[11px] l-text-muted pt-1.5 border-t l-border">
+                        <span>SLA: <strong class="l-text-main">${r.slaRemaining}</strong></span>
+                        ${r.attachment ? `<span>📎 ${r.attachment.name}</span>` : ''}
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // =========================================================================
+    // 6. TAB 2: ПАРКОВКА (СХЕМА P1) — INTERACTIVE FLOOR MAP
+    // =========================================================================
+    function renderParkingTab() {
+      const pk = getTenantQuotaInfo();
+      const selected = state.parkingSlots.find(s => s.id === state.selectedSlotId) || state.parkingSlots[0];
+      const isEmployeeOnly = state.account === 'tenant' && state.tenantSubRole === 'employee';
+      const isSecurity = state.account === 'security';
+      const isUk = state.account === 'uk';
+
+      // Determine whether selected spot can be booked by current role
+      let canBookSelected = false;
+      let bookHint = '';
+      if (selected.status === 'occupied') {
+        canBookSelected = false;
+        bookHint = `Место ${selected.id} занято (${selected.company} · ${selected.plate})`;
+      } else if (isEmployeeOnly) {
+        // Employee can only book guest spots or free spots as guest
+        canBookSelected = (selected.status === 'guest' || selected.status === 'free');
+        bookHint = canBookSelected
+          ? `Выбрано место ${selected.id} (бронирование как гостевое)`
+          : `Место ${selected.id} относится к корпоративной квоте — обратитесь к Администратору арендатора`;
+      } else {
+        canBookSelected = true;
+        bookHint = `Выбрано место ${selected.id} — доступно для бронирования`;
+      }
+
+      const relevantBookings = (state.account === 'tenant')
+        ? state.parkingBookings.filter(b => b.tenantId === state.currentTenant.id)
+        : state.parkingBookings;
+
+      return `
+        <div class="space-y-6">
+          <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+            <!-- LEFT / TOP CARD (8 cols): INTERACTIVE FLOOR P1 MAP -->
+            <div class="xl:col-span-8 l-card p-5 sm:p-6">
+              <div class="flex flex-wrap items-start justify-between gap-3 mb-5">
+                <div>
+                  <div class="text-[11px] font-bold uppercase tracking-widest" style="color: var(--accent-emerald);">ПАРКОВКА</div>
+                  <h1 class="text-xl sm:text-2xl font-extrabold l-text-main mt-0.5">Схема этажа P1</h1>
+                </div>
+                <div class="flex items-center gap-2 text-xs font-semibold ${state.acsOnline ? 'text-emerald-600' : 'text-[#FF441F]'}">
+                  <span class="w-2 h-2 rounded-full ${state.acsOnline ? 'bg-emerald-500 animate-dot' : 'bg-[#FF441F] animate-dot'}"></span>
+                  <span>${state.acsOnline ? 'В реальном времени' : 'Аварийный режим КПП'}</span>
+                </div>
+              </div>
+
+              <!-- Map Frame with Entrance / Grid (4x5) / Exit -->
+              <div class="p-4 sm:p-6 rounded-2xl border l-border" style="background-color: var(--bg-subtle);">
+                <div class="flex items-center gap-3 sm:gap-5">
+                  <!-- Left Vertical Entrance Badge -->
+                  <div class="hidden sm:flex items-center justify-center w-9 h-28 rounded-lg shrink-0 font-bold text-[11px] l-text-muted border l-border" style="background-color: var(--bg-muted);">
+                    <span class="vertical-label">ВЪЕЗД</span>
+                  </div>
+
+                  <!-- 4x5 Interactive Parking Grid -->
+                  <div class="flex-1 grid grid-cols-2 sm:grid-cols-5 gap-2.5 sm:gap-3">
+                    ${state.parkingSlots.map(slot => {
+                      const isSel = slot.id === state.selectedSlotId;
+                      return `
+                        <button
+                          type="button"
+                          onclick="selectParkingSlot('${slot.id}')"
+                          class="p-slot status-${slot.status} ${isSel ? 'is-selected' : ''} py-4 px-2 text-center cursor-pointer flex flex-col items-center justify-center"
+                        >
+                          <div class="p-slot-bar"></div>
+                          <div class="text-xs sm:text-[13px] font-bold tabular-nums">${slot.id}</div>
+                          ${slot.plate ? `<div class="text-[9px] font-mono opacity-80 mt-1 truncate max-w-full">${slot.plate}</div>` : `<div class="text-[9px] opacity-65 mt-1">${slot.status === 'quota' ? 'Квота' : slot.status === 'guest' ? 'Гость' : 'Свободно'}</div>`}
+                        </button>
+                      `;
+                    }).join('')}
+                  </div>
+
+                  <!-- Right Vertical Exit Badge -->
+                  <div class="hidden sm:flex items-center justify-center w-9 h-28 rounded-lg shrink-0 font-bold text-[11px] l-text-muted border l-border" style="background-color: var(--bg-muted);">
+                    <span class="vertical-label">ВЫЕЗД</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Legend + Selected Slot Inspector -->
+              <div class="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div class="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs l-text-muted">
+                  <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm border" style="background-color: var(--slot-free-bg); border-color: var(--slot-free-border);"></span>Свободно</span>
+                  <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm" style="background-color: var(--slot-occ-bar);"></span>Занято</span>
+                  <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm" style="background-color: var(--slot-quota-bar);"></span>Ваша квота</span>
+                  <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm" style="background-color: var(--slot-guest-bar);"></span>Гостевое место</span>
+                </div>
+                <div class="text-xs font-medium l-text-main">
+                  ${bookHint}
+                </div>
+              </div>
+
+              <!-- Separate Accounting Strip (Bookings != Physical KPP) -->
+              <div class="mt-5 pt-4 border-t l-border grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="p-3 l-subtle">
+                  <div class="text-[10px] font-bold uppercase tracking-wider l-text-muted">Всего в БЦ (P1–P3)</div>
+                  <div class="text-lg font-extrabold l-text-main mt-0.5 tabular-nums">${state.buildingParkingTotal} мест</div>
+                </div>
+                <div class="p-3 l-subtle">
+                  <div class="text-[10px] font-bold uppercase tracking-wider l-text-muted">Фактически на территории (КПП)</div>
+                  <div class="text-lg font-extrabold mt-0.5 tabular-nums text-[#00C2E8]">${state.buildingParkingBasePhysical + pk.physicalOnSite} авто</div>
+                </div>
+                <div class="p-3 l-subtle">
+                  <div class="text-[10px] font-bold uppercase tracking-wider l-text-muted">Операционный буфер (5%)</div>
+                  <div class="text-lg font-extrabold mt-0.5 tabular-nums text-emerald-600">${state.parkingBufferTotal - state.parkingBufferUsed} / ${state.parkingBufferTotal} своб.</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- RIGHT / BOTTOM CARD (4 cols): QUOTA, BOOK BUTTON & UPCOMING BOOKINGS -->
+            <div class="xl:col-span-4 l-card p-5 sm:p-6 space-y-5">
+              <!-- Quota Counter -->
+              <div>
+                <div class="text-[11px] font-bold uppercase tracking-widest" style="color: var(--accent-emerald);">
+                  ${(isUk || isSecurity) ? 'КВОТА АРЕНДАТОРА (ТЕХНОВЕКТОР)' : 'ВАША КВОТА'}
+                </div>
+                <div class="flex items-baseline gap-1.5 mt-2">
+                  <span class="text-4xl font-extrabold l-text-main tabular-nums">${pk.used}</span>
+                  <span class="text-lg font-bold l-text-muted tabular-nums">/ ${pk.total}</span>
+                </div>
+                <div class="text-xs l-text-muted mt-1">
+                  Осталось мест до конца месяца: <strong class="l-text-main">${pk.remaining}</strong>
+                </div>
+
+                <!-- Primary Full-Width Book Button -->
+                <button
+                  type="button"
+                  onclick="openParkingBookingModal()"
+                  ${!canBookSelected ? 'disabled' : ''}
+                  class="l-btn-emerald w-full mt-4 py-3 text-sm cursor-pointer shadow-sm"
+                >
+                  ${selected.status === 'occupied' ? `Место ${selected.id} занято` : `Забронировать место ${selected.id}`}
+                </button>
+              </div>
+
+              <!-- Upcoming Bookings List -->
+              <div class="pt-4 border-t l-border">
+                <div class="flex items-center justify-between mb-3">
+                  <h2 class="text-sm font-extrabold l-text-main">
+                    ${state.account === 'tenant' ? 'Ближайшие брони' : 'Активные брони этажа P1'}
+                  </h2>
+                  <span class="text-[11px] font-semibold l-text-muted">${relevantBookings.length} шт.</span>
+                </div>
+
+                <div class="space-y-2.5 max-h-[360px] overflow-y-auto pr-1">
+                  ${relevantBookings.map(b => `
+                    <div class="p-3 l-subtle flex items-center gap-3">
+                      <!-- Date Badge -->
+                      <div class="w-11 h-11 rounded-lg flex flex-col items-center justify-center shrink-0 leading-tight" style="background-color: var(--accent-emerald-soft); color: var(--accent-emerald);">
+                        <span class="text-sm font-extrabold tabular-nums">${b.dateDay}</span>
+                        <span class="text-[10px] font-semibold">${b.dateMonth}</span>
+                      </div>
+                      <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-1.5">
+                          <span class="text-xs font-extrabold l-text-main">${b.slotId}</span>
+                          <span class="text-[10px] font-mono px-1.5 py-0.5 rounded l-card l-text-main">${b.plate}</span>
+                        </div>
+                        <div class="text-[11px] l-text-muted truncate mt-0.5">${b.timeRange} · ${b.driverName}</div>
+                        <div class="text-[10px] mt-0.5 font-semibold ${b.physicalStatus === 'На территории (Факт)' ? 'text-emerald-600' : 'l-text-muted'}">
+                          ${b.physicalStatus}
+                        </div>
+                      </div>
+                      <div class="flex flex-col gap-1 shrink-0">
+                        ${(isSecurity || state.account === 'master') && b.physicalStatus !== 'Выехал (Факт)' ? `
+                          <button
+                            type="button"
+                            onclick="toggleParkingFact('${b.id}', '${b.physicalStatus === 'Ожидается на КПП' ? 'in' : 'out'}')"
+                            class="px-2 py-1 text-[10px] font-bold rounded cursor-pointer ${b.physicalStatus === 'Ожидается на КПП' ? 'bg-[#FF441F] text-white' : 'l-btn-dark'}"
+                          >
+                            ${b.physicalStatus === 'Ожидается на КПП' ? 'Въезд' : 'Выезд'}
+                          </button>
+                        ` : ''}
+                        ${canManageCorporateQuota() ? `
+                          <button
+                            type="button"
+                            onclick="cancelParkingBooking('${b.id}')"
+                            class="text-[11px] font-semibold text-[#FF441F] hover:underline cursor-pointer text-right"
+                            title="Отменить бронь"
+                          >
+                            Отменить
+                          </button>
+                        ` : ''}
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // =========================================================================
+    // 7. TAB 3: УК / ЭКСПЛУАТАЦИЯ (TWO-LAYER SLA + PRIVATE NOTES)
+    // =========================================================================
+    function renderUkTab() {
+      const openCount = state.requests.filter(r => r.status !== 'Выполнена').length;
+      const pausedCount = state.requests.filter(r => r.status === 'Пауза SLA').length;
+      const doneCount = state.requests.filter(r => r.status === 'Выполнена').length;
+
+      return `
+        <div class="space-y-5">
+          <!-- KPI Row -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="l-card p-5">
+              <div class="text-[11px] font-bold uppercase tracking-widest l-text-muted">ОТКРЫТЫЕ ЗАЯВКИ ПО БЦ</div>
+              <div class="text-3xl font-extrabold l-text-main mt-1.5 tabular-nums">${openCount} <span class="text-sm font-normal l-text-muted">из ${state.requests.length}</span></div>
+            </div>
+            <div class="l-card p-5">
+              <div class="text-[11px] font-bold uppercase tracking-widest l-text-muted">НА ВАЛИДНОЙ ПАУЗЕ SLA</div>
+              <div class="text-3xl font-extrabold mt-1.5 tabular-nums text-[#FF441F]">${pausedCount}</div>
+            </div>
+            <div class="l-card p-5">
+              <div class="text-[11px] font-bold uppercase tracking-widest l-text-muted">ВЫПОЛНЕНО В SLA</div>
+              <div class="text-3xl font-extrabold mt-1.5 tabular-nums text-[#00C2E8]">92% <span class="text-sm font-normal l-text-muted">(${doneCount} закр.)</span></div>
+            </div>
+          </div>
+
+          <!-- Requests Table -->
+          <div class="l-card overflow-hidden">
+            <div class="p-5 border-b l-border flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <div class="text-[11px] font-bold uppercase tracking-widest l-text-muted">ЕДИНОЕ ОКНО ДИСПЕТЧЕРСКОЙ УК</div>
+                <h2 class="text-base font-extrabold l-text-main mt-0.5">Двухслойный SLA и приватные заметки «Только для УК»</h2>
+              </div>
+              <span class="text-xs l-text-muted">Приватные заметки изолированы на уровне RLS и скрыты от арендаторов</span>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse text-sm">
+                <thead>
+                  <tr class="l-subtle text-[11px] uppercase l-text-muted border-b l-border">
+                    <th class="py-3 px-4 font-bold">ID / Арендатор</th>
+                    <th class="py-3 px-4 font-bold">Категория и описание</th>
+                    <th class="py-3 px-4 font-bold">Статус / SLA</th>
+                    <th class="py-3 px-4 font-bold">Приватные заметки</th>
+                    <th class="py-3 px-4 font-bold text-right">Действие</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y l-border">
+                  ${state.requests.map(r => `
+                    <tr>
+                      <td class="py-3.5 px-4 align-top">
+                        <div class="font-mono text-xs font-bold l-text-main">${r.id}</div>
+                        <div class="text-xs font-semibold l-text-main mt-0.5">${r.tenantName}</div>
+                        <div class="text-[11px] l-text-muted">${r.office}</div>
+                      </td>
+                      <td class="py-3.5 px-4 align-top max-w-md">
+                        <div class="text-xs font-bold text-[#FF441F]">${r.category}</div>
+                        <div class="text-xs l-text-main mt-0.5">${r.description}</div>
+                        ${r.attachment ? `<div class="mt-1.5 inline-flex items-center gap-1 px-2 py-0.5 text-[11px] l-subtle l-text-muted">📎 ${r.attachment.name} · <strong>${r.attachment.s3Badge}</strong></div>` : ''}
+                      </td>
+                      <td class="py-3.5 px-4 align-top">
+                        <div>${getRequestStatusBadge(r.status)}</div>
+                        <div class="text-xs l-text-muted mt-1.5 font-medium">${r.slaRemaining}</div>
+                        ${r.status === 'Пауза SLA' ? `<div class="text-[11px] text-amber-600 mt-0.5">${r.pauseReason}</div>` : ''}
+                      </td>
+                      <td class="py-3.5 px-4 align-top">
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold l-subtle l-text-main">
+                          🔒 ${r.privateNotes.length}
+                        </span>
+                      </td>
+                      <td class="py-3.5 px-4 align-top text-right">
+                        <button type="button" onclick="openUkReqModal('${r.id}')" class="l-btn-primary px-3.5 py-1.5 text-xs cursor-pointer">
+                          Управлять
+                        </button>
+                      </td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // =========================================================================
+    // 8. TAB 4: ПОСТ ОХРАНЫ (КПП / СБ)
+    // =========================================================================
+    function renderSecurityTab() {
+      const q = state.securitySearch.trim().toLowerCase();
+      const filteredPasses = state.passes.filter(p =>
+        !q || p.guestName.toLowerCase().includes(q) || p.tenantName.toLowerCase().includes(q) || p.id.toLowerCase().includes(q) || (p.plate && p.plate.toLowerCase().includes(q))
+      );
+      const activeAlerts = state.signalRAlerts.filter(a => !a.resolved);
+
+      return `
+        <div class="space-y-5">
+          <!-- Offline Emergency Banner -->
+          ${!state.acsOnline ? `
+            <div class="p-5 rounded-xl bg-[#FF441F] text-white shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div class="flex items-start gap-3">
+                <svg class="w-7 h-7 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                <div>
+                  <div class="text-sm sm:text-base font-extrabold uppercase tracking-wide">АВАРИЙНЫЙ РЕЖИМ OFFLINE — переход на бумажный журнал</div>
+                  <p class="text-xs sm:text-sm opacity-95 mt-1">Ранее синхронизированные пропуска работают локально в памяти контроллеров СКУД. Новые гости оформляются по аварийному регламенту СБ.</p>
+                </div>
+              </div>
+              <span class="px-3 py-1.5 rounded-lg bg-black/25 text-xs font-mono whitespace-nowrap">Локальный кэш дня активен</span>
+            </div>
+          ` : ''}
+
+          <!-- SignalR Alerts Panel (REVOKE_FAILED + VIP) -->
+          ${activeAlerts.length > 0 ? `
+            <div class="space-y-3">
+              ${activeAlerts.map(a => {
+                const isCrit = a.type === 'REVOKE_FAILED';
+                return `
+                  <div class="p-4 rounded-xl border-2 ${isCrit ? 'border-[#FF441F] bg-[#FF441F]/10' : 'border-amber-500/60 bg-amber-500/10'} flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                      <div class="flex items-center gap-2 text-xs font-extrabold ${isCrit ? 'text-[#FF441F]' : 'text-amber-600'}">
+                        <span class="w-2 h-2 rounded-full ${isCrit ? 'bg-[#FF441F] animate-ping' : 'bg-amber-500'}"></span>
+                        <span>${isCrit ? 'КРИТИЧЕСКИЙ SIGNALR-АЛЕРТ: REVOKE_FAILED' : 'ПРИОРИТЕТНОЕ УВЕДОМЛЕНИЕ: VIP-ВИЗИТ'} · ${a.time}</span>
+                      </div>
+                      <div class="text-sm font-bold l-text-main mt-1">${a.guestName} ${a.plate ? `(${a.plate})` : ''} · ${a.company || ''}</div>
+                      <div class="text-xs l-text-muted mt-0.5">${a.message}</div>
+                    </div>
+                    <button type="button" onclick="resolveSignalRAlert('${a.id}')" class="${isCrit ? 'l-btn-primary' : 'l-btn-dark'} px-4 py-2 text-xs whitespace-nowrap cursor-pointer">
+                      ${isCrit ? 'Подтвердить ручную блокировку ✓' : 'Принято в работу ✓'}
+                    </button>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          ` : ''}
+
+          <div class="grid grid-cols-1 xl:grid-cols-12 gap-6">
+            <!-- Left (7 cols): Operational Passes Registry -->
+            <div class="xl:col-span-7 l-card p-5">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                <div>
+                  <div class="text-[11px] font-bold uppercase tracking-widest l-text-muted">ПОСТ ОХРАНЫ · ≤ 2 КЛИКА</div>
+                  <h2 class="text-base font-extrabold l-text-main mt-0.5">Оперативный реестр пропусков (${filteredPasses.length})</h2>
+                </div>
+                <input
+                  type="text"
+                  value="${state.securitySearch}"
+                  oninput="setSecuritySearch(this.value)"
+                  placeholder="Поиск ФИО, компания, авто..."
+                  class="l-input px-3 py-1.5 text-xs w-full sm:w-60"
+                />
+              </div>
+
+              <div class="space-y-3">
+                ${filteredPasses.map(p => `
+                  <div class="p-4 l-subtle flex flex-col gap-2.5">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                      <div>
+                        <div class="flex items-center gap-2 flex-wrap">
+                          <span class="text-sm font-bold l-text-main">${p.guestName}</span>
+                          ${p.isVip ? `<span class="px-1.5 py-0.5 text-[10px] font-extrabold rounded bg-amber-500/20 text-amber-600">VIP</span>` : ''}
+                          ${p.plate ? `<span class="font-mono text-xs px-1.5 py-0.5 rounded l-card l-text-main">${p.plate}</span>` : ''}
+                        </div>
+                        <div class="text-xs l-text-muted mt-0.5">${p.tenantName} · <span class="font-mono">${p.id}</span></div>
+                      </div>
+                      <div>${getPassStatusBadge(p.status)}</div>
+                    </div>
+                    ${p.status === 'ACTIVE' ? `
+                      <div class="flex items-center justify-end gap-2 pt-2 border-t l-border">
+                        <button type="button" onclick="confirmPhysicalEntry('${p.id}')" class="l-btn-emerald px-3.5 py-1.5 text-xs cursor-pointer">Подтвердить проход</button>
+                        <button type="button" onclick="revokePass('${p.id}', 'Пост охраны (КПП)')" class="l-btn-outline px-3 py-1.5 text-xs cursor-pointer">Отозвать</button>
+                      </div>
+                    ` : ''}
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+
+            <!-- Right (5 cols): 1-Click Parking KPP Check-in/out -->
+            <div class="xl:col-span-5 l-card p-5 h-fit">
+              <div class="text-[11px] font-bold uppercase tracking-widest l-text-muted">КПП ПАРКОВКИ · ФАКТИЧЕСКАЯ ЗАНЯТОСТЬ</div>
+              <h2 class="text-base font-extrabold l-text-main mt-0.5 mb-4">Фиксация въезда / выезда (1 клик)</h2>
+              <div class="space-y-3">
+                ${state.parkingBookings.map(b => `
+                  <div class="p-3.5 l-subtle flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                      <div class="flex items-center gap-2">
+                        <span class="font-mono font-extrabold text-xs l-text-main px-2 py-0.5 rounded l-card">${b.plate}</span>
+                        <span class="text-xs font-bold l-text-main">${b.slotId}</span>
+                        <span class="text-xs l-text-muted">${b.driverName}</span>
+                      </div>
+                      <div class="text-[11px] l-text-muted mt-1">
+                        ${b.tenantName} · <strong class="${b.physicalStatus === 'На территории (Факт)' ? 'text-emerald-600' : 'l-text-main'}">${b.physicalStatus}</strong>
+                      </div>
+                    </div>
+                    <div>
+                      ${b.physicalStatus === 'Ожидается на КПП' ? `
+                        <button type="button" onclick="toggleParkingFact('${b.id}', 'in')" class="l-btn-primary px-3 py-2 text-xs whitespace-nowrap cursor-pointer">Зафиксировать въезд</button>
+                      ` : b.physicalStatus === 'На территории (Факт)' ? `
+                        <button type="button" onclick="toggleParkingFact('${b.id}', 'out')" class="l-btn-dark px-3 py-2 text-xs whitespace-nowrap cursor-pointer">Зафиксировать выезд</button>
+                      ` : `
+                        <span class="text-xs l-text-muted font-semibold">Выехал</span>
+                      `}
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // =========================================================================
+    // 9. TAB 5: АУДИТ И СКУД (ИБ)
+    // =========================================================================
+    function renderAuditTab() {
+      const failedCount = state.passes.filter(p => p.status === 'FAILED' || p.status === 'REVOKE_FAILED').length;
+      return `
+        <div class="space-y-5">
+          <!-- Top Monitoring Cards -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="l-card p-5 flex flex-col justify-between">
+              <div>
+                <div class="text-[11px] font-bold uppercase tracking-widest l-text-muted">КАНАЛ СКУД (ACL)</div>
+                <div class="text-xl font-extrabold mt-1.5 ${state.acsOnline ? 'text-emerald-600' : 'text-[#FF441F]'}">
+                  ${state.acsOnline ? 'ONLINE · Подключён' : 'OFFLINE · Обрыв связи'}
+                </div>
+                <div class="text-xs l-text-muted mt-1">Последняя сверка: <strong class="l-text-main">${state.lastReconciliation}</strong> · Расхождений: <strong class="l-text-main">${failedCount}</strong></div>
+              </div>
+              <button type="button" onclick="runReconciliationNow()" class="l-btn-primary mt-4 w-full py-2.5 text-xs cursor-pointer">
+                ${state.reconciliationRunning ? 'Выполняется сверка...' : 'Запустить сверку (Reconciliation)'}
+              </button>
+            </div>
+
+            <div class="l-card p-5 flex flex-col justify-between">
+              <div>
+                <div class="text-[11px] font-bold uppercase tracking-widest l-text-muted">ОТЧЁТНОСТЬ И SIEM</div>
+                <div class="text-base font-extrabold l-text-main mt-1.5">Защищённый экспорт CSV</div>
+                <div class="text-xs l-text-muted mt-1">Автоэкранирование формул (=, +, -, @) и обязательная фиксация факта выгрузки в аудит и SIEM.</div>
+              </div>
+              <button type="button" onclick="exportProtectedCsv()" class="l-btn-dark mt-4 w-full py-2.5 text-xs cursor-pointer">
+                Экспорт защищённого CSV
+              </button>
+            </div>
+
+            <div class="l-card p-5">
+              <div class="text-[11px] font-bold uppercase tracking-widest l-text-muted">ИЗОЛЯЦИЯ, 152-ФЗ И ЧС</div>
+              <div class="text-base font-extrabold l-text-main mt-1.5">PostgreSQL RLS · Fail-Closed</div>
+              <p class="text-xs l-text-muted mt-1.5 leading-relaxed">
+                Контекст <span class="font-mono l-text-main">(site_id, tenant_id)</span> из JWT. Keycloak MFA. Вложения в приватном S3 РФ (TTL 5 мин). Платформа не заменяет СОУЭ при ЧС.
+              </p>
+            </div>
+          </div>
+
+          <!-- Append-Only Audit Log -->
+          <div class="l-card overflow-hidden">
+            <div class="p-5 border-b l-border flex items-center justify-between flex-wrap gap-2">
+              <div>
+                <div class="text-[11px] font-bold uppercase tracking-widest l-text-muted">НЕИЗМЕНЯЕМЫЙ ЖУРНАЛ СОБЫТИЙ</div>
+                <h2 class="text-base font-extrabold l-text-main mt-0.5">Append-Only Audit Log (Только чтение)</h2>
+              </div>
+              <span class="px-2.5 py-1 text-[11px] font-mono font-bold rounded l-subtle l-text-muted">WORM · IMMUTABLE · ${state.auditLog.length} записей</span>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr class="l-subtle text-[11px] uppercase l-text-muted border-b l-border">
+                    <th class="py-3 px-4 font-bold">Время / ID</th>
+                    <th class="py-3 px-4 font-bold">Роль / Актор</th>
+                    <th class="py-3 px-4 font-bold">Событие / Сущность</th>
+                    <th class="py-3 px-4 font-bold">Детали</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y l-border">
+                  ${state.auditLog.map(l => {
+                    const lvlStyle = l.level === 'error'
+                      ? 'bg-[#FF441F]/15 text-[#FF441F]'
+                      : l.level === 'warn'
+                        ? 'bg-amber-500/15 text-amber-600'
+                        : l.level === 'ok'
+                          ? 'bg-emerald-500/15 text-emerald-600'
+                          : 'bg-[#00C2E8]/15 text-[#00A5C7]';
+                    return `
+                      <tr>
+                        <td class="py-3 px-4 whitespace-nowrap font-mono">
+                          <span class="font-bold l-text-main">${l.time}</span>
+                          <div class="text-[10px] l-text-muted">${l.id}</div>
+                        </td>
+                        <td class="py-3 px-4">
+                          <div class="font-semibold l-text-main">${l.actor}</div>
+                          <div class="text-[10px] l-text-muted">${l.role}</div>
+                        </td>
+                        <td class="py-3 px-4 whitespace-nowrap">
+                          <span class="px-2 py-0.5 font-mono font-bold rounded ${lvlStyle}">${l.action}</span>
+                          <div class="text-[10px] font-mono l-text-muted mt-1">${l.entity}</div>
+                        </td>
+                        <td class="py-3 px-4 l-text-main">${l.details}</td>
+                      </tr>
+                    `;
+                  }).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // =========================================================================
+    // 10. INTERACTIVE ACTION HANDLERS
+    // =========================================================================
+    function setTenantSubRole(role) {
+      state.tenantSubRole = role;
+      render();
+    }
+
+    function toggleDelegation(enabled) {
+      state.delegationEnabled = enabled;
+      addAudit('Арендатор', 'Е. Морозова (Администратор арендатора)', 'RBAC_DELEGATION', 'ООО «ТехноВектор»', `Делегирование выдачи QR сотрудникам ${enabled ? 'ВКЛЮЧЕНО' : 'ОТКЛЮЧЕНО'}.`, 'info');
+      showToast('Делегирование обновлено', enabled ? 'Сотрудники арендатора могут заказывать разовые QR.' : 'Заказ QR сотрудниками заблокирован.', 'info');
+      render();
+    }
+
+    // Parking Map Selection & Booking
+    function selectParkingSlot(slotId) {
+      state.selectedSlotId = slotId;
+      render();
+    }
+
+    function openParkingBookingModal() {
+      const slot = state.parkingSlots.find(s => s.id === state.selectedSlotId);
+      if (!slot || slot.status === 'occupied') return;
+      const isEmployeeOnly = state.account === 'tenant' && state.tenantSubRole === 'employee';
+      const defaultType = (isEmployeeOnly || slot.status === 'guest') ? 'guest' : 'quota';
+
+      document.getElementById('parking-modal-body').innerHTML = `
+        <div class="flex items-start justify-between gap-2 pb-3 border-b l-border">
+          <div>
+            <div class="text-[11px] font-bold uppercase tracking-widest" style="color: var(--accent-emerald);">БРОНИРОВАНИЕ · ЭТАЖ P1</div>
+            <h3 class="text-lg font-extrabold l-text-main mt-0.5">Место ${slot.id}</h3>
+          </div>
+          <button type="button" onclick="closeModal('parking-modal')" class="p-1.5 rounded-lg l-subtle l-text-muted cursor-pointer">✕</button>
+        </div>
+
+        <form onsubmit="submitParkingBooking(event, '${slot.id}')" class="space-y-3.5 mt-4">
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold l-text-muted mb-1">Дата</label>
+              <input id="pk-date" type="date" value="2026-11-26" required class="l-input w-full px-3 py-2 text-xs" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold l-text-muted mb-1">Интервал времени</label>
+              <select id="pk-time" class="l-input w-full px-3 py-2 text-xs">
+                <option>09:00–13:00</option>
+                <option selected>10:30–13:30</option>
+                <option>14:00–18:00</option>
+                <option>09:00–18:00 (весь день)</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold l-text-muted mb-1">ФИО водителя / гостя *</label>
+            <input id="pk-driver" type="text" required placeholder="Иванов С.П." class="l-input w-full px-3 py-2 text-sm" />
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold l-text-muted mb-1">Госномер авто *</label>
+              <input id="pk-plate" type="text" required placeholder="А123ВС777" class="l-input w-full px-3 py-2 text-sm uppercase font-mono" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold l-text-muted mb-1">Тип брони</label>
+              <select id="pk-type" class="l-input w-full px-3 py-2 text-xs" ${isEmployeeOnly ? 'disabled' : ''}>
+                <option value="quota" ${defaultType === 'quota' ? 'selected' : ''}>Ваша квота</option>
+                <option value="guest" ${defaultType === 'guest' ? 'selected' : ''}>Гостевое место</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="pt-2 flex items-center justify-end gap-2">
+            <button type="button" onclick="closeModal('parking-modal')" class="l-btn-outline px-4 py-2 text-xs cursor-pointer">Отмена</button>
+            <button type="submit" class="l-btn-emerald px-5 py-2 text-xs cursor-pointer">Подтвердить бронь</button>
+          </div>
+        </form>
+      `;
+
+      const modal = document.getElementById('parking-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function submitParkingBooking(e, slotId) {
+      e.preventDefault();
+      const dateStr = document.getElementById('pk-date').value;
+      const timeRange = document.getElementById('pk-time').value;
+      const driverName = document.getElementById('pk-driver').value.trim();
+      const plate = document.getElementById('pk-plate').value.trim().toUpperCase();
+      const type = document.getElementById('pk-type').value;
+
+      const day = dateStr ? dateStr.split('-')[2] : '26';
+      const slot = state.parkingSlots.find(s => s.id === slotId);
+      if (slot) {
+        slot.status = type === 'guest' ? 'guest' : 'quota';
+        slot.company = state.currentTenant.name;
+        slot.driver = driverName;
+        slot.plate = plate;
+        slot.time = timeRange;
+      }
+
+      const bookingId = `PK-${508 + state.parkingBookings.length}`;
+      state.parkingBookings.unshift({
+        id: bookingId,
+        slotId,
+        tenantId: state.currentTenant.id,
+        tenantName: state.currentTenant.name,
+        dateDay: day,
+        dateMonth: 'ноя',
+        timeRange,
+        driverName,
+        plate,
+        type,
+        physicalStatus: 'Ожидается на КПП',
+        checkInTime: null,
+      });
+
+      const actorName = state.account === 'master'
+        ? 'А. Соколов (Мастер-администратор)'
+        : state.tenantSubRole === 'admin'
+          ? 'Е. Морозова (Администратор арендатора)'
+          : 'Д. Волков (Сотрудник арендатора)';
+
+      addAudit(ACCOUNTS[state.account].title, actorName, 'PARKING_BOOKED', `${bookingId} (${slotId})`, `Забронировано место ${slotId} (${type === 'guest' ? 'Гостевое' : 'Квота'}) для ${driverName}, авто ${plate}.`, 'ok');
+      closeModal('parking-modal');
+      showToast(`Место ${slotId} забронировано`, `Авто ${plate} передано в список ожидания на Пост охраны (КПП).`, 'success');
+      render();
+    }
+
+    function cancelParkingBooking(bookingId) {
+      const idx = state.parkingBookings.findIndex(b => b.id === bookingId);
+      if (idx === -1) return;
+      const b = state.parkingBookings[idx];
+      state.parkingBookings.splice(idx, 1);
+
+      const slot = state.parkingSlots.find(s => s.id === b.slotId);
+      if (slot) {
+        slot.plate = '';
+        slot.driver = '';
+        slot.time = '';
+        slot.status = 'free';
+      }
+
+      addAudit(ACCOUNTS[state.account].title, ACCOUNTS[state.account].userName, 'PARKING_CANCELLED', `${b.id} (${b.slotId})`, `Отменена бронь места ${b.slotId} (${b.driverName}, ${b.plate}). Квота возвращена.`, 'warn');
+      showToast('Бронь отменена', `Место ${b.slotId} освобождено на схеме P1, счётчик квоты обновлён.`, 'warn');
+      render();
+    }
+
+    // Guest Pass Creation & State Machine
+    function handleCreatePass(e) {
+      e.preventDefault();
+      const name = document.getElementById('pass-name').value.trim();
+      const phone = document.getElementById('pass-phone').value.trim();
+      const plate = (document.getElementById('pass-plate')?.value || '').trim().toUpperCase();
+      const vipEl = document.getElementById('pass-vip');
+      const isVip = vipEl ? vipEl.checked : false;
+      if (!name) return;
+
+      const passId = `QR-2611-${Math.floor(1000 + Math.random() * 8999)}`;
+      const isAdmin = state.account === 'master' || state.tenantSubRole === 'admin';
+      const actor = isAdmin ? 'Е. Морозова (Администратор арендатора)' : 'Д. Волков (Сотрудник арендатора)';
+
+      state.passes.unshift({
+        id: passId,
+        tenantId: state.currentTenant.id,
+        tenantName: state.currentTenant.name,
+        guestName: name,
+        phone,
+        plate,
+        isVip,
+        status: 'PENDING_SYNC',
+        createdBy: actor,
+        acsAckTime: 'Отправка в СКУД...',
+      });
+
+      if (isVip) {
+        state.signalRAlerts.unshift({
+          id: `ALR-VIP-${Date.now()}`,
+          type: 'VIP',
+          passId,
+          guestName: name,
+          company: state.currentTenant.name,
+          plate,
+          time: nowTimeStr(),
+          message: 'Оформлен VIP-пропуск. Подготовьте бесшовный проход и сопровождение на ресепшен.',
+          resolved: false,
+        });
+      }
+
+      addAudit('Арендатор', actor, 'PASS_OUTBOX_QUEUED', passId, `Пропуск для ${name} поставлен в очередь Outbox (PENDING_SYNC).`, 'info');
+      showToast('Отправлено в СКУД', `Пропуск ${passId} в статусе PENDING_SYNC...`, 'info');
+      render();
+
+      setTimeout(() => {
+        const target = state.passes.find(p => p.id === passId);
+        if (!target || target.status !== 'PENDING_SYNC') return;
+        if (state.acsOnline) {
+          target.status = 'ACTIVE';
+          target.acsAckTime = `${nowTimeStr()} (1.2с)`;
+          addAudit('Шина СКУД (ACL)', 'Адаптер СКУД', 'PASS_ACK_ACTIVE', passId, `СКУД подтвердил пропуск ${target.guestName}. QR-код доступен.`, 'ok');
+          showToast('СКУД подтвердил (ACTIVE)', `QR-код для ${target.guestName} готов к открытию.`, 'success');
+        } else {
+          target.status = 'FAILED';
+          target.acsAckTime = 'Ошибка: СКУД Offline';
+          addAudit('Шина СКУД (ACL)', 'Адаптер СКУД', 'PASS_SYNC_FAILED', passId, `Сбой доставки ${passId} (СКУД Offline). QR заблокирован.`, 'error');
+          showToast('Ошибка СКУД (FAILED)', `Пропуск ${passId} не активирован — канал Offline.`, 'error');
+        }
+        render();
+      }, 1200);
+    }
+
+    function retryPassSync(passId) {
+      const target = state.passes.find(p => p.id === passId);
+      if (!target) return;
+      target.status = 'PENDING_SYNC';
+      target.acsAckTime = 'Повтор Outbox...';
+      render();
+      setTimeout(() => {
+        if (state.acsOnline) {
+          target.status = 'ACTIVE';
+          target.acsAckTime = `${nowTimeStr()} (1.0с)`;
+          addAudit('Шина СКУД (ACL)', 'Адаптер СКУД', 'PASS_RETRY_ACTIVE', passId, `Повторная синхронизация ${passId} успешна.`, 'ok');
+          showToast('Синхронизация успешна', `Пропуск ${passId} переведён в ACTIVE.`, 'success');
+        } else {
+          target.status = 'FAILED';
+          target.acsAckTime = 'Ошибка: СКУД Offline';
+          showToast('СКУД Offline', 'Переведите СКУД в Online под Мастер-администратором.', 'error');
+        }
+        render();
+      }, 1000);
+    }
+
+    function revokePass(passId, actorLabel) {
+      const target = state.passes.find(p => p.id === passId);
+      if (!target) return;
+      if (state.acsOnline) {
+        target.status = 'REVOKED';
+        target.acsAckTime = `Отозван (${nowTimeStr()})`;
+        addAudit(ACCOUNTS[state.account].title, actorLabel, 'PASS_REVOKED', passId, `Пропуск ${target.guestName} отозван в СКУД.`, 'warn');
+        showToast('Пропуск отозван', `${passId} переведён в статус REVOKED.`, 'warn');
+      } else {
+        target.status = 'REVOKE_FAILED';
+        target.acsAckTime = 'ОШИБКА ОТЗЫВА (Offline)';
+        state.signalRAlerts.unshift({
+          id: `ALR-REV-${Date.now()}`,
+          type: 'REVOKE_FAILED',
+          passId,
+          guestName: target.guestName,
+          company: target.tenantName,
+          plate: target.plate,
+          time: nowTimeStr(),
+          message: 'Команда отзыва не доставлена в СКУД (Offline). Выполните ручную блокировку в локальном ПО СКУД.',
+          resolved: false,
+        });
+        addAudit(ACCOUNTS[state.account].title, actorLabel, 'REVOKE_FAILED', passId, `КРИТИЧНО: сбой отзыва в Offline. Отправлен SignalR-алерт на КПП.`, 'error');
+        showToast('SignalR-Алерт: REVOKE_FAILED!', `Критический алерт отправлен на Пост охраны (КПП)!`, 'error');
+      }
+      render();
+    }
+
+    function confirmPhysicalEntry(passId) {
+      const target = state.passes.find(p => p.id === passId);
+      if (!target || target.status !== 'ACTIVE') return;
+      target.status = 'USED';
+      target.acsAckTime = `Проход в ${nowTimeStr().slice(0, 5)}`;
+      addAudit('Охрана (КПП)', 'С. Петров (Старший смены КПП)', 'PHYSICAL_ENTRY', passId, `Подтверждён проход ${target.guestName}.`, 'ok');
+      showToast('Проход подтверждён', `${target.guestName} прошёл турникет.`, 'success');
+      render();
+    }
+
+    function resolveSignalRAlert(alertId) {
+      const a = state.signalRAlerts.find(x => x.id === alertId);
+      if (!a) return;
+      a.resolved = true;
+      if (a.type === 'REVOKE_FAILED') {
+        const p = state.passes.find(x => x.id === a.passId);
+        if (p) { p.status = 'REVOKED'; p.acsAckTime = 'Ручная блокировка КПП'; }
+        addAudit('Охрана (КПП)', 'С. Петров (Старший смены КПП)', 'MANUAL_REVOKE_OK', a.passId, `Подтверждена ручная блокировка пропуска на контроллере СКУД.`, 'warn');
+        showToast('Алерт закрыт', `Ручная блокировка ${a.passId} зафиксирована в аудите.`, 'success');
+      } else {
+        addAudit('Охрана (КПП)', 'С. Петров (Старший смены КПП)', 'VIP_ALERT_ACK', a.passId, `Охрана приняла VIP-визит ${a.guestName} в сопровождение.`, 'info');
+        showToast('VIP-уведомление принято', `Сотрудник КПП оповещён о прибытии ${a.guestName}.`, 'info');
+      }
+      render();
+    }
+
+    function toggleParkingFact(bookingId, dir) {
+      const b = state.parkingBookings.find(x => x.id === bookingId);
+      if (!b) return;
+      const t = nowTimeStr().slice(0, 5);
+      if (dir === 'in') {
+        b.physicalStatus = 'На территории (Факт)';
+        b.checkInTime = t;
+        addAudit('Охрана (КПП)', 'С. Петров (Старший смены КПП)', 'PARKING_FACT_IN', `${b.id} (${b.slotId})`, `Зафиксирован въезд авто ${b.plate} в ${t}.`, 'ok');
+        showToast('Въезд зафиксирован', `Авто ${b.plate} на территории БЦ (место ${b.slotId}).`, 'success');
+      } else {
+        b.physicalStatus = 'Выехал (Факт)';
+        addAudit('Охрана (КПП)', 'С. Петров (Старший смены КПП)', 'PARKING_FACT_OUT', `${b.id} (${b.slotId})`, `Зафиксирован выезд авто ${b.plate} в ${t}.`, 'info');
+        showToast('Выезд зафиксирован', `Авто ${b.plate} покинуло парковку.`, 'info');
+      }
+      render();
+    }
+
+    function setSecuritySearch(val) {
+      state.securitySearch = val;
+      render();
+      const inp = document.querySelector('input[placeholder="Поиск ФИО, компания, авто..."]');
+      if (inp) { inp.focus(); inp.setSelectionRange(val.length, val.length); }
+    }
+
+    // Service Requests & S3 Simulation
+    function simulateS3Upload() {
+      state.tempUploadedFile = { name: `office_photo_${Math.floor(10 + Math.random() * 89)}.jpg`, s3Badge: 'Presigned URL 5 мин' };
+      showToast('Загружено в приватный S3', 'Антивирус пройден. Сгенерирован Presigned URL (TTL 5 мин).', 'success');
+      render();
+    }
+
+    function clearTempFile() { state.tempUploadedFile = null; render(); }
+
+    function handleCreateRequest(e) {
+      e.preventDefault();
+      const category = document.getElementById('req-category').value;
+      const desc = document.getElementById('req-desc').value.trim();
+      if (!desc) return;
+      const reqId = `REQ-${2048 + state.requests.length}`;
+      state.requests.unshift({
+        id: reqId,
+        tenantId: state.currentTenant.id,
+        tenantName: state.currentTenant.name,
+        office: state.currentTenant.floor,
+        category,
+        description: desc,
+        status: 'Новая',
+        pauseReason: '',
+        slaRemaining: '04ч 00м до дедлайна',
+        createdAt: `25.11.2026 ${nowTimeStr().slice(0, 5)}`,
+        attachment: state.tempUploadedFile ? { ...state.tempUploadedFile } : null,
+        privateNotes: [],
+      });
+      state.tempUploadedFile = null;
+      addAudit('Арендатор', 'Е. Морозова (Администратор арендатора)', 'REQUEST_CREATED', reqId, `Создана заявка «${category}».`, 'ok');
+      showToast('Заявка отправлена', `${reqId} поступила в диспетчерскую УК.`, 'success');
+      render();
+    }
+
+    // UK Request Modal
+    function openUkReqModal(reqId) {
+      state.selectedUkReqId = reqId;
+      const modal = document.getElementById('uk-req-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      renderUkReqModalContent();
+    }
+
+    function renderUkReqModalContent() {
+      const r = state.requests.find(x => x.id === state.selectedUkReqId);
+      if (!r) return;
+      document.getElementById('uk-req-modal-body').innerHTML = `
+        <div class="p-5 sm:p-6 space-y-5">
+          <div class="flex items-start justify-between gap-3 border-b l-border pb-4">
+            <div>
+              <div class="text-xs font-mono font-bold l-text-muted">${r.id} · ${r.tenantName} (${r.office})</div>
+              <h3 class="text-lg font-extrabold l-text-main mt-1">${r.category}</h3>
+              <p class="text-xs l-text-muted mt-1">${r.description}</p>
+            </div>
+            <button type="button" onclick="closeModal('uk-req-modal')" class="p-1.5 rounded-lg l-subtle l-text-muted cursor-pointer">✕</button>
+          </div>
+
+          <div class="p-4 l-subtle space-y-3">
+            <div class="text-[11px] font-bold uppercase tracking-widest l-text-muted">УПРАВЛЕНИЕ СТАТУСОМ И ПАУЗОЙ SLA</div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-semibold l-text-muted mb-1">Статус заявки</label>
+                <select id="uk-status-select" onchange="onUkStatusChange()" class="l-input w-full px-3 py-2 text-sm">
+                  ${['Новая', 'В работе', 'Пауза SLA', 'Выполнена'].map(st => `<option value="${st}" ${r.status === st ? 'selected' : ''}>${st}</option>`).join('')}
+                </select>
+              </div>
+              <div id="uk-pause-wrap" class="${r.status === 'Пауза SLA' ? '' : 'opacity-40 pointer-events-none'}">
+                <label class="block text-xs font-semibold l-text-muted mb-1">Обязательная причина паузы SLA</label>
+                <select id="uk-pause-select" class="l-input w-full px-3 py-2 text-sm">
+                  ${['Ожидание доступа в офис', 'Закупка комплектующих', 'Нерабочее время календаря', 'Согласование сметы'].map(pr => `<option value="${pr}" ${r.pauseReason === pr ? 'selected' : ''}>${pr}</option>`).join('')}
+                </select>
+              </div>
+            </div>
+            <div class="flex justify-end">
+              <button type="button" onclick="saveUkRequestStatus('${r.id}')" class="l-btn-primary px-4 py-2 text-xs cursor-pointer">Сохранить статус SLA</button>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-xl border border-amber-500/40 bg-amber-500/10 space-y-3">
+            <div class="text-xs font-extrabold text-amber-600 uppercase tracking-wide">🔒 Приватные заметки «Только для УК» (скрыто от арендатора)</div>
+            <div class="space-y-2 max-h-36 overflow-y-auto">
+              ${r.privateNotes.length === 0 ? `<div class="text-xs l-text-muted italic">Приватных заметок пока нет.</div>` : r.privateNotes.map(n => `
+                <div class="l-card p-2.5 text-xs">
+                  <div class="flex justify-between text-[11px] l-text-muted mb-1"><strong class="l-text-main">${n.author}</strong><span>${n.time}</span></div>
+                  <div class="l-text-main">${n.text}</div>
+                </div>
+              `).join('')}
+            </div>
+            <form onsubmit="addUkPrivateNote(event, '${r.id}')" class="flex gap-2">
+              <input id="uk-note-input" type="text" required placeholder="Внутренний комментарий диспетчера или инженера..." class="l-input flex-1 px-3 py-2 text-xs" />
+              <button type="submit" class="l-btn-dark px-3.5 py-2 text-xs cursor-pointer">Добавить</button>
+            </form>
+          </div>
+        </div>
+      `;
+    }
+
+    function onUkStatusChange() {
+      const v = document.getElementById('uk-status-select').value;
+      const w = document.getElementById('uk-pause-wrap');
+      w.classList.toggle('opacity-40', v !== 'Пауза SLA');
+      w.classList.toggle('pointer-events-none', v !== 'Пауза SLA');
+    }
+
+    function saveUkRequestStatus(reqId) {
+      const r = state.requests.find(x => x.id === reqId);
+      if (!r) return;
+      const st = document.getElementById('uk-status-select').value;
+      const pr = document.getElementById('uk-pause-select').value;
+      r.status = st;
+      if (st === 'Пауза SLA') {
+        r.pauseReason = pr;
+        r.slaRemaining = 'Таймер SLA на паузе';
+        addAudit('УК / Эксплуатация', 'И. Громова (Диспетчер УК)', 'SLA_PAUSED', r.id, `Заявка переведена на паузу SLA: «${pr}».`, 'warn');
+      } else if (st === 'Выполнена') {
+        r.pauseReason = '';
+        r.slaRemaining = 'Выполнена в SLA';
+        addAudit('УК / Эксплуатация', 'И. Громова (Диспетчер УК)', 'REQUEST_CLOSED', r.id, `Заявка закрыта в рамках SLA.`, 'ok');
+      } else {
+        r.pauseReason = '';
+        r.slaRemaining = '02ч 45м до дедлайна';
+        addAudit('УК / Эксплуатация', 'И. Громова (Диспетчер УК)', 'REQUEST_STATUS', r.id, `Статус заявки изменён на «${st}».`, 'info');
+      }
+      showToast('Статус обновлён', `${r.id} → ${st}. Обновлено в кабинете арендатора.`, 'success');
+      render();
+      renderUkReqModalContent();
+    }
+
+    function addUkPrivateNote(e, reqId) {
+      e.preventDefault();
+      const r = state.requests.find(x => x.id === reqId);
+      const inp = document.getElementById('uk-note-input');
+      if (!r || !inp.value.trim()) return;
+      r.privateNotes.push({ author: 'И. Громова (Диспетчер УК)', time: nowTimeStr().slice(0, 5), text: inp.value.trim() });
+      addAudit('УК / Эксплуатация', 'И. Громова (Диспетчер УК)', 'PRIVATE_NOTE_ADDED', r.id, `Добавлена приватная заметка «Только для УК».`, 'info');
+      showToast('Заметка сохранена', 'Заметка видна только сотрудникам УК.', 'info');
+      render();
+      renderUkReqModalContent();
+    }
+
+    // Mobile SVG QR Modal
+    function openQrModal(passId) {
+      const p = state.passes.find(x => x.id === passId);
+      if (!p || p.status !== 'ACTIVE') return;
+      document.getElementById('qr-modal-body').innerHTML = `
+        <div class="text-center space-y-4">
+          <div>
+            <div class="text-base font-extrabold l-text-main">${p.guestName}</div>
+            <div class="text-xs l-text-muted mt-0.5">${p.tenantName}</div>
+            <div class="mt-2">${getPassStatusBadge(p.status)}</div>
+          </div>
+          <div class="inline-block p-4 rounded-2xl bg-white border border-gray-200 shadow-inner">
+            <svg class="w-44 h-44 text-[#1E2023]" viewBox="0 0 29 29" fill="currentColor" shape-rendering="crispEdges">
+              <path d="M0,0 h7v7h-7z M1,1 v5h5v-5z M2,2 h3v3h-3z M22,0 h7v7h-7z M23,1 v5h5v-5z M24,2 h3v3h-3z M0,22 h7v7h-7z M1,23 v5h5v-5z M2,24 h3v3h-3z"/>
+              <path d="M9,1 h2v2h-2z M13,1 h3v1h-3z M18,1 h2v3h-2z M9,5 h4v2h-4z M15,4 h2v3h-2z M1,9 h3v2h-3z M6,9 h2v4h-2z M10,9 h3v2h-3z M15,9 h4v2h-4z M21,9 h3v2h-3z M26,9 h2v3h-2z M1,13 h4v2h-4z M9,13 h2v3h-2z M13,12 h3v3h-3z M18,13 h2v4h-2z M22,13 h4v2h-4z M2,17 h3v2h-3z M7,16 h3v3h-3z M12,17 h4v2h-4z M20,18 h3v2h-3z M25,16 h3v4h-3z M9,21 h2v3h-2z M13,21 h3v2h-3z M18,22 h4v2h-4z M24,22 h4v2h-4z M9,26 h4v2h-4z M15,25 h3v3h-3z M20,26 h3v2h-3z M25,26 h3v2h-3z"/>
+            </svg>
+          </div>
+          <div class="l-subtle p-3 text-left text-xs space-y-1.5">
+            <div class="flex justify-between"><span class="l-text-muted">ID пропуска:</span><span class="font-mono font-bold l-text-main">${p.id}</span></div>
+            <div class="flex justify-between"><span class="l-text-muted">Режим прохода:</span><span class="font-bold text-emerald-600">1 вход / 1 выход</span></div>
+            ${p.plate ? `<div class="flex justify-between"><span class="l-text-muted">Госномер:</span><span class="font-mono font-bold l-text-main">${p.plate}</span></div>` : ''}
+          </div>
+        </div>
+      `;
+      const modal = document.getElementById('qr-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeModal(id, e) {
+      if (e && e.target !== e.currentTarget) return;
+      const modal = document.getElementById(id);
+      if (!modal) return;
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      if (id === 'uk-req-modal') state.selectedUkReqId = null;
+    }
+
+    // Reconciliation & Protected CSV Export
+    function runReconciliationNow() {
+      if (state.reconciliationRunning) return;
+      state.reconciliationRunning = true;
+      render();
+      setTimeout(() => {
+        state.reconciliationRunning = false;
+        state.lastReconciliation = nowTimeStr();
+        if (!state.acsOnline) {
+          addAudit('Аудит и СКУД (ИБ)', 'Сверка Reconciliation', 'RECONCILE_FAILED', 'СКУД ACL', 'Сбой сверки: канал СКУД в режиме Offline.', 'error');
+          showToast('Сверка не выполнена', 'Включите СКУД Online в шапке.', 'error');
+        } else {
+          let fixed = 0;
+          state.passes.forEach(p => {
+            if (p.status === 'FAILED' || p.status === 'PENDING_SYNC') {
+              p.status = 'ACTIVE';
+              p.acsAckTime = `Сверено (${state.lastReconciliation})`;
+              fixed++;
+            } else if (p.status === 'REVOKE_FAILED') {
+              p.status = 'REVOKED';
+              p.acsAckTime = 'Отозвано сверкой';
+              state.signalRAlerts.forEach(a => { if (a.passId === p.id) a.resolved = true; });
+              fixed++;
+            }
+          });
+          addAudit('Аудит и СКУД (ИБ)', 'Сверка Reconciliation', 'RECONCILE_OK', 'СКУД ACL', `Ручная сверка завершена. Устранено расхождений: ${fixed}.`, 'ok');
+          showToast('Сверка завершена', fixed > 0 ? `Устранено расхождений: ${fixed}.` : 'Расхождений со СКУД не найдено.', 'success');
+        }
+        render();
+      }, 900);
+    }
+
+    function exportProtectedCsv() {
+      const esc = (v) => {
+        let s = String(v ?? '').replace(/"/g, '""');
+        if (/^[=+\-@]/.test(s)) s = `'${s}`;
+        return `"${s}"`;
+      };
+      const rows = [
+        ['ID', 'Компания', 'Категория', 'Статус', 'Причина паузы SLA', 'SLA'],
+        ...state.requests.map(r => [r.id, r.tenantName, r.category, r.status, r.pauseReason || '-', r.slaRemaining])
+      ];
+      const csv = '\uFEFF' + rows.map(row => row.map(esc).join(';')).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Lovit_Business_SLA_${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      addAudit('Аудит и СКУД (ИБ)', ACCOUNTS[state.account].userName, 'CSV_EXPORT_SIEM', 'SLA_Report.csv', 'Защищённый экспорт CSV выполнен (формулы экранированы, событие передано в SIEM).', 'warn');
+      showToast('Защищённый CSV выгружен', 'Формулы экранированы, факт выгрузки записан в Append-Only аудит-лог.', 'success');
+      render();
+    }
+
+    // =========================================================================
+    // 11. MASTER RENDER LOOP
+    // =========================================================================
+    function render() {
+      renderHeader();
+      updateThemeIcon();
+      const main = document.getElementById('app-main');
+      if (state.activeTab === 'tenant') main.innerHTML = renderTenantTab();
+      else if (state.activeTab === 'parking') main.innerHTML = renderParkingTab();
+      else if (state.activeTab === 'uk') main.innerHTML = renderUkTab();
+      else if (state.activeTab === 'security') main.innerHTML = renderSecurityTab();
+      else if (state.activeTab === 'audit') main.innerHTML = renderAuditTab();
+    }
+
+    window.addEventListener('DOMContentLoaded', render);
+  </script>
+</body>
+</html>
