@@ -1,8 +1,8 @@
 # Lovit Business — Интерактивный продуктовый прототип (B2B2C PropTech)
 
 > **Демо-стенд (GitHub Pages):
-* [Главная страница прототипа](https://vibrokirill.github.io/business-prototype/)
-* [Макет системы контроля доступа (СКУД)](cs-mock.html)
+* [Прототип TechProp](https://vibrokirill.github.io/business-prototype/)
+* [Прототип СКУД](https://vibrokirill.github.io/business-prototype/acs-mock.html)
 * [Панель управления PO](https://vibrokirill.github.io/business-prototype/proptechapp_pm_control_plane_product_manager_team_lead)
 
 
