@@ -1,0 +1,2158 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PropTechApp — PM Control Plane (PO / Team Lead)</title>
+  <style>
+    /* ===================================================================== */
+    /* 1. DESIGN SYSTEM TOKENS (LIGHT DEFAULT + DARK THEME)                  */
+    /* ===================================================================== */
+    :root,
+    [data-theme="light"] {
+      --bg-page: #F5F6F8;
+      --bg-card: #FFFFFF;
+      --bg-subtle: #F8F9FB;
+      --bg-muted: #ECEEF2;
+      --bg-header: #FFFFFF;
+      --border: #E5E7EB;
+      --border-strong: #D1D5DB;
+      --text-main: #1E2023;
+      --text-muted: #646B76;
+      --text-dim: #8D95A2;
+
+      --orange: #FF441F;
+      --orange-hover: #E03512;
+      --orange-soft: rgba(255, 68, 31, 0.10);
+      --orange-border: rgba(255, 68, 31, 0.35);
+
+      --cyan: #00C2E8;
+      --cyan-text: #0092B0;
+      --cyan-soft: rgba(0, 194, 232, 0.11);
+      --cyan-border: rgba(0, 194, 232, 0.38);
+
+      --green: #10B981;
+      --green-text: #059669;
+      --green-soft: rgba(16, 185, 129, 0.11);
+      --green-border: rgba(16, 185, 129, 0.35);
+
+      --amber: #F59E0B;
+      --amber-text: #B45309;
+      --amber-soft: rgba(245, 158, 11, 0.12);
+      --amber-border: rgba(245, 158, 11, 0.38);
+
+      --btn-dark: #1E2023;
+      --btn-dark-hover: #32363D;
+      --btn-dark-text: #FFFFFF;
+
+      --seg-track: #ECEEF2;
+      --seg-active: #FFFFFF;
+      --shadow-card: 0 2px 10px rgba(17, 24, 39, 0.04);
+      --shadow-seg: 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
+
+    [data-theme="dark"] {
+      --bg-page: #121316;
+      --bg-card: #1C1E22;
+      --bg-subtle: #16181C;
+      --bg-muted: #262930;
+      --bg-header: #17191D;
+      --border: #2B2F37;
+      --border-strong: #3C414C;
+      --text-main: #F3F4F6;
+      --text-muted: #9CA3AF;
+      --text-dim: #6B7280;
+
+      --orange: #FF441F;
+      --orange-hover: #FF5C3D;
+      --orange-soft: rgba(255, 68, 31, 0.16);
+      --orange-border: rgba(255, 68, 31, 0.44);
+
+      --cyan: #00C2E8;
+      --cyan-text: #38D4F5;
+      --cyan-soft: rgba(0, 194, 232, 0.15);
+      --cyan-border: rgba(0, 194, 232, 0.42);
+
+      --green: #10B981;
+      --green-text: #34D399;
+      --green-soft: rgba(16, 185, 129, 0.15);
+      --green-border: rgba(16, 185, 129, 0.40);
+
+      --amber: #F59E0B;
+      --amber-text: #FBBF24;
+      --amber-soft: rgba(245, 158, 11, 0.15);
+      --amber-border: rgba(245, 158, 11, 0.40);
+
+      --btn-dark: #2E323B;
+      --btn-dark-hover: #3D424E;
+      --btn-dark-text: #F3F4F6;
+
+      --seg-track: #121316;
+      --seg-active: #272A32;
+      --shadow-card: 0 4px 18px rgba(0, 0, 0, 0.30);
+      --shadow-seg: 0 2px 6px rgba(0, 0, 0, 0.42);
+    }
+
+    /* ===================================================================== */
+    /* 2. BASE RESET & LAYOUT                                                */
+    /* ===================================================================== */
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      -webkit-font-smoothing: antialiased;
+      transition: background-color 0.2s ease, color 0.2s ease;
+      overflow-x: hidden;
+    }
+
+    .app-shell { display: flex; flex-direction: column; min-height: 100vh; }
+    .container { width: 100%; max-width: 1480px; margin: 0 auto; padding: 0 16px; }
+    @media (min-width: 640px) { .container { padding: 0 24px; } }
+
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-variant-numeric: tabular-nums; }
+    .tabular { font-variant-numeric: tabular-nums; }
+    .text-muted { color: var(--text-muted); }
+    .text-xs { font-size: 12px; }
+    .text-11 { font-size: 11px; }
+    .fw-700 { font-weight: 700; }
+    .fw-800 { font-weight: 800; }
+
+    /* ===================================================================== */
+    /* 3. HEADER & GLOBAL CONTROLS                                           */
+    /* ===================================================================== */
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: var(--bg-header);
+      border-bottom: 1px solid var(--border);
+    }
+    .header-top {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 11px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .brand { display: flex; align-items: center; gap: 11px; }
+    .brand-logo {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-strong);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .brand-title { font-size: 15.5px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.2; }
+    .brand-sub { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+
+    .header-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .week-slider-box {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 10px;
+      border-radius: 9px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      font-size: 11.5px;
+      font-weight: 700;
+    }
+    .week-slider-box input[type="range"] {
+      width: 88px;
+      accent-color: var(--orange);
+      cursor: pointer;
+    }
+
+    .bridge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 9px;
+      border-radius: 8px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+    .bridge-pill.connected {
+      background: var(--cyan-soft);
+      border-color: var(--cyan-border);
+      color: var(--cyan-text);
+    }
+
+    .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .dot-pulse { animation: pulseDot 1.35s ease-in-out infinite; }
+    @keyframes pulseDot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.84); }
+    }
+
+    /* Compact Theme Toggle */
+    .theme-switch {
+      position: relative;
+      width: 46px;
+      height: 24px;
+      border-radius: 9999px;
+      background: var(--seg-track);
+      border: 1px solid var(--border-strong);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      padding: 2px;
+    }
+    .theme-thumb {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--bg-card);
+      color: #F59E0B;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.22);
+      transform: translateX(0);
+      transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s ease;
+    }
+    [data-theme="dark"] .theme-thumb {
+      transform: translateX(22px);
+      background: #272A32;
+      color: #00C2E8;
+    }
+
+    .header-bar-2 {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 9px 0;
+    }
+
+    .seg-track {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      background: var(--seg-track);
+      padding: 3px;
+      border-radius: 10px;
+      overflow-x: auto;
+      max-width: 100%;
+    }
+    .seg-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 12px;
+      border-radius: 7px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+    }
+    .seg-btn:hover { color: var(--text-main); }
+    .seg-btn.active {
+      background: var(--seg-active);
+      color: var(--text-main);
+      box-shadow: var(--shadow-seg);
+    }
+
+    /* ===================================================================== */
+    /* 4. CORE COMPONENTS: CARDS, BADGES, BUTTONS, INPUTS, GRIDS             */
+    /* ===================================================================== */
+    .main-content { flex: 1; padding: 20px 0 36px; }
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      box-shadow: var(--shadow-card);
+    }
+    .card-pad { padding: 18px 20px; }
+    .subtle {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+
+    .eyebrow {
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+    }
+    .h2 { font-size: 15.5px; font-weight: 800; margin: 2px 0 0; }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+      line-height: 1.3;
+    }
+    .b-orange { background: var(--orange-soft); color: var(--orange); border: 1px solid var(--orange-border); }
+    .b-orange-solid { background: var(--orange); color: #FFFFFF; }
+    .b-cyan { background: var(--cyan-soft); color: var(--cyan-text); border: 1px solid var(--cyan-border); }
+    .b-green { background: var(--green-soft); color: var(--green-text); border: 1px solid var(--green-border); }
+    .b-green-solid { background: var(--green); color: #FFFFFF; }
+    .b-amber { background: var(--amber-soft); color: var(--amber-text); border: 1px solid var(--amber-border); }
+    .b-muted { background: var(--bg-muted); color: var(--text-muted); border: 1px solid var(--border); }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px 13px;
+      border-radius: 9px;
+      border: 1px solid transparent;
+      font-family: inherit;
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+    }
+    .btn:active:not(:disabled) { transform: scale(0.985); }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn-sm { padding: 5px 10px; font-size: 11.5px; border-radius: 7px; }
+    .btn-xs { padding: 4px 8px; font-size: 11px; border-radius: 6px; }
+    .btn-orange { background: var(--orange); color: #FFFFFF; }
+    .btn-orange:hover:not(:disabled) { background: var(--orange-hover); }
+    .btn-cyan { background: var(--cyan); color: #0B1519; }
+    .btn-cyan:hover:not(:disabled) { opacity: 0.9; }
+    .btn-dark { background: var(--btn-dark); color: var(--btn-dark-text); }
+    .btn-dark:hover:not(:disabled) { background: var(--btn-dark-hover); }
+    .btn-outline { background: transparent; border-color: var(--border-strong); color: var(--text-main); }
+    .btn-outline:hover:not(:disabled) { background: var(--bg-muted); border-color: var(--cyan); }
+
+    .input, .select {
+      width: 100%;
+      padding: 8px 11px;
+      border-radius: 8px;
+      border: 1px solid var(--border-strong);
+      background: var(--bg-subtle);
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 12.5px;
+      font-weight: 500;
+    }
+    .input:focus, .select:focus { outline: none; border-color: var(--cyan); background: var(--bg-card); }
+    .select-compact { width: auto; padding: 6px 10px; font-size: 12px; font-weight: 600; }
+
+    .stack-xs { display: flex; flex-direction: column; gap: 6px; }
+    .stack-sm { display: flex; flex-direction: column; gap: 10px; }
+    .stack-md { display: flex; flex-direction: column; gap: 18px; }
+    .row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .between { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+
+    .kpi-grid-5 { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    @media (min-width: 640px) { .kpi-grid-5 { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 1120px) { .kpi-grid-5 { grid-template-columns: repeat(5, 1fr); } }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr; gap: 16px; }
+    @media (min-width: 960px) { .grid-2 { grid-template-columns: 1fr 1fr; } }
+
+    .grid-3 { display: grid; grid-template-columns: 1fr; gap: 14px; }
+    @media (min-width: 860px) { .grid-3 { grid-template-columns: repeat(3, 1fr); } }
+
+    .grid-4 { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    @media (min-width: 640px) { .grid-4 { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 1120px) { .grid-4 { grid-template-columns: repeat(4, 1fr); } }
+
+    .kpi-card {
+      padding: 15px 16px;
+      border-radius: 13px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-card);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 6px;
+    }
+    .kpi-val { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; }
+
+    .progress-bar {
+      width: 100%;
+      height: 7px;
+      border-radius: 999px;
+      background: var(--bg-muted);
+      overflow: hidden;
+    }
+    .progress-fill { height: 100%; border-radius: 999px; transition: width 0.25s ease; }
+
+    /* Tables */
+    .table-wrap { width: 100%; overflow-x: auto; }
+    table.tbl { width: 100%; border-collapse: collapse; font-size: 12px; text-align: left; }
+    table.tbl th {
+      padding: 10px 12px;
+      font-size: 10.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      background: var(--bg-subtle);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    table.tbl td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    table.tbl tr:last-child td { border-bottom: none; }
+    table.tbl tr.row-dim { opacity: 0.45; }
+    table.tbl tr.row-alert { background: var(--orange-soft); }
+
+    /* Checkboxes / Stop Criteria */
+    .check-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      font-size: 12.5px;
+    }
+    .check-row.failed {
+      border-color: var(--orange);
+      background: var(--orange-soft);
+    }
+    .check-row input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      margin-top: 2px;
+      accent-color: var(--green);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    /* Kanban */
+    .kanban-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    @media (min-width: 1024px) { .kanban-grid { grid-template-columns: repeat(4, 1fr); } }
+    .kanban-col {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 360px;
+    }
+    .kanban-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 11px 12px;
+      box-shadow: var(--shadow-card);
+    }
+
+    /* Gantt */
+    .gantt-wrap { overflow-x: auto; padding-bottom: 6px; }
+    .gantt-grid { min-width: 820px; position: relative; }
+    .gantt-row {
+      display: grid;
+      grid-template-columns: 230px 1fr;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      min-height: 44px;
+    }
+    .gantt-row:last-child { border-bottom: none; }
+    .gantt-track {
+      position: relative;
+      height: 42px;
+      background-image: repeating-linear-gradient(to right, transparent 0, transparent calc(100%/28 - 1px), var(--border) calc(100%/28 - 1px), var(--border) calc(100%/28));
+    }
+    .gantt-bar {
+      position: absolute;
+      top: 8px;
+      height: 26px;
+      border-radius: 7px;
+      color: #FFFFFF;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      padding: 0 9px;
+      cursor: pointer;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
+    }
+    .gantt-bar:hover { transform: translateY(-1px); box-shadow: 0 3px 10px rgba(0,0,0,0.2); }
+    .gantt-bar.selected { outline: 2px solid var(--text-main); outline-offset: 2px; }
+    .gantt-vline {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    /* Modals & Toasts */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 70;
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(2px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-strong);
+      border-radius: 15px;
+      width: 100%;
+      max-width: 520px;
+      padding: 20px;
+      box-shadow: 0 20px 45px rgba(0,0,0,0.3);
+    }
+
+    .toast-stack {
+      position: fixed;
+      right: 16px;
+      bottom: 20px;
+      z-index: 80;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-width: 360px;
+      width: calc(100% - 32px);
+      pointer-events: none;
+    }
+    .toast {
+      pointer-events: auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border-strong);
+      border-left-width: 4px;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 12px;
+      box-shadow: 0 10px 26px rgba(0,0,0,0.25);
+    }
+
+    .footer {
+      margin-top: auto;
+      background: var(--bg-card);
+      border-top: 1px solid var(--border);
+      padding: 12px 0;
+      font-size: 11.5px;
+      color: var(--text-muted);
+    }
+
+    input[type="range"].full-range {
+      width: 100%;
+      accent-color: var(--cyan);
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <!-- =================================================================== -->
+    <!-- GLOBAL HEADER                                                       -->
+    <!-- =================================================================== -->
+    <header class="header">
+      <div class="container">
+        <div class="header-top">
+          <!-- Brand Logo -->
+          <div class="brand">
+            <div class="brand-logo" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 28 28" fill="none">
+                <rect x="3" y="10" width="9" height="15" rx="2" fill="#FF441F"/>
+                <rect x="14" y="3" width="11" height="22" rx="2" fill="#00C2E8" fill-opacity="0.18" stroke="#00C2E8" stroke-width="2"/>
+                <path d="M17.5 8H21.5M17.5 13H21.5M17.5 18H21.5" stroke="#00C2E8" stroke-width="2" stroke-linecap="round"/>
+                <rect x="6" y="14" width="3" height="3" rx="0.8" fill="#FFFFFF"/>
+                <rect x="6" y="19" width="3" height="3" rx="0.8" fill="#FFFFFF"/>
+              </svg>
+            </div>
+            <div>
+              <div class="brand-title">PropTechApp | PM Control Plane (PO / Team Lead)</div>
+              <div class="brand-sub">Управление MVP, сроками, бюджетом, командой 9,1 FTE и KPI пилотного БЦ 42 000 м²</div>
+            </div>
+          </div>
+
+          <!-- Global Controls -->
+          <div class="header-controls">
+            <!-- Scope Scenario Switcher -->
+            <select id="scope-select" class="select select-compact" onchange="setScopeScenario(this.value)" aria-label="Сценарий Scope">
+              <option value="base">Базовый MVP (73 ч/н · 28 нед. · 24,86 млн ₽)</option>
+              <option value="scA">Сценарий А: Срок -10 нед. (53 ч/н · 18 нед.)</option>
+              <option value="scB">Сценарий Б: Бюджет -30% (45 ч/н · 22,4 млн ₽)</option>
+            </select>
+
+            <!-- Current Pilot Week Slider -->
+            <div class="week-slider-box">
+              <span class="text-muted">Неделя:</span>
+              <span class="mono" id="week-val-label" style="color: var(--orange); min-width: 28px;">W8</span>
+              <input type="range" id="week-slider" min="1" max="28" value="8" oninput="setCurrentWeek(Number(this.value))" aria-label="Текущая неделя пилота" />
+            </div>
+
+            <!-- Read-only BroadcastChannel Listener Indicator -->
+            <div id="bridge-pill" class="bridge-pill" title="Слушатель стенда СКУД (BroadcastChannel)">
+              <span class="dot" style="background: var(--text-dim);"></span>
+              <span>Связь со стендом СКУД: Ожидание</span>
+            </div>
+
+            <!-- Release Gate Status Badge -->
+            <span id="header-release-badge" class="badge b-green-solid">GO</span>
+
+            <!-- Reset Button -->
+            <button type="button" class="btn btn-outline btn-sm" onclick="resetToBaseline()" title="Сбросить все изменения к эталону DOCX/XLSX">
+              Сбросить к эталону
+            </button>
+
+            <!-- Compact Theme Toggle -->
+            <button type="button" class="theme-switch" onclick="toggleTheme()" role="switch" aria-label="Светлая / Тёмная тема" title="Светлая / Тёмная тема">
+              <span class="theme-thumb" id="theme-thumb"></span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 6 Navigation Tabs -->
+        <div class="header-bar-2">
+          <nav class="seg-track" id="main-tabs" aria-label="Разделы PM Control Plane"></nav>
+          <div class="text-11 mono text-muted" id="scope-summary-caption"></div>
+        </div>
+      </div>
+    </header>
+
+    <!-- =================================================================== -->
+    <!-- MAIN WORKSPACE                                                      -->
+    <!-- =================================================================== -->
+    <main class="main-content">
+      <div class="container" id="app-main"></div>
+    </main>
+
+    <!-- =================================================================== -->
+    <!-- FOOTER                                                              -->
+    <!-- =================================================================== -->
+    <footer class="footer">
+      <div class="container between">
+        <span>PropTechApp — PM Control Plane · Единый источник управленческих данных (DOCX + XLSX). Все неподтверждённые до замера W1–W2 вводные помечены [Допущение].</span>
+        <span class="mono">MVP 7 мес. · 32 млн ₽ · 9,1 FTE · 36 мес. SaaS</span>
+      </div>
+    </footer>
+  </div>
+
+  <!-- MODAL: ADD NEW EPIC -->
+  <div id="epic-modal" class="modal-backdrop" onclick="closeModal('epic-modal', event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <div class="between" style="padding-bottom: 12px; border-bottom: 1px solid var(--border);">
+        <div>
+          <div class="eyebrow">BACKLOG GOVERNANCE</div>
+          <div class="h2">Добавить задачу / эпик</div>
+        </div>
+        <button type="button" class="btn btn-outline btn-xs" onclick="closeModal('epic-modal')">✕</button>
+      </div>
+      <form onsubmit="submitNewEpic(event)" class="stack-sm" style="margin-top: 14px;">
+        <div>
+          <label class="eyebrow" style="display:block; margin-bottom:4px;">Название эпика / задачи *</label>
+          <input id="ne-title" class="input" required placeholder="Например: Интеграция с корпоративным AD" />
+        </div>
+        <div class="grid-2">
+          <div>
+            <label class="eyebrow" style="display:block; margin-bottom:4px;">Стадия</label>
+            <select id="ne-stage" class="select">
+              <option value="MVP">MVP</option>
+              <option value="Этап 2">Этап 2</option>
+              <option value="Этап 3">Этап 3</option>
+            </select>
+          </div>
+          <div>
+            <label class="eyebrow" style="display:block; margin-bottom:4px;">Исполнитель</label>
+            <input id="ne-owner" class="input" value="Senior BE" />
+          </div>
+        </div>
+        <div class="grid-3">
+          <div>
+            <label class="eyebrow" style="display:block; margin-bottom:4px;">Ценность BV (1–10)</label>
+            <input id="ne-bv" type="number" min="1" max="10" value="8" class="input mono" required />
+          </div>
+          <div>
+            <label class="eyebrow" style="display:block; margin-bottom:4px;">Риск RR (1–10)</label>
+            <input id="ne-rr" type="number" min="1" max="10" value="7" class="input mono" required />
+          </div>
+          <div>
+            <label class="eyebrow" style="display:block; margin-bottom:4px;">Объём (ч/н)</label>
+            <input id="ne-effort" type="number" min="1" max="20" value="4" class="input mono" required />
+          </div>
+        </div>
+        <div class="subtle text-11 text-muted" style="padding: 9px 11px;">
+          Правило Steering Committee: <strong>«1 добавили — эквивалент трудоёмкости убрали»</strong>. При превышении лимита ч/н MVP система подсветит перегрузку.
+        </div>
+        <div class="row" style="justify-content: flex-end; margin-top: 6px;">
+          <button type="button" class="btn btn-outline btn-sm" onclick="closeModal('epic-modal')">Отмена</button>
+          <button type="submit" class="btn btn-orange btn-sm">Добавить в бэклог</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- TOASTS -->
+  <div id="toast-stack" class="toast-stack"></div>
+
+  <script>
+    // =========================================================================
+    // 1. BASELINE REFERENCE DATA (FROM DOCX & XLSX)
+    // =========================================================================
+    function createInitialState() {
+      return {
+        theme: 'light',
+        activeTab: 'overview', // 'overview' | 'backlog' | 'gantt' | 'team' | 'finance' | 'kpi'
+        scopeScenario: 'base', // 'base' | 'scA' | 'scB'
+        currentWeek: 8,
+
+        // Read-only BroadcastChannel status
+        bridgeConnected: false,
+        bridgeLastSeen: null,
+
+        // 6 Unconditional Release Stop Criteria (InfoSec & QA Veto)
+        stopCriteria: [
+          { id: 'SC-1', text: '0 cross-tenant утечек (PostgreSQL RLS fail-closed, списки / S3 / CSV)', checked: true },
+          { id: 'SC-2', text: '0 проходов по PENDING_SYNC / FAILED / REVOKED QR на живом турникете', checked: true },
+          { id: 'SC-3', text: '0 Critical / High уязвимостей по отчёту внешнего пентеста', checked: true },
+          { id: 'SC-4', text: 'Пройдена воспроизводимая приёмка на реальном оборудовании СКУД (W20–W22)', checked: true },
+          { id: 'SC-5', text: 'Проверено восстановление БД из бэкапа (DR) и Append-Only аудит-лог', checked: true },
+          { id: 'SC-6', text: 'Подписан аварийный бумажный offline-регламент охраны и обучены все смены', checked: true },
+        ],
+
+        // Governance Decisions (Day 90 & Day 180)
+        governance: {
+          day90: 'Ожидает решения',   // 'GO' | 'CHANGE / PIVOT' | 'STOP'
+          day180: 'Ожидает решения',
+        },
+
+        // 30 / 60 / 90 Day PO/TL Plan (Artifact 14)
+        plan306090: [
+          { id: 'P30-1', horizon: 'День 30 (M1)', text: 'Полевой 5-дневный замер baseline (КПП, УК, парковка) и закрытие 12 противоречий ТЗ', done: true },
+          { id: 'P30-2', horizon: 'День 30 (M1)', text: 'Утверждение 6 ADR, STRIDE Threat Model, модели 152-ФЗ и подписание Pilot Charter', done: true },
+          { id: 'P30-3', horizon: 'День 30 (M1)', text: 'Подписание договора с подрядчиком СКУД (ACL, наш Git, IP, транши 30/50/20%)', done: true },
+          { id: 'P60-1', horizon: 'День 60 (M2)', text: 'Готовность мультиарендного ядра (.NET + PostgreSQL RLS + Keycloak MFA) и CI/CD', done: true },
+          { id: 'P60-2', horizon: 'День 60 (M2)', text: 'Запуск Mock-эмулятора СКУД (W3–W7) и сборка 80% логики пропусков до поставки стенда W8', done: true },
+          { id: 'P60-3', horizon: 'День 60 (M2)', text: 'Утверждение 2-кликового прототипа поста охраны с начальником СБ', done: false },
+          { id: 'P90-1', horizon: 'День 90 (M3)', text: 'Подключение реального стенда СКУД (W8), прохождение контрактных автотестов и первое демо', done: false },
+          { id: 'P90-2', horizon: 'День 90 (M3)', text: 'Первые 5–8 пресейл-интервью с внешними УК по прототипу (сбор LOI >= 10 ₽/м²)', done: false },
+          { id: 'P90-3', horizon: 'День 90 (M3)', text: 'Проведение 90-дневного Steering Committee (ворота Go / Change / Stop)', done: false },
+        ],
+
+        // Backlog: ALL 24 Epics (Exact DOCX/XLSX Data)
+        backlogView: 'table', // 'table' | 'kanban'
+        backlogStageFilter: 'ALL',
+        backlogStatusFilter: 'ALL',
+        backlogSearch: '',
+        epics: [
+          // MVP (15 epics = 73 ч/н)
+          { id: 'EP-01', title: 'Ядро изоляции арендаторов (PostgreSQL RLS и 2-ур. RBAC)', stage: 'MVP', bv: 9, rr: 10, effort: 6, dep: 'Старт W4', scA: 'Оставить', effA: 6, scB: 'Оставить', effB: 6, status: 'Done', owner: 'Senior BE' },
+          { id: 'EP-02', title: 'Авторизация Keycloak (SSO/MFA), роли и неизменяемый аудит', stage: 'MVP', bv: 7, rr: 10, effort: 4, dep: 'Инфра W3', scA: 'Оставить', effA: 4, scB: 'Оставить', effB: 4, status: 'Done', owner: 'Senior BE' },
+          { id: 'EP-03', title: 'Шина интеграций (ACL, Outbox, RabbitMQ, Mock-эмулятор СКУД)', stage: 'MVP', bv: 8, rr: 10, effort: 6, dep: 'Аудит API W3', scA: 'Оставить', effA: 6, scB: 'Оставить', effB: 6, status: 'Done', owner: 'Middle BE' },
+          { id: 'EP-04', title: 'Гостевые QR-пропуска (статусы, отзыв ≤60с, VIP, Спецдоступ)', stage: 'MVP', bv: 10, rr: 9, effort: 6, dep: 'EP-03', scA: 'Оставить', effA: 6, scB: 'Оставить', effB: 6, status: 'In Progress', owner: 'Middle BE + FE' },
+          { id: 'EP-05', title: 'Адаптер legacy-СКУД пилотного БЦ и фоновая сверка 5 мин', stage: 'MVP', bv: 10, rr: 10, effort: 7, dep: 'Стенд W8', scA: 'Оставить', effA: 7, scB: 'Оставить', effB: 7, status: 'In Progress', owner: 'Подрядчик СКУД' },
+          { id: 'EP-06', title: 'Веб-кабинет поста охраны (≤2 клика, SignalR, кэш дня)', stage: 'MVP', bv: 9, rr: 9, effort: 4, dep: 'EP-04', scA: 'Оставить', effA: 4, scB: 'Оставить', effB: 4, status: 'In Progress', owner: 'Senior FE' },
+          { id: 'EP-07', title: 'Заявки арендаторов и вложения (приватный S3, антивирус)', stage: 'MVP', bv: 9, rr: 7, effort: 5, dep: 'EP-01 / S3', scA: 'Оставить', effA: 5, scB: 'Убран', effB: 0, status: 'Backlog', owner: 'Middle FE' },
+          { id: 'EP-08', title: 'Двухслойный SLA УК (календари, паузы, приватные заметки)', stage: 'MVP', bv: 9, rr: 6, effort: 6, dep: 'EP-07', scA: 'Упростить', effA: 3, scB: 'Убран', effB: 0, status: 'Backlog', owner: 'Senior BE' },
+          { id: 'EP-09', title: 'Парковка (420 мест): квоты и брони (SELECT FOR UPDATE)', stage: 'MVP', bv: 8, rr: 7, effort: 5, dep: 'EP-01', scA: 'Упростить', effA: 3, scB: 'Упростить', effB: 3, status: 'QA / ИБ', owner: 'Middle BE' },
+          { id: 'EP-10', title: 'Экран физ. занятости парковки на КПП (отдельно от квот)', stage: 'MVP', bv: 6, rr: 6, effort: 4, dep: 'EP-09', scA: 'Убран', effA: 0, scB: 'Убран', effB: 0, status: 'Backlog', owner: 'Middle FE' },
+          { id: 'EP-11', title: 'Уведомления (веб, SignalR, Email, SMS) с защитой от дублей', stage: 'MVP', bv: 7, rr: 5, effort: 3, dep: 'EP-01', scA: 'Оставить', effA: 3, scB: 'Оставить', effB: 3, status: 'Backlog', owner: 'Middle BE' },
+          { id: 'EP-12', title: 'Инфоцентр БЦ (новости, регламенты, рассылка документов)', stage: 'MVP', bv: 5, rr: 3, effort: 4, dep: 'EP-01', scA: 'Убран', effA: 0, scB: 'Убран', effB: 0, status: 'Backlog', owner: 'Middle FE' },
+          { id: 'EP-13', title: 'Бронирование общих переговорок (UTC, скрытие названий)', stage: 'MVP', bv: 5, rr: 3, effort: 5, dep: 'EP-01', scA: 'Убран', effA: 0, scB: 'Убран', effB: 0, status: 'Backlog', owner: 'Senior FE' },
+          { id: 'EP-14', title: 'Отчеты SLA и парковки, защищенный экспорт CSV с аудитом', stage: 'MVP', bv: 7, rr: 7, effort: 4, dep: 'EP-07 / 09', scA: 'Упростить', effA: 2, scB: 'Упростить', effB: 2, status: 'Backlog', owner: 'Senior BE' },
+          { id: 'EP-15', title: 'Контур 152-ФЗ (удаление 30–90д), тест DR-бэкапа, пентест', stage: 'MVP', bv: 6, rr: 10, effort: 4, dep: 'Инфра W4', scA: 'Оставить', effA: 4, scB: 'Оставить', effB: 4, status: 'In Progress', owner: 'InfoSec + DevOps' },
+          // Stage 2 (6 epics = 50 ч/н)
+          { id: 'EP-16', title: 'Нативные мобильные приложения iOS/Android (Swift/Kotlin)', stage: 'Этап 2', bv: 9, rr: 5, effort: 10, dep: 'OpenAPI MVP', scA: '—', effA: 0, scB: '—', effB: 0, status: 'Backlog', owner: 'Mobile Team' },
+          { id: 'EP-17', title: 'Постоянные пропуска сотрудников (BLE / NFC)', stage: 'Этап 2', bv: 9, rr: 6, effort: 8, dep: 'EP-16, СКУД', scA: '—', effA: 0, scB: '—', effB: 0, status: 'Backlog', owner: 'Senior BE' },
+          { id: 'EP-18', title: 'Интеграция с 1С / ERP (договоры, реестры, акты)', stage: 'Этап 2', bv: 8, rr: 6, effort: 9, dep: 'Партнёр 1С', scA: '—', effA: 0, scB: '—', effB: 0, status: 'Backlog', owner: 'Партнёр 1С' },
+          { id: 'EP-19', title: 'Библиотека адаптеров СКУД (Bolid, Sigur, Parsec, PERCo)', stage: 'Этап 2', bv: 9, rr: 9, effort: 8, dep: 'EP-03 ACL', scA: '—', effA: 0, scB: '—', effB: 0, status: 'Backlog', owner: 'Подрядчик СКУД' },
+          { id: 'EP-20', title: 'Пакет локальной установки On-Premise (Helm/K8s)', stage: 'Этап 2', bv: 8, rr: 9, effort: 8, dep: 'ADR-05', scA: '—', effA: 0, scB: '—', effB: 0, status: 'Backlog', owner: 'DevOps' },
+          { id: 'EP-21', title: 'Платные допуслуги УК и эквайринг 54-ФЗ', stage: 'Этап 2', bv: 8, rr: 3, effort: 7, dep: 'EP-07', scA: '—', effA: 0, scB: '—', effB: 0, status: 'Backlog', owner: 'Middle BE' },
+          // Stage 3 (3 epics = 28 ч/н)
+          { id: 'EP-22', title: 'Интеграция камер LPR (распознавание номеров парковки)', stage: 'Этап 3', bv: 8, rr: 6, effort: 7, dep: 'EP-10', scA: '—', effA: 0, scB: '—', effB: 0, status: 'Backlog', owner: 'Подрядчик LPR' },
+          { id: 'EP-23', title: 'Инженерная телеметрия BMS (только чтение)', stage: 'Этап 3', bv: 7, rr: 7, effort: 10, dep: 'Партнёр BMS', scA: '—', effA: 0, scB: '—', effB: 0, status: 'Backlog', owner: 'Партнёр BMS' },
+          { id: 'EP-24', title: 'Ограниченные безопасные команды BMS (стенд, 2x подтв.)', stage: 'Этап 3', bv: 6, rr: 8, effort: 11, dep: 'EP-23, ИБ', scA: '—', effA: 0, scB: '—', effB: 0, status: 'Backlog', owner: 'Architect + ИБ' },
+        ],
+
+        // Gantt Phases (28 Weeks)
+        selectedPhaseId: 'PH-4',
+        ganttPhases: [
+          { id: 'PH-1', name: '1. Обследование (Discovery)', start: 1, end: 3, color: '#FF441F', critical: true, milestones: '5-дневный замер baseline, аудит API СКУД, закрытие 12 противоречий, 6 ADR, STRIDE, Pilot Charter.', risk: 'Фиксация минимального канонического ACL-контракта до W3.' },
+          { id: 'PH-2', name: '2. Прототипы и инфра', start: 2, end: 5, color: '#00C2E8', critical: false, milestones: 'Кликабельные UX-прототипы (2-клик пост СБ), Облако РФ (152-ФЗ), K8s/Helm, CI/CD, Keycloak.', risk: 'Подписание договора с подрядчиком СКУД к W4 (наш Git + IP).' },
+          { id: 'PH-3', name: '3. Фундамент и эмулятор СКУД', start: 3, end: 8, color: '#F59E0B', critical: true, milestones: 'Multi-tenant ядро (.NET + PostgreSQL RLS fail-closed), Outbox/RabbitMQ, Mock-эмулятор СКУД.', risk: 'Обход задержки стенда W8: собираем 80–85% логики и автотестов до W8.' },
+          { id: 'PH-4', name: '4. Интеграции и процессы', start: 8, end: 16, color: '#FF441F', critical: true, milestones: 'Веха W8: поставка стенда СКУД → адаптер + сверка 5 мин; кабинет охраны (SignalR); Заявки + 2-сл. SLA; Парковка.', risk: 'Критический путь: задержка стенда W8 > 2 недель сдвигает живой турникет.' },
+          { id: 'PH-5', name: '5. Периферия и буфер сжатия', start: 14, end: 19, color: '#00C2E8', critical: false, milestones: 'Уведомления с дедупликацией, отчёты + защищённый CSV, буфер (EP-10/12/13). Веха W19: Code Freeze.', risk: 'Буфер сжатия (-13 ч/н) при необходимости удержать срок.' },
+          { id: 'PH-6', name: '6. Испытания и ИБ', start: 16, end: 23, color: '#FF441F', critical: true, milestones: 'Контрактные и concurrency-тесты, приёмка на живом турникете БЦ (W20–W22), нагрузка ×5, внешний пентест, тест DR.', risk: '6 безусловных Release Stop Criteria (право вето ИБ и QA).' },
+          { id: 'PH-7', name: '7. Пилот и 10-дн. ОЭ', start: 23, end: 26, color: '#10B981', critical: false, milestones: 'Онбординг 8–12 пилотных компаний (чемпионы), обучение всех смен охраны и УК, 10-дневная опытная эксплуатация.', risk: 'Отработка бумажного offline-регламента и проверка антисаботажа.' },
+          { id: 'PH-8', name: '8. Расширение и передача', start: 27, end: 28, color: '#10B981', critical: false, milestones: 'Раскатка на 55 компаний, комитет Go/No-Go, передача кода, CI/CD, OpenAPI, тестов и документации (НМА).', risk: 'Закрытие бюджета MVP и открытие транша Этапа 2.' },
+        ],
+
+        // Team (9.1 FTE + ACS Contractor)
+        team: [
+          { id: 'T-01', role: 'PO / Team Lead', fte: 1.0, cost7m: 3.15, load: 100, supportTax: false, absent: false, paired: false, note: 'Стратегия, MVP, бюджет, подрядчик, Go/No-Go' },
+          { id: 'T-02', role: 'Business Analyst', fte: 1.0, cost7m: 2.10, load: 95, supportTax: false, absent: false, paired: false, note: 'Discovery, baseline, BPMN, User Stories, SLA' },
+          { id: 'T-03', role: 'UX/UI Designer', fte: 1.0, cost7m: 1.90, load: 85, supportTax: false, absent: false, paired: false, note: 'Web/PWA, 2-клик пост СБ, дизайн-система (6 мес.)' },
+          { id: 'T-04', role: 'Senior Backend (.NET)', fte: 1.0, cost7m: 2.95, load: 100, supportTax: true, absent: false, paired: true, note: 'Парное владение BE: RLS, Keycloak, SLA, отчёты' },
+          { id: 'T-05', role: 'Middle Backend (.NET)', fte: 1.0, cost7m: 2.25, load: 95, supportTax: true, absent: false, paired: true, note: 'Парное владение BE: ACL/Outbox, QR, парковка' },
+          { id: 'T-06', role: 'Senior Frontend (React/TS)', fte: 1.0, cost7m: 2.65, load: 95, supportTax: true, absent: false, paired: true, note: 'Кабинет охраны (SignalR), архитектура PWA' },
+          { id: 'T-07', role: 'Middle Frontend (React/TS)', fte: 1.0, cost7m: 2.00, load: 90, supportTax: false, absent: false, paired: true, note: 'Заявки S3, парковка, инфоцентр' },
+          { id: 'T-08', role: 'QA Engineer', fte: 1.0, cost7m: 1.85, load: 95, supportTax: false, absent: false, paired: false, note: 'Cross-tenant CI, контракты Mock/Real, турникет' },
+          { id: 'T-09', role: 'DevOps Engineer', fte: 0.5, cost7m: 1.05, load: 80, supportTax: true, absent: false, paired: false, note: 'Облако РФ, K8s/Helm, Vault, Grafana, DR-бэкапы' },
+          { id: 'T-10', role: 'Solution Architect', fte: 0.3, cost7m: 0.55, load: 90, supportTax: false, absent: false, paired: false, note: 'Пик 0,4 FTE на W1–W8 и W18–W24; 6 ADR, ACL/RLS' },
+          { id: 'T-11', role: 'InfoSec Lead (ИБ)', fte: 0.3, cost7m: 0.50, load: 85, supportTax: false, absent: false, paired: false, note: 'Пик 0,4 FTE на W1–W8 и W18–W24; STRIDE, 152-ФЗ' },
+          { id: 'T-12', role: 'Подрядчик адаптера СКУД', fte: 0, cost7m: 2.00, load: 100, supportTax: false, absent: false, paired: false, note: 'Фикс 2,00 млн ₽ · Транши 30% стенд / 50% турникет / 20% ОЭ · наш Git + IP' },
+        ],
+
+        // MVP Budget Tracking (Plan 24.86M, Limit 32.00M, Reserve 7.14M)
+        budgetItems: [
+          { id: 'B-1', name: 'Команда разработки (9,1 FTE, 7 мес., ФОТ МСК 2026)', plan: 20.95, actual: 6.10, maxSlider: 28.0 },
+          { id: 'B-2', name: 'Адаптер legacy-СКУД (подрядчик, транши 30/50/20%)', plan: 2.00, actual: 0.60, maxSlider: 4.5 },
+          { id: 'B-3', name: 'Аттестованное Облако РФ (152-ФЗ) + SMS/Email-шлюзы', plan: 0.91, actual: 0.28, maxSlider: 2.5 },
+          { id: 'B-4', name: 'Внешний пентест и аудит ИБ (до запуска ОЭ)', plan: 1.00, actual: 0.00, maxSlider: 2.5 },
+        ],
+
+        // 36-Month Financial Model & Sensitivity
+        finScenario: 'base', // 'pess' | 'base' | 'opt'
+        finParams: {
+          tariff: 12,      // RUB/m2/month (8..16)
+          cac: 2.4,        // M RUB (1.5..3.6)
+          churn: 8,        // %/year (5..15)
+          avgArea: 42,     // thousand m2 (25..60)
+          setupFee: 1.6,   // M RUB
+          setupCogs: 1.2,  // M RUB
+          saasCogsM: 0.095,// M RUB/month per BC
+          fixedOpexY: 58.0,// M RUB/year post-MVP
+        },
+
+        // Tab 6 sub-tab
+        kpiSubTab: 'metrics', // 'metrics' | 'hypotheses' | 'contradictions' | 'risks'
+
+        // 14 KPI Metrics (North Star + 5 Branches)
+        metrics: [
+          { id: 'M-00', branch: 'North Star', name: 'Доля ключевых операций в self-service в рамках SLA', unit: '%', baseline: '0%', target: '≥ 65%', redFlagLabel: '< 35%', value: 68, min: 0, max: 100, step: 1, checkRed: v => v < 35 },
+          { id: 'M-01', branch: '1. Арендатор', name: 'Медиана времени оформления гостевого пропуска', unit: 'мин', baseline: '~15 мин', target: '≤ 2 мин', redFlagLabel: '> 5 мин', value: 1.8, min: 0.5, max: 15, step: 0.1, checkRed: v => v > 5 },
+          { id: 'M-02', branch: '1. Арендатор', name: 'Активные компании-арендаторы (из 55 в БЦ)', unit: 'комп.', baseline: '0', target: '≥ 35', redFlagLabel: '< 20', value: 38, min: 0, max: 55, step: 1, checkRed: v => v < 20 },
+          { id: 'M-03', branch: '1. Арендатор', name: 'Удовлетворённость пользователей (CSAT)', unit: '/5', baseline: 'н/д', target: '≥ 4,2', redFlagLabel: '< 3,5', value: 4.4, min: 1.0, max: 5.0, step: 0.1, checkRed: v => v < 3.5 },
+          { id: 'M-04', branch: '2. Эффективность УК', name: 'Доля заявок, закрытых в рамках 2-слойного SLA', unit: '%', baseline: '~60%', target: '≥ 85%', redFlagLabel: '< 70%', value: 87, min: 30, max: 100, step: 1, checkRed: v => v < 70 },
+          { id: 'M-05', branch: '2. Эффективность УК', name: 'Снижение повторных уточняющих звонков в УК', unit: '%', baseline: '0%', target: '≥ 30%', redFlagLabel: '< 10%', value: 34, min: 0, max: 80, step: 1, checkRed: v => v < 10 },
+          { id: 'M-06', branch: '2. Эффективность УК', name: 'Снижение доли ручных пропусков на КПП', unit: '%', baseline: '0%', target: '≥ 50%', redFlagLabel: '< 20%', value: 58, min: 0, max: 100, step: 1, checkRed: v => v < 20 },
+          { id: 'M-07', branch: '2. Эффективность УК', name: 'Конфликты парковки (на 100 заездов)', unit: 'шт.', baseline: '~12', target: '< 3', redFlagLabel: '> 6', value: 2.1, min: 0, max: 15, step: 0.1, checkRed: v => v > 6 },
+          { id: 'M-08', branch: '3. Доступ и ИБ', name: 'Ошибки синхронизации пропусков со СКУД (FAILED)', unit: '%', baseline: 'н/д', target: '< 0,5%', redFlagLabel: '> 1,5%', value: 0.3, min: 0, max: 5, step: 0.1, checkRed: v => v > 1.5 },
+          { id: 'M-09', branch: '3. Доступ и ИБ', name: 'Время отзыва пропуска в СКУД (p95)', unit: 'сек', baseline: '> 600с', target: '≤ 60 с', redFlagLabel: '> 120 с', value: 18, min: 1, max: 180, step: 1, checkRed: v => v > 120 },
+          { id: 'M-10', branch: '3. Доступ и ИБ', name: 'Инциденты межтенантной утечки (Cross-tenant)', unit: 'инц.', baseline: '0', target: 'Строго 0', redFlagLabel: '> 0 (STOP)', value: 0, min: 0, max: 3, step: 1, checkRed: v => v > 0 },
+          { id: 'M-11', branch: '4. Бизнес продукта', name: 'Внешние LOI к M6 по ставке ≥ 10 ₽/м²', unit: 'LOI', baseline: '0', target: '≥ 3', redFlagLabel: '0 LOI', value: 3, min: 0, max: 10, step: 1, checkRed: v => v === 0 },
+          { id: 'M-12', branch: '4. Бизнес продукта', name: 'Валовая маржа подписки (SaaS GM)', unit: '%', baseline: 'н/д', target: '≥ 80%', redFlagLabel: '< 70%', value: 81.2, min: 50, max: 95, step: 0.2, checkRed: v => v < 70 },
+          { id: 'M-13', branch: '5. Качество Delivery', name: 'Отклонение бюджета от лимита 32 млн ₽ (DORA)', unit: '%', baseline: '0%', target: '≤ 5%', redFlagLabel: '> 10%', value: 2.0, min: 0, max: 25, step: 0.5, checkRed: v => v > 10 },
+        ],
+
+        // 8 Hypotheses (H-01..H-08)
+        hypotheses: [
+          { id: 'H-01', priority: 'Топ-5', text: 'Self-service сократит медиану оформления гостевого пропуска с ~15 мин до ≤ 2 мин', threshold: '≤ 2 мин у ≥ 70% гостей', status: 'Подтверждена' },
+          { id: 'H-02', priority: 'Топ-5', text: 'Единый реестр и 2-слойный SLA снизят повторные звонки в диспетчерскую УК на ≥ 30%', threshold: '≥ -30% звонков за 30 дн.', status: 'В проверке' },
+          { id: 'H-03', priority: 'Топ-5', text: 'Интеграция через ACL + Outbox поверх legacy-СКУД обеспечит < 0,5% ошибок без замены железа', threshold: 'Ошибки < 0,5%, отзыв ≤ 60с', status: 'В проверке' },
+          { id: 'H-04', priority: 'Топ-5', text: 'Адаптивный Web/PWA закроет ≥ 80% гостевых и офисных сценариев без нативных iOS/Android', threshold: '≥ 80% операций в PWA', status: 'Подтверждена' },
+          { id: 'H-05', priority: 'Топ-5', text: 'Внешние собственники и УК готовы платить ≥ 10–12 ₽/м²/мес. за цифровой периметр и SLA', threshold: '≥ 3 внешних LOI к M6', status: 'В проверке' },
+          { id: 'H-06', priority: 'Доп.', text: 'Раздельный учёт квот парковки и факта КПП снизит число парковочных конфликтов в 4 раза', threshold: '< 3 конфл. / 100 заездов', status: 'В проверке' },
+          { id: 'H-07', priority: 'Доп.', text: '2-кликовый интерфейс поста СБ и обучение смен предотвратят возврат к бумажному журналу', threshold: '≥ -50% ручных пропусков', status: 'В проверке' },
+          { id: 'H-08', priority: 'Доп.', text: 'Playbook и библиотека адаптеров позволят подключать 2-й БЦ за 4–6 недель без форков кода', threshold: '≤ 6 нед. на 2-й объект', status: 'В проверке' },
+        ],
+
+        // 12 Contradictions / Questions before dev (Q-01..Q-12)
+        contradictions: [
+          { id: 'Q-01', title: 'Стенд legacy-СКУД не ранее W8 при сроке пилота 7 месяцев', resolution: 'Внедрён ACL + Mock-эмулятор СКУД с W3 (80% логики до W8).', closed: true },
+          { id: 'Q-02', title: 'Неразграниченный бюджет доработки железа/считывателей СКУД', resolution: 'Железо и лицензии БЦ юридически вынесены за пределы 32 млн ₽.', closed: true },
+          { id: 'Q-03', title: 'Слишком широкий список контуров в Приложении А (7 модулей)', resolution: 'Введён буфер сжатия (EP-10/12/13) и 2 развилки (-10 нед. / -30%).', closed: true },
+          { id: 'Q-04', title: 'Незафиксированный выбор Cloud РФ vs On-Premise для пилота', resolution: 'Пилот в аттестованном Облаке РФ (152-ФЗ) + Helm/K8s под On-Prem Этапа 2.', closed: true },
+          { id: 'Q-05', title: 'Смешение брони парковочной квоты и фактической занятости КПП', resolution: 'Разделены на 2 независимые сущности в БД + 5% операционный буфер.', closed: true },
+          { id: 'Q-06', title: 'Риск утечки ПДн при хранении сканов паспортов по 152-ФЗ', resolution: 'Запрет сбора/хранения сканов паспортов в MVP; автоудаление через 30–90 дн.', closed: true },
+          { id: 'Q-07', title: 'Конфликт прозрачности SLA: страх УК перед «карательным» контролем', resolution: 'Внедрён 2-слойный SLA (валидные паузы + приватные заметки УК).', closed: true },
+          { id: 'Q-08', title: 'Иллюзия валидного QR до подтверждения от контроллера СКУД', resolution: 'Строгий автомат статусов: QR не рендерится до ACK (PENDING_SYNC → ACTIVE).', closed: true },
+          { id: 'Q-09', title: 'Узкое горлышко офис-менеджера в IT-компаниях на 200+ человек', resolution: 'Двухуровневый RBAC арендатора (Админ + делегирование сотрудникам).', closed: true },
+          { id: 'Q-10', title: 'Риск использования платформы как канала оповещения при ЧС', resolution: 'Явный юридический дисклеймер: не заменяет СОУЭ при пожаре/ЧС.', closed: true },
+          { id: 'Q-11', title: 'Риск Vendor Lock-in на подрядчике адаптера СКУД', resolution: 'Код строго в нашем Git, 100% IP заказчику, оплата 30/50/20%.', closed: false },
+          { id: 'Q-12', title: 'Отсутствие замеренного Baseline до старта пилота', resolution: 'Обязательный 5-дневный полевой хронометраж BA на W1–W2.', closed: false },
+        ],
+
+        // Top-10 Risks
+        risks: [
+          { id: 'R-01', cat: 'Технический', title: 'Задержка поставки стенда legacy-СКУД позже W8', prob: 4, imp: 5, stopRelease: false, mitigation: 'Mock-эмулятор с W3; покупка настольного контроллера или 2 волны запуска.', status: 'Под контролем' },
+          { id: 'R-02', cat: 'ИБ / 152-ФЗ', title: 'Межтенантная утечка данных (Cross-tenant IDOR / кэш / S3)', prob: 2, imp: 5, stopRelease: true, mitigation: 'PostgreSQL RLS fail-closed, CI cross-tenant тесты, Presigned URLs 5 мин.', status: 'Снижен' },
+          { id: 'R-03', cat: 'Доступ / СБ', title: 'Сбой отзыва пропуска при обрыве связи (REVOKE_FAILED)', prob: 3, imp: 5, stopRelease: true, mitigation: 'Мгновенный красный SignalR-алерт на КПП + ручная блокировка + сверка 5 мин.', status: 'Под контролем' },
+          { id: 'R-04', cat: 'Операционный', title: 'Тихий саботаж смен охраны и возврат к бумажной тетради', prob: 4, imp: 4, stopRelease: false, mitigation: '2-кликовый экран СБ (согласован с нач. СБ), обучение смен, приказ УК.', status: 'В работе' },
+          { id: 'R-05', cat: 'Операционный', title: 'Сопротивление УК прозрачному контролю SLA', prob: 3, imp: 4, stopRelease: false, mitigation: 'Двухслойный SLA («бронежилет УК»): валидные паузы и приватные заметки.', status: 'Снижен' },
+          { id: 'R-06', cat: 'Команда', title: 'Уход ключевого Backend-разработчика (Bus Factor = 1)', prob: 2, imp: 5, stopRelease: false, mitigation: 'Парное владение кодом BE, ADR-документация, общий CI/CD.', status: 'Снижен' },
+          { id: 'R-07', cat: 'Подрядчик', title: 'Vendor lock-in на интеграторе адаптера СКУД', prob: 3, imp: 4, stopRelease: false, mitigation: 'Разработка строго в нашем Git, передача 100% IP, транши 30/50/20%.', status: 'В работе' },
+          { id: 'R-08', cat: 'Коммерческий', title: 'Демпинг клиентов до 8 ₽/м² или 0 внешних LOI к M6', prob: 3, imp: 5, stopRelease: false, mitigation: 'Пресейл на M4–M6; ворота Дня 180 (Stop до инвестиций в Этап 2).', status: 'В работе' },
+          { id: 'R-09', cat: 'Юридический', title: 'Задержка согласования поручения ПДн (152-ФЗ) с юристами УК', prob: 3, imp: 4, stopRelease: true, mitigation: 'Старт на W1, отказ от сканов паспортов в MVP, локализация в ЦОД РФ.', status: 'Под контролем' },
+          { id: 'R-10', cat: 'Бизнес / Стейкх.', title: 'Давление бизнеса вывести сырой мобильный ключ к выставке', prob: 3, imp: 4, stopRelease: true, mitigation: 'Изолированный выставочный стенд с синтетикой («Прототип Этапа 2»).', status: 'Снижен' },
+        ],
+      };
+    }
+
+    let state = createInitialState();
+
+    // =========================================================================
+    // 2. READ-ONLY BROADCASTCHANNEL LISTENER (ACS STAND STATUS)
+    // =========================================================================
+    try {
+      if (typeof BroadcastChannel !== 'undefined') {
+        const ch = new BroadcastChannel('lovit_acs_bridge_v1');
+        ch.onmessage = (ev) => {
+          if (ev.data) {
+            state.bridgeConnected = true;
+            state.bridgeLastSeen = new Date().toTimeString().split(' ')[0];
+            renderHeader();
+          }
+        };
+      }
+    } catch (e) { /* ignore */ }
+
+    // =========================================================================
+    // 3. HELPERS & CALCULATIONS
+    // =========================================================================
+    function esc(s) {
+      return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function fmtNum(n, dec = 1) {
+      return Number(n).toLocaleString('ru-RU', { minimumFractionDigits: dec, maximumFractionDigits: dec });
+    }
+
+    function showToast(title, msg, tone = 'cyan') {
+      const stack = document.getElementById('toast-stack');
+      const colors = { cyan: '#00C2E8', orange: '#FF441F', green: '#10B981', amber: '#F59E0B' };
+      const el = document.createElement('div');
+      el.className = 'toast';
+      el.style.borderLeftColor = colors[tone] || colors.cyan;
+      el.innerHTML = `<div class="fw-700">${esc(title)}</div><div class="text-muted" style="margin-top:3px;">${esc(msg)}</div>`;
+      stack.appendChild(el);
+      setTimeout(() => { el.style.opacity = '0'; el.style.transition = 'opacity 0.25s'; setTimeout(() => el.remove(), 260); }, 3600);
+    }
+
+    function calcWsjf(ep) {
+      const eff = Math.max(1, Number(ep.effort) || 1);
+      return ((ep.bv * 0.6 + ep.rr * 0.4) * 10) / eff;
+    }
+
+    function getEpicScenarioEffort(ep) {
+      if (ep.stage !== 'MVP') return 0;
+      if (state.scopeScenario === 'scA') return ep.effA !== undefined ? ep.effA : ep.effort;
+      if (state.scopeScenario === 'scB') return ep.effB !== undefined ? ep.effB : ep.effort;
+      return ep.effort;
+    }
+
+    function getScopeMeta() {
+      const mvpEpics = state.epics.filter(e => e.stage === 'MVP');
+      const activeEpics = mvpEpics.filter(e => getEpicScenarioEffort(e) > 0);
+      const totalEffort = activeEpics.reduce((s, e) => s + getEpicScenarioEffort(e), 0);
+      const doneEffort = activeEpics.filter(e => e.status === 'Done').reduce((s, e) => s + getEpicScenarioEffort(e), 0);
+      const progressPct = totalEffort > 0 ? Math.round((doneEffort / totalEffort) * 100) : 0;
+
+      if (state.scopeScenario === 'scA') {
+        return { label: 'Сценарий А (-10 нед.)', targetEffort: 53, totalEffort, doneEffort, progressPct, weeks: 18, budgetPlan: 19.4, budgetLimit: 24.0 };
+      }
+      if (state.scopeScenario === 'scB') {
+        return { label: 'Сценарий Б (-30% бюджета)', targetEffort: 45, totalEffort, doneEffort, progressPct, weeks: 25, budgetPlan: 21.8, budgetLimit: 22.4 };
+      }
+      return { label: 'Базовый MVP', targetEffort: 73, totalEffort, doneEffort, progressPct, weeks: 28, budgetPlan: 24.86, budgetLimit: 32.0 };
+    }
+
+    function isReleaseGo() {
+      return state.stopCriteria.every(c => c.checked);
+    }
+
+    function getTeamCapacity() {
+      const internal = state.team.filter(t => t.fte > 0);
+      const totalFte = internal.reduce((s, t) => s + t.fte, 0);
+      const availableFte = internal.reduce((s, t) => s + (t.absent ? 0 : t.fte), 0);
+      const devRoles = internal.filter(t => t.role.includes('Backend') || t.role.includes('Frontend'));
+      const activeDevs = devRoles.filter(t => !t.absent).length;
+      const netCapacityWeeks = Math.round(activeDevs * 27 * 0.72); // focus factor 0.72
+      const absentSingles = internal.filter(t => t.absent && !t.paired);
+      const absentPaired = internal.filter(t => t.absent && t.paired);
+      return { totalFte, availableFte, activeDevs, netCapacityWeeks, absentSingles, absentPaired };
+    }
+
+    function computeFinancialModel() {
+      const p = state.finParams;
+      const arpa = (p.avgArea * p.tariff) / 1000; // M RUB / month
+      const acv = arpa * 12;
+      const saasGpM = arpa - p.saasCogsM;
+      const saasGmPct = arpa > 0 ? (saasGpM / arpa) * 100 : 0;
+      const setupGp = p.setupFee - p.setupCogs;
+      const ltv3ySaas = saasGpM * 36 * (1 - (p.churn / 100) * 0.85);
+      const ltv3yTotal = ltv3ySaas + setupGp;
+      const ltvCacTotal = p.cac > 0 ? ltv3yTotal / p.cac : 0;
+      const ltvCacSaas = p.cac > 0 ? ltv3ySaas / p.cac : 0;
+      const paybackNet = saasGpM > 0 ? Math.max(0.5, (p.cac - setupGp) / saasGpM) : 99;
+      const paybackSaas = saasGpM > 0 ? p.cac / saasGpM : 99;
+      const bcsForOpex = saasGpM > 0 ? Math.ceil(p.fixedOpexY / (saasGpM * 12)) : 99;
+
+      // Quarterly acquisition profiles
+      const profiles = {
+        pess: { newBcs: [0,0,0,1,1,1,2,2,2,2,2,3], chBcs: [0,0,0,0,0,0,0,0,1,0,0,1] },
+        base: { newBcs: [0,0,0,2,2,3,3,4,4,4,4,5], chBcs: [0,0,0,0,0,0,0,1,0,1,0,1] },
+        opt:  { newBcs: [0,0,0,3,4,4,5,5,5,5,5,6], chBcs: [0,0,0,0,0,0,0,1,0,0,1,0] },
+      };
+      const prof = profiles[state.finScenario];
+      const rdScale = p.fixedOpexY / 58.0;
+      const rdVals = [13.7, 13.7, 12.2, 12.0*rdScale, 13.2*rdScale, 13.2*rdScale, 13.8*rdScale, 13.8*rdScale, 14.4*rdScale, 14.4*rdScale, 15.0*rdScale, 15.0*rdScale];
+
+      let act = 0, cf = 0, totalRev = 0, totalEbitda = 0, minCf = 0, beQuarter = null;
+      const quarters = [];
+      for (let q = 0; q < 12; q++) {
+        const prev = act;
+        act = Math.max(0, prev + prof.newBcs[q] - prof.chBcs[q]);
+        const avg = (prev + act) / 2;
+        const rev = avg * arpa * 3 + prof.newBcs[q] * p.setupFee;
+        const cogs = avg * p.saasCogsM * 3 + prof.newBcs[q] * p.setupCogs;
+        const opex = rdVals[q] + prof.newBcs[q] * p.cac;
+        const ebitda = (rev - cogs) - opex;
+        cf += ebitda;
+        totalRev += rev;
+        totalEbitda += ebitda;
+        if (cf < minCf) minCf = cf;
+        if (beQuarter === null && q >= 3 && ebitda > 0) beQuarter = `Q${q + 1}`;
+        quarters.push({ q: `Q${q + 1}`, act, rev, ebitda, cf });
+      }
+      const arrM36 = act * acv;
+
+      return {
+        arpa, acv, saasGmPct, setupGp, ltv3yTotal, ltvCacTotal, ltvCacSaas,
+        paybackNet, paybackSaas, bcsForOpex, quarters, actM36: act,
+        totalRev, totalEbitda, minCf, beQuarter: beQuarter || '> 36 мес.', arrM36,
+      };
+    }
+
+    // =========================================================================
+    // 4. GLOBAL ACTIONS
+    // =========================================================================
+    function toggleTheme() {
+      state.theme = state.theme === 'light' ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', state.theme);
+      renderHeader();
+    }
+
+    function setScopeScenario(val) {
+      state.scopeScenario = val;
+      const meta = getScopeMeta();
+      showToast(`Активирован: ${meta.label}`, `Активный объём MVP: ${meta.totalEffort} ч/н · Горизонт: ${meta.weeks} нед.`, 'cyan');
+      render();
+    }
+
+    function setCurrentWeek(w) {
+      state.currentWeek = w;
+      render();
+    }
+
+    function switchTab(tab) {
+      state.activeTab = tab;
+      render();
+    }
+
+    function resetToBaseline() {
+      const keepTheme = state.theme;
+      const keepBridge = state.bridgeConnected;
+      state = createInitialState();
+      state.theme = keepTheme;
+      state.bridgeConnected = keepBridge;
+      showToast('Сброшено к эталону DOCX/XLSX', 'Все статусы, чекбоксы, бюджет и сценарии восстановлены.', 'green');
+      render();
+    }
+
+    // =========================================================================
+    // 5. HEADER RENDER
+    // =========================================================================
+    function renderHeader() {
+      document.getElementById('scope-select').value = state.scopeScenario;
+      document.getElementById('week-slider').value = state.currentWeek;
+      document.getElementById('week-val-label').textContent = `W${state.currentWeek}`;
+
+      const bp = document.getElementById('bridge-pill');
+      if (state.bridgeConnected) {
+        bp.className = 'bridge-pill connected';
+        bp.innerHTML = `<span class="dot dot-pulse" style="background: var(--cyan);"></span><span>Связь со стендом СКУД: Подключён (${state.bridgeLastSeen})</span>`;
+      } else {
+        bp.className = 'bridge-pill';
+        bp.innerHTML = `<span class="dot" style="background: var(--text-dim);"></span><span>Связь со стендом СКУД: Ожидание</span>`;
+      }
+
+      const rel = document.getElementById('header-release-badge');
+      if (isReleaseGo()) {
+        rel.className = 'badge b-green-solid';
+        rel.textContent = 'RELEASE: GO';
+      } else {
+        rel.className = 'badge b-orange-solid';
+        rel.textContent = 'NO-GO · ВЕТО ИБ/QA';
+      }
+
+      document.getElementById('theme-thumb').innerHTML = state.theme === 'light'
+        ? '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>'
+        : '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>';
+
+      const redMetricsCount = state.metrics.filter(m => m.checkRed(m.value)).length;
+      const tabs = [
+        { id: 'overview', label: 'Обзор и Governance' },
+        { id: 'backlog', label: 'Бэклог (24 эпика WSJF)' },
+        { id: 'gantt', label: 'Сроки, Гант и Roadmap' },
+        { id: 'team', label: 'Команда (9,1 FTE)' },
+        { id: 'finance', label: 'Бюджет и Финмодель' },
+        { id: 'kpi', label: 'KPI, Гипотезы и Риски', badge: redMetricsCount > 0 ? `${redMetricsCount} Red` : '' },
+      ];
+
+      document.getElementById('main-tabs').innerHTML = tabs.map(t => `
+        <button type="button" class="seg-btn ${state.activeTab === t.id ? 'active' : ''}" onclick="switchTab('${t.id}')">
+          <span>${t.label}</span>
+          ${t.badge ? `<span class="badge b-orange-solid" style="padding:1px 6px; font-size:10px;">${t.badge}</span>` : ''}
+        </button>
+      `).join('');
+
+      const meta = getScopeMeta();
+      document.getElementById('scope-summary-caption').textContent =
+        `${meta.label} · Объём: ${meta.totalEffort} ч/н · Прогресс: ${meta.progressPct}% · W${state.currentWeek}/${meta.weeks}`;
+    }
+
+    // =========================================================================
+    // 6. TAB 1: ОБЗОР И GOVERNANCE
+    // =========================================================================
+    function getNextMilestone(w) {
+      if (w < 3) return 'W3: Контракт ACL и аудит API СКУД';
+      if (w <= 8) return 'W8: Поставка стенда legacy-СКУД';
+      if (w <= 15) return 'W15: Завершение адаптера СКУД + сверки';
+      if (w <= 19) return 'W19: Code Freeze периферии MVP';
+      if (w <= 22) return 'W20–W22: Приёмка на живом турникете';
+      if (w <= 26) return 'W25–W26: 10-дневная опытная эксплуатация';
+      return 'W28: Раскатка на 55 комп. и Go/No-Go';
+    }
+
+    function renderOverviewTab() {
+      const meta = getScopeMeta();
+      const cap = getTeamCapacity();
+      const go = isReleaseGo();
+      const actualSpend = state.budgetItems.reduce((s, i) => s + i.actual, 0);
+      const reserve = Math.max(0, meta.budgetLimit - meta.budgetPlan);
+      const reservePct = ((reserve / meta.budgetLimit) * 100).toFixed(1);
+      const planDone = state.plan306090.filter(x => x.done).length;
+
+      return `
+        <div class="stack-md">
+          <!-- 5 Top KPI Cards -->
+          <div class="kpi-grid-5">
+            <div class="kpi-card">
+              <div class="eyebrow">БЮДЖЕТ MVP (БЕЗ НДС)</div>
+              <div class="kpi-val mono">${fmtNum(actualSpend, 2)} <span class="text-xs text-muted">/ ${fmtNum(meta.budgetPlan, 2)} млн ₽</span></div>
+              <div class="text-11 text-muted">Лимит: <strong>${fmtNum(meta.budgetLimit, 2)} млн</strong> · Резерв: ${fmtNum(reserve, 2)} млн (${reservePct}%)</div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="eyebrow">СРОК И БЛИЖАЙШАЯ ВЕХА</div>
+              <div class="kpi-val mono" style="color: var(--orange);">W${state.currentWeek} <span class="text-xs text-muted">из ${meta.weeks} нед.</span></div>
+              <div class="text-11 text-muted">${getNextMilestone(state.currentWeek)}</div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="eyebrow">ГОТОВНОСТЬ MVP (${meta.label})</div>
+              <div class="kpi-val mono" style="color: var(--cyan-text);">${meta.progressPct}% <span class="text-xs text-muted">(${meta.doneEffort}/${meta.totalEffort} ч/н)</span></div>
+              <div class="progress-bar"><div class="progress-fill" style="width:${meta.progressPct}%; background: var(--cyan);"></div></div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="eyebrow">КОМАНДА И ЁМКОСТЬ</div>
+              <div class="kpi-val mono">${fmtNum(cap.availableFte, 1)} <span class="text-xs text-muted">/ ${fmtNum(cap.totalFte, 1)} FTE</span></div>
+              <div class="text-11 text-muted">Focus 0,72 → ~${cap.netCapacityWeeks} ч/н + Подрядчик СКУД</div>
+            </div>
+
+            <div class="kpi-card" style="border-color: ${go ? 'var(--green-border)' : 'var(--orange)'}; background: ${go ? 'var(--green-soft)' : 'var(--orange-soft)'};">
+              <div class="eyebrow" style="color: ${go ? 'var(--green-text)' : 'var(--orange)'};">RELEASE GATE (ИБ / QA)</div>
+              <div class="kpi-val" style="color: ${go ? 'var(--green-text)' : 'var(--orange)'};">${go ? 'GO · Готов' : 'NO-GO · ВЕТО'}</div>
+              <div class="text-11" style="color: var(--text-main);">Пройдено критериев: <strong>${state.stopCriteria.filter(c => c.checked).length} / 6</strong></div>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <!-- 6 Unconditional Release Stop Criteria -->
+            <div class="card card-pad stack-sm">
+              <div class="between">
+                <div>
+                  <div class="eyebrow" style="color: var(--orange);">БЕЗУСЛОВНОЕ ПРАВО ВЕТО ИБ И QA</div>
+                  <h2 class="h2">6 Release Stop Criteria (не подлежат бизнес-одобрению)</h2>
+                </div>
+                <span class="badge ${go ? 'b-green' : 'b-orange-solid'}">${go ? '6 / 6 OK' : 'РЕЛИЗ ЗАБЛОКИРОВАН'}</span>
+              </div>
+              <div class="stack-xs">
+                ${state.stopCriteria.map(c => `
+                  <label class="check-row ${c.checked ? '' : 'failed'}">
+                    <input type="checkbox" ${c.checked ? 'checked' : ''} onchange="toggleStopCriterion('${c.id}', this.checked)" />
+                    <div style="flex:1;">
+                      <span class="mono fw-700 text-11" style="color:${c.checked ? 'var(--green-text)' : 'var(--orange)'};">${c.id}</span>
+                      <span style="margin-left:6px;">${esc(c.text)}</span>
+                    </div>
+                  </label>
+                `).join('')}
+              </div>
+            </div>
+
+            <!-- Governance Gates (90 & 180 Days) -->
+            <div class="card card-pad stack-md">
+              <div>
+                <div class="eyebrow">PRODUCT STEERING COMMITTEE</div>
+                <h2 class="h2">Ворота Product Governance (90 и 180 дней)</h2>
+                <p class="text-xs text-muted" style="margin: 4px 0 0;">Решения принимаются ежемесячно на основе телеметрии, финансового трекера и воронки продаж.</p>
+              </div>
+
+              <!-- Day 90 Gate -->
+              <div class="subtle stack-sm" style="padding: 14px;">
+                <div class="between">
+                  <span class="fw-800 text-xs">Ворота Дня 90 (конец M3 · Операционно-технический стоп-кран)</span>
+                  <span class="badge ${state.governance.day90 === 'GO' ? 'b-green' : state.governance.day90 === 'STOP' ? 'b-orange-solid' : 'b-amber'}">${state.governance.day90}</span>
+                </div>
+                <div class="text-xs text-muted">Условие продолжения: рабочий доступ к стенду/API СКУД без замены железа + подписанный Pilot Charter и регламент УК.</div>
+                <div class="row">
+                  <button type="button" class="btn btn-xs ${state.governance.day90 === 'GO' ? 'btn-cyan' : 'btn-outline'}" onclick="setGovDecision('day90','GO')">Зафиксировать GO</button>
+                  <button type="button" class="btn btn-xs ${state.governance.day90 === 'CHANGE / PIVOT' ? 'btn-dark' : 'btn-outline'}" onclick="setGovDecision('day90','CHANGE / PIVOT')">Change / Pivot</button>
+                  <button type="button" class="btn btn-xs ${state.governance.day90 === 'STOP' ? 'btn-orange' : 'btn-outline'}" onclick="setGovDecision('day90','STOP')">Stop / Смена БЦ</button>
+                </div>
+              </div>
+
+              <!-- Day 180 Gate -->
+              <div class="subtle stack-sm" style="padding: 14px;">
+                <div class="between">
+                  <span class="fw-800 text-xs">Ворота Дня 180 (конец M6 · Коммерческий стоп-кран до Этапа 2)</span>
+                  <span class="badge ${state.governance.day180 === 'GO' ? 'b-green' : state.governance.day180 === 'STOP' ? 'b-orange-solid' : 'b-amber'}">${state.governance.day180}</span>
+                </div>
+                <div class="text-xs text-muted">Условие выхода в Этап 2: ≥ 3 внешних LOI по ставке ≥ 10 ₽/м², self-service ≥ 65%, ошибки СКУД < 0,5%. При 0 LOI → Stop масштабирования.</div>
+                <div class="row">
+                  <button type="button" class="btn btn-xs ${state.governance.day180 === 'GO' ? 'btn-cyan' : 'btn-outline'}" onclick="setGovDecision('day180','GO')">Зафиксировать GO</button>
+                  <button type="button" class="btn btn-xs ${state.governance.day180 === 'CHANGE / PIVOT' ? 'btn-dark' : 'btn-outline'}" onclick="setGovDecision('day180','CHANGE / PIVOT')">Change / Pivot</button>
+                  <button type="button" class="btn btn-xs ${state.governance.day180 === 'STOP' ? 'btn-orange' : 'btn-outline'}" onclick="setGovDecision('day180','STOP')">Stop Этапа 2</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 30 / 60 / 90 Day Plan Checklist (Artifact 14) -->
+          <div class="card card-pad stack-sm">
+            <div class="between">
+              <div>
+                <div class="eyebrow">АРТЕФАКТ 14 · ЛИЧНЫЕ KPI РУКОВОДИТЕЛЯ</div>
+                <h2 class="h2">План PO / Team Lead на 30 / 60 / 90 дней</h2>
+              </div>
+              <span class="badge b-cyan mono">Выполнено: ${planDone} / ${state.plan306090.length}</span>
+            </div>
+            <div class="grid-3">
+              ${['День 30 (M1)', 'День 60 (M2)', 'День 90 (M3)'].map(h => `
+                <div class="subtle stack-xs" style="padding: 12px;">
+                  <div class="fw-800 text-xs" style="color: var(--cyan-text); margin-bottom: 4px;">${h}</div>
+                  ${state.plan306090.filter(item => item.horizon === h).map(item => `
+                    <label class="row" style="align-items:flex-start; cursor:pointer; font-size:12px; padding:4px 0;">
+                      <input type="checkbox" ${item.done ? 'checked' : ''} onchange="togglePlanItem('${item.id}', this.checked)" style="margin-top:2px; accent-color:var(--green);" />
+                      <span style="${item.done ? 'text-decoration:line-through; opacity:0.65;' : ''}">${esc(item.text)}</span>
+                    </label>
+                  `).join('')}
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function toggleStopCriterion(id, val) {
+      const c = state.stopCriteria.find(x => x.id === id);
+      if (c) c.checked = val;
+      if (!val) showToast('ВЕТО ИБ / QA АКТИВИРОВАНО', `Критерий ${id} снят — статус релиза переведён в NO-GO.`, 'orange');
+      render();
+    }
+
+    function setGovDecision(gate, decision) {
+      state.governance[gate] = decision;
+      showToast(`Решение Steering Committee (${gate === 'day90' ? 'День 90' : 'День 180'})`, `Зафиксирован статус: ${decision}.`, decision === 'GO' ? 'green' : decision === 'STOP' ? 'orange' : 'amber');
+      render();
+    }
+
+    function togglePlanItem(id, val) {
+      const it = state.plan306090.find(x => x.id === id);
+      if (it) it.done = val;
+      render();
+    }
+
+    // =========================================================================
+    // 7. TAB 2: БЭКЛОГ (24 ЭПИКА WSJF + КАНБАН)
+    // =========================================================================
+    function renderBacklogTab() {
+      const meta = getScopeMeta();
+      const overloaded = meta.totalEffort > meta.targetEffort;
+      const q = state.backlogSearch.trim().toLowerCase();
+
+      const filtered = state.epics
+        .filter(e => state.backlogStageFilter === 'ALL' || e.stage === state.backlogStageFilter)
+        .filter(e => state.backlogStatusFilter === 'ALL' || e.status === state.backlogStatusFilter)
+        .filter(e => !q || e.id.toLowerCase().includes(q) || e.title.toLowerCase().includes(q) || e.owner.toLowerCase().includes(q));
+
+      return `
+        <div class="stack-md">
+          ${overloaded ? `
+            <div style="padding: 13px 16px; border-radius: 12px; background: var(--orange-soft); border: 1.5px solid var(--orange);" class="between">
+              <div class="text-xs fw-700" style="color: var(--orange);">
+                ⚠ Нарушение правила Governance «1 добавили — эквивалент убрали»: текущий объём MVP (${meta.totalEffort} ч/н) превышает лимит сценария (${meta.targetEffort} ч/н) на +${meta.totalEffort - meta.targetEffort} ч/н.
+              </div>
+              <span class="badge b-orange-solid">Требуется балансировка</span>
+            </div>
+          ` : ''}
+
+          <!-- Controls Toolbar -->
+          <div class="card card-pad between">
+            <div class="row">
+              <div class="seg-track">
+                <button type="button" class="seg-btn ${state.backlogView === 'table' ? 'active' : ''}" onclick="state.backlogView='table'; render();">Таблица WSJF (24)</button>
+                <button type="button" class="seg-btn ${state.backlogView === 'kanban' ? 'active' : ''}" onclick="state.backlogView='kanban'; render();">Канбан-доска (MVP)</button>
+              </div>
+
+              <select class="select select-compact" onchange="state.backlogStageFilter=this.value; render();" aria-label="Фильтр стадии">
+                <option value="ALL" ${state.backlogStageFilter==='ALL'?'selected':''}>Все стадии (24)</option>
+                <option value="MVP" ${state.backlogStageFilter==='MVP'?'selected':''}>MVP (15)</option>
+                <option value="Этап 2" ${state.backlogStageFilter==='Этап 2'?'selected':''}>Этап 2 (6)</option>
+                <option value="Этап 3" ${state.backlogStageFilter==='Этап 3'?'selected':''}>Этап 3 (3)</option>
+              </select>
+
+              <select class="select select-compact" onchange="state.backlogStatusFilter=this.value; render();" aria-label="Фильтр статуса">
+                <option value="ALL" ${state.backlogStatusFilter==='ALL'?'selected':''}>Все статусы</option>
+                <option value="Backlog" ${state.backlogStatusFilter==='Backlog'?'selected':''}>Backlog</option>
+                <option value="In Progress" ${state.backlogStatusFilter==='In Progress'?'selected':''}>In Progress</option>
+                <option value="QA / ИБ" ${state.backlogStatusFilter==='QA / ИБ'?'selected':''}>QA / ИБ</option>
+                <option value="Done" ${state.backlogStatusFilter==='Done'?'selected':''}>Done</option>
+              </select>
+
+              <input class="input" style="width: 200px;" placeholder="Поиск EP, название..." value="${esc(state.backlogSearch)}" oninput="state.backlogSearch=this.value; render();" />
+            </div>
+
+            <div class="row">
+              <button type="button" class="btn btn-outline btn-sm" onclick="exportBacklogCsv()">Экспорт в CSV</button>
+              <button type="button" class="btn btn-orange btn-sm" onclick="openModal('epic-modal')">+ Добавить эпик</button>
+            </div>
+          </div>
+
+          ${state.backlogView === 'table' ? renderBacklogTable(filtered) : renderBacklogKanban()}
+        </div>
+      `;
+    }
+
+    function statusBadge(st) {
+      if (st === 'Done') return '<span class="badge b-green">Done</span>';
+      if (st === 'QA / ИБ') return '<span class="badge b-amber">QA / ИБ</span>';
+      if (st === 'In Progress') return '<span class="badge b-cyan">In Progress</span>';
+      return '<span class="badge b-muted">Backlog</span>';
+    }
+
+    function renderBacklogTable(list) {
+      return `
+        <div class="card" style="overflow: hidden;">
+          <div class="table-wrap">
+            <table class="tbl">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Эпик</th>
+                  <th>Стадия</th>
+                  <th>BV / RR</th>
+                  <th>Ч/н (сц.)</th>
+                  <th>WSJF</th>
+                  <th>Зависимость</th>
+                  <th>Сж. А / Б</th>
+                  <th>Исполнитель</th>
+                  <th>Статус</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${list.map(e => {
+                  const scEff = e.stage === 'MVP' ? getEpicScenarioEffort(e) : e.effort;
+                  const removed = e.stage === 'MVP' && scEff === 0;
+                  const wsjf = calcWsjf(e).toFixed(1);
+                  return `
+                    <tr class="${removed ? 'row-dim' : ''}">
+                      <td class="mono fw-700">${esc(e.id)}</td>
+                      <td style="min-width: 240px;">
+                        <div class="fw-700">${esc(e.title)}</div>
+                        ${removed ? `<span class="badge b-orange" style="margin-top:3px;">Выведен в ${state.scopeScenario === 'scA' ? 'Сценарии А' : 'Сценарии Б'}</span>` : ''}
+                      </td>
+                      <td><span class="badge ${e.stage==='MVP'?'b-cyan':'b-muted'}">${e.stage}</span></td>
+                      <td class="mono">${e.bv} / ${e.rr}</td>
+                      <td class="mono fw-700">${scEff} <span class="text-muted text-11">${scEff !== e.effort ? `(база ${e.effort})` : ''}</span></td>
+                      <td class="mono fw-800" style="color: var(--orange);">${wsjf}</td>
+                      <td class="text-11 text-muted">${esc(e.dep)}</td>
+                      <td class="text-11 text-muted mono">${e.scA}(${e.effA}) / ${e.scB}(${e.effB})</td>
+                      <td class="text-11">${esc(e.owner)}</td>
+                      <td>
+                        <select class="select select-compact" onchange="updateEpicStatus('${e.id}', this.value)" aria-label="Статус ${e.id}">
+                          ${['Backlog','In Progress','QA / ИБ','Done'].map(s => `<option value="${s}" ${e.status===s?'selected':''}>${s}</option>`).join('')}
+                        </select>
+                      </td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderBacklogKanban() {
+      const cols = ['Backlog', 'In Progress', 'QA / ИБ', 'Done'];
+      const mvpActive = state.epics.filter(e => e.stage === 'MVP' && getEpicScenarioEffort(e) > 0);
+      return `
+        <div class="kanban-grid">
+          ${cols.map((col, idx) => {
+            const items = mvpActive.filter(e => e.status === col);
+            const sumEff = items.reduce((s, e) => s + getEpicScenarioEffort(e), 0);
+            return `
+              <div class="kanban-col">
+                <div class="between" style="padding-bottom: 8px; border-bottom: 1px solid var(--border);">
+                  <span class="fw-800 text-xs">${col}</span>
+                  <span class="badge b-muted mono">${items.length} · ${sumEff} ч/н</span>
+                </div>
+                ${items.map(e => `
+                  <div class="kanban-card stack-xs">
+                    <div class="between">
+                      <span class="mono fw-800 text-11" style="color: var(--cyan-text);">${e.id}</span>
+                      <span class="badge b-orange mono" style="padding:1px 6px;">WSJF ${calcWsjf(e).toFixed(1)}</span>
+                    </div>
+                    <div class="text-xs fw-700" style="line-height: 1.35;">${esc(e.title)}</div>
+                    <div class="between text-11 text-muted">
+                      <span>${esc(e.owner)}</span>
+                      <span class="mono fw-700">${getEpicScenarioEffort(e)} ч/н</span>
+                    </div>
+                    <div class="between" style="padding-top: 6px; border-top: 1px solid var(--border);">
+                      <button type="button" class="btn btn-outline btn-xs" ${idx === 0 ? 'disabled' : ''} onclick="moveEpic('${e.id}', -1)">← Назад</button>
+                      <button type="button" class="btn btn-cyan btn-xs" ${idx === cols.length - 1 ? 'disabled' : ''} onclick="moveEpic('${e.id}', 1)">Далее →</button>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
+    }
+
+    function updateEpicStatus(id, st) {
+      const ep = state.epics.find(e => e.id === id);
+      if (ep) ep.status = st;
+      render();
+    }
+
+    function moveEpic(id, delta) {
+      const cols = ['Backlog', 'In Progress', 'QA / ИБ', 'Done'];
+      const ep = state.epics.find(e => e.id === id);
+      if (!ep) return;
+      const ni = Math.max(0, Math.min(cols.length - 1, cols.indexOf(ep.status) + delta));
+      ep.status = cols[ni];
+      render();
+    }
+
+    function submitNewEpic(e) {
+      e.preventDefault();
+      const id = `EP-${state.epics.length + 1}`;
+      const title = document.getElementById('ne-title').value.trim();
+      const stage = document.getElementById('ne-stage').value;
+      const owner = document.getElementById('ne-owner').value.trim() || 'Senior BE';
+      const bv = Number(document.getElementById('ne-bv').value);
+      const rr = Number(document.getElementById('ne-rr').value);
+      const effort = Number(document.getElementById('ne-effort').value);
+
+      state.epics.push({
+        id, title, stage, bv, rr, effort, dep: 'Новый', scA: 'Оставить', effA: effort, scB: 'Оставить', effB: effort, status: 'Backlog', owner,
+      });
+      closeModal('epic-modal');
+      const meta = getScopeMeta();
+      if (stage === 'MVP' && meta.totalEffort > meta.targetEffort) {
+        showToast('Превышен лимит MVP!', `Добавлен ${id} (+${effort} ч/н). По правилу Governance уберите эквивалент.`, 'orange');
+      } else {
+        showToast('Эпик добавлен', `${id}: ${title} (WSJF ${(((bv*0.6+rr*0.4)*10)/effort).toFixed(1)}).`, 'green');
+      }
+      render();
+    }
+
+    function exportBacklogCsv() {
+      const safe = v => { let s = String(v ?? '').replace(/"/g, '""'); if (/^[=+\-@]/.test(s)) s = `'${s}`; return `"${s}"`; };
+      const rows = [
+        ['ID', 'Эпик', 'Стадия', 'BV', 'RR', 'Объем ч/н', 'WSJF', 'Зависимость', 'Исполнитель', 'Статус'],
+        ...state.epics.map(e => [e.id, e.title, e.stage, e.bv, e.rr, e.effort, calcWsjf(e).toFixed(1), e.dep, e.owner, e.status]),
+      ];
+      const blob = new Blob(['\uFEFF' + rows.map(r => r.map(safe).join(';')).join('\n')], { type: 'text/csv;charset=utf-8;' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `PropTechApp_Backlog_WSJF_${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+      showToast('CSV экспортирован', 'Формулы экранированы (=, +, -, @) по требованиям ИБ.', 'green');
+    }
+
+    // =========================================================================
+    // 8. TAB 3: СРОКИ, ГАНТ И ROADMAP
+    // =========================================================================
+    function renderGanttTab() {
+      const sel = state.ganttPhases.find(p => p.id === state.selectedPhaseId) || state.ganttPhases[0];
+      const curLeftPct = ((state.currentWeek - 0.5) / 28) * 100;
+      const w8LeftPct = ((8 - 0.5) / 28) * 100;
+      const w19LeftPct = ((19 - 0.5) / 28) * 100;
+
+      const roadmapStages = [
+        { stage: '0. Discovery (M1 / W1–W3)', outcome: 'Сняты риски СКУД, 152-ФЗ и baseline до кода.', exit: 'Подписаны Pilot Charter, 6 ADR, контракт ACL и договор СКУД.', anti: 'Код до фиксации контракта ACL.' },
+        { stage: '1. MVP & Pilot (M2–M7, расш. M9)', outcome: '2 сквозных сценария на 1 БЦ (42 000 м², 55 арендаторов) без инцидентов ИБ.', exit: '10 дн. ОЭ на живом турникете; 0 утечек; ошибки СКУД <0,5%; self-service ≥65%; ≥3 LOI.', anti: 'iOS/Android, BLE/NFC, 1С, 54-ФЗ, On-Prem, LPR, BMS.' },
+        { stage: '2. Product-Market Fit (M8–M18)', outcome: '5–8 платящих БЦ (≥3 внешних) без форков кода.', exit: 'Запуск 2-го БЦ ≤4–6 нед.; SaaS GM ≥80%; Payback ≤6 мес.; рабочий пакет Helm On-Prem.', anti: 'Управляющие команды BMS, внешний маркетплейс.' },
+        { stage: '3. Scale (M19–M36)', outcome: '28 активных БЦ, ARR 169,3 млн ₽, квартальная EBITDA > 0 в Q10.', exit: 'Устойчивая EBITDA > 0, NRR ≥110%, портфельные сделки на топ-30 УК.', anti: 'Замена бухгалтерии 1С, собственное железо СКУД, форки.' },
+      ];
+
+      return `
+        <div class="stack-md">
+          <!-- Interactive 28-Week Gantt -->
+          <div class="card card-pad stack-sm">
+            <div class="between">
+              <div>
+                <div class="eyebrow">RELEASE PLAN ПИЛОТА · 28 НЕДЕЛЬ (7 МЕСЯЦЕВ)</div>
+                <h2 class="h2">Интерактивная диаграмма Ганта (кликните по фазе для деталей)</h2>
+              </div>
+              <div class="row text-11">
+                <span class="badge b-orange">Текущая неделя: W${state.currentWeek}</span>
+                <span class="badge b-amber">Веха W8: Стенд СКУД</span>
+                <span class="badge b-cyan">Веха W19: Code Freeze</span>
+              </div>
+            </div>
+
+            <div class="gantt-wrap">
+              <div class="gantt-grid">
+                <!-- Header Weeks Row -->
+                <div class="gantt-row" style="min-height: 28px; background: var(--bg-subtle);">
+                  <div class="text-11 fw-700 text-muted" style="padding: 0 10px;">Фаза пилота</div>
+                  <div style="display:grid; grid-template-columns: repeat(28, 1fr); text-align:center; font-size:9.5px;" class="mono text-muted">
+                    ${Array.from({ length: 28 }, (_, i) => `<span style="${i+1===state.currentWeek?'color:var(--orange);font-weight:800;':''}">W${i+1}</span>`).join('')}
+                  </div>
+                </div>
+
+                <!-- Phase Bars -->
+                <div style="position: relative;">
+                  ${state.ganttPhases.map(ph => {
+                    const left = ((ph.start - 1) / 28) * 100;
+                    const width = ((ph.end - ph.start + 1) / 28) * 100;
+                    return `
+                      <div class="gantt-row">
+                        <div style="padding: 6px 10px; font-size: 12px; font-weight: 700;">
+                          ${esc(ph.name)}
+                          ${ph.critical ? '<span style="color:var(--orange); font-size:10px; margin-left:4px;">● Крит.</span>' : ''}
+                        </div>
+                        <div class="gantt-track">
+                          <div
+                            class="gantt-bar ${ph.id === state.selectedPhaseId ? 'selected' : ''}"
+                            style="left:${left}%; width:${width}%; background:${ph.color};"
+                            onclick="state.selectedPhaseId='${ph.id}'; render();"
+                            title="${esc(ph.name)} (W${ph.start}–W${ph.end})"
+                          >
+                            W${ph.start}–W${ph.end}
+                          </div>
+                        </div>
+                      </div>
+                    `;
+                  }).join('')}
+
+                  <!-- Vertical Markers -->
+                  <div class="gantt-vline" style="left: calc(230px + (100% - 230px) * ${w8LeftPct / 100}); border-left: 1.5px dashed var(--amber); background: none;"></div>
+                  <div class="gantt-vline" style="left: calc(230px + (100% - 230px) * ${w19LeftPct / 100}); border-left: 1.5px dashed var(--cyan); background: none;"></div>
+                  <div class="gantt-vline" style="left: calc(230px + (100% - 230px) * ${curLeftPct / 100}); background: var(--orange);"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Selected Phase Detail Panel -->
+            <div class="subtle card-pad" style="border-left: 4px solid ${sel.color};">
+              <div class="between">
+                <div class="fw-800">${esc(sel.name)} <span class="mono text-muted" style="margin-left:6px;">(W${sel.start}–W${sel.end})</span></div>
+                <span class="badge ${sel.critical ? 'b-orange' : 'b-cyan'}">${sel.critical ? 'Критический путь' : 'Параллельный трек'}</span>
+              </div>
+              <div class="grid-2" style="margin-top: 10px;">
+                <div class="text-xs"><span class="eyebrow" style="display:block; margin-bottom:3px;">Вехи и артефакты</span>${esc(sel.milestones)}</div>
+                <div class="text-xs"><span class="eyebrow" style="display:block; margin-bottom:3px; color:var(--orange);">Ключевой риск / Защита</span>${esc(sel.risk)}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Outcome-Based Roadmap 0-36 Months -->
+          <div class="card card-pad stack-sm">
+            <div>
+              <div class="eyebrow">СТРАТЕГИЯ ПРОДУКТА · 0–36 МЕСЯЦЕВ</div>
+              <h2 class="h2">Outcome-Based Roadmap, Exit Criteria и Anti-Scope</h2>
+            </div>
+            <div class="grid-2">
+              ${roadmapStages.map(r => `
+                <div class="subtle stack-xs" style="padding: 14px;">
+                  <div class="fw-800 text-xs" style="color: var(--cyan-text);">${r.stage}</div>
+                  <div class="text-xs"><strong>Outcome:</strong> ${r.outcome}</div>
+                  <div class="text-xs text-muted"><strong>Exit Criteria:</strong> ${r.exit}</div>
+                  <div class="text-11" style="color: var(--orange);"><strong>Anti-Scope (НЕ строим):</strong> ${r.anti}</div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // =========================================================================
+    // 9. TAB 4: КОМАНДА (9,1 FTE)
+    // =========================================================================
+    function renderTeamTab() {
+      const cap = getTeamCapacity();
+      const totalPayroll = state.team.filter(t => t.fte > 0).reduce((s, t) => s + t.cost7m, 0);
+
+      return `
+        <div class="stack-md">
+          ${cap.absentSingles.length > 0 ? `
+            <div style="padding: 13px 16px; border-radius: 12px; background: var(--orange-soft); border: 1.5px solid var(--orange);" class="between">
+              <div class="text-xs fw-700" style="color: var(--orange);">
+                ⚠ Алерт Bus Factor: отмечено отсутствие непарных ролей (${cap.absentSingles.map(x => x.role).join(', ')}). Доступная ёмкость снижена до ${fmtNum(cap.availableFte, 1)} FTE (~${cap.netCapacityWeeks} ч/н).
+              </div>
+              <span class="badge b-orange-solid">Риск графика</span>
+            </div>
+          ` : cap.absentPaired.length > 0 ? `
+            <div style="padding: 13px 16px; border-radius: 12px; background: var(--amber-soft); border: 1px solid var(--amber-border);" class="between">
+              <div class="text-xs fw-700" style="color: var(--amber-text);">
+                ℹ Отсутствует парная роль (${cap.absentPaired.map(x => x.role).join(', ')}): благодаря парному владению кодом проект не остановлен, но ёмкость снижена до ~${cap.netCapacityWeeks} ч/н.
+              </div>
+              <span class="badge b-amber">Парное владение защищает</span>
+            </div>
+          ` : ''}
+
+          <div class="card card-pad between">
+            <div>
+              <div class="eyebrow">STREAM-ALIGNED КОМАНДА</div>
+              <h2 class="h2">Состав команды (9,1 FTE · ФОТ 7 мес.: ${fmtNum(totalPayroll, 2)} млн ₽ + Подрядчик 2,00 млн ₽)</h2>
+            </div>
+            <div class="row">
+              <span class="badge b-cyan mono">Доступно: ${fmtNum(cap.availableFte, 1)} / ${fmtNum(cap.totalFte, 1)} FTE</span>
+              <span class="badge b-muted mono">Ёмкость разраб.: ~${cap.netCapacityWeeks} ч/н (focus 0,72)</span>
+            </div>
+          </div>
+
+          <div class="grid-3">
+            ${state.team.map(t => {
+              const assigned = state.epics.filter(e => e.stage === 'MVP' && e.owner.toLowerCase().includes(t.role.split(' ')[0].toLowerCase())).slice(0, 3);
+              return `
+                <div class="card card-pad stack-xs" style="${t.absent ? 'border-color: var(--orange); background: var(--orange-soft);' : ''}">
+                  <div class="between">
+                    <div class="fw-800 text-xs">${esc(t.role)}</div>
+                    <span class="badge ${t.fte > 0 ? 'b-cyan' : 'b-amber'} mono">${t.fte > 0 ? `${fmtNum(t.fte, 1)} FTE` : 'Подрядчик'}</span>
+                  </div>
+                  <div class="text-11 text-muted">${esc(t.note)}</div>
+                  <div class="between text-11" style="margin-top:4px;">
+                    <span>Загрузка: <strong class="mono">${t.absent ? '0%' : `${t.load}%`}</strong></span>
+                    <span class="mono fw-700">${fmtNum(t.cost7m, 2)} млн ₽</span>
+                  </div>
+                  <div class="progress-bar"><div class="progress-fill" style="width:${t.absent ? 0 : t.load}%; background:${t.absent ? 'var(--orange)' : 'var(--cyan)'};"></div></div>
+
+                  ${assigned.length > 0 ? `
+                    <div class="row" style="margin-top:4px;">
+                      ${assigned.map(ep => `<span class="badge b-muted mono" style="font-size:10px;">${ep.id}</span>`).join('')}
+                    </div>
+                  ` : ''}
+
+                  <div class="between" style="padding-top:8px; margin-top:4px; border-top:1px solid var(--border); font-size:11px;">
+                    <label class="row" style="gap:5px; cursor:pointer;">
+                      <input type="checkbox" ${t.supportTax ? 'checked' : ''} onchange="toggleTeamFlag('${t.id}','supportTax',this.checked)" style="accent-color:var(--cyan);" />
+                      <span class="text-muted">Налог подд. ≤10%</span>
+                    </label>
+                    <label class="row" style="gap:5px; cursor:pointer; color:${t.absent ? 'var(--orange)' : 'var(--text-muted)'}; font-weight:${t.absent ? '700' : '500'};">
+                      <input type="checkbox" ${t.absent ? 'checked' : ''} onchange="toggleTeamFlag('${t.id}','absent',this.checked)" style="accent-color:var(--orange);" />
+                      <span>Отпуск / риск</span>
+                    </label>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+
+          <!-- PO/TL Decision Matrix -->
+          <div class="card card-pad stack-sm">
+            <div>
+              <div class="eyebrow">OPERATING MODEL · ИСКЛЮЧЕНИЕ УЗКОГО ГОРЛЫШКА</div>
+              <h2 class="h2">Матрица решений PO / Team Lead</h2>
+            </div>
+            <div class="grid-2">
+              <div class="subtle stack-xs" style="padding: 14px; border-left: 3px solid var(--orange);">
+                <div class="fw-800 text-xs" style="color: var(--orange);">Решаю лично (PO / Team Lead)</div>
+                <div class="text-xs text-muted" style="line-height:1.55;">
+                  • Продуктовая стратегия, границы MVP и активация сценариев сжатия (-10 нед. / -30%)<br/>
+                  • Приоритет эпиков (WSJF) и контроль бюджета 32 млн ₽<br/>
+                  • Контракт, вехи 30/50/20% и приёмка подрядчика СКУД<br/>
+                  • Эскалации с директором УК, начальником СБ и спонсором<br/>
+                  • Остановка релиза при нарушении гейтов (Go / Change / Stop)
+                </div>
+              </div>
+              <div class="subtle stack-xs" style="padding: 14px; border-left: 3px solid var(--cyan);">
+                <div class="fw-800 text-xs" style="color: var(--cyan-text);">Делегирую команде (с проверкой на ритуалах)</div>
+                <div class="text-xs text-muted" style="line-height:1.55;">
+                  • Детализация процессов, BPMN, User Stories и крайние случаи → <strong>Business Analyst</strong><br/>
+                  • Схема БД, RLS, PgBouncer, выбор библиотек и код-ревью → <strong>Architect и Senior BE</strong><br/>
+                  • Дизайн-система и прототипы Web/PWA / КПП → <strong>UX/UI Designer</strong><br/>
+                  • CI/CD, K8s/Helm, Vault, мониторинг Grafana и бэкапы DR → <strong>DevOps</strong><br/>
+                  • Пирамида тестов, cross-tenant автотесты и регресс → <strong>QA Engineer</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function toggleTeamFlag(id, key, val) {
+      const m = state.team.find(x => x.id === id);
+      if (m) m[key] = val;
+      render();
+    }
+
+    // =========================================================================
+    // 10. TAB 5: БЮДЖЕТ И ФИНМОДЕЛЬ (36 МЕСЯЦЕВ + SVG ГРАФИК)
+    // =========================================================================
+    function setFinScenario(sc) {
+      state.finScenario = sc;
+      if (sc === 'pess') {
+        state.finParams = { tariff: 10, cac: 3.0, churn: 12, avgArea: 36, setupFee: 1.35, setupCogs: 1.30, saasCogsM: 0.105, fixedOpexY: 58.0 };
+      } else if (sc === 'opt') {
+        state.finParams = { tariff: 14, cac: 1.8, churn: 5, avgArea: 48, setupFee: 2.00, setupCogs: 1.10, saasCogsM: 0.090, fixedOpexY: 58.0 };
+      } else {
+        state.finParams = { tariff: 12, cac: 2.4, churn: 8, avgArea: 42, setupFee: 1.60, setupCogs: 1.20, saasCogsM: 0.095, fixedOpexY: 58.0 };
+      }
+      render();
+    }
+
+    function renderFinanceChartSvg(quarters) {
+      const W = 760, H = 250, padL = 52, padR = 52, padT = 22, padB = 34;
+      const plotW = W - padL - padR;
+      const plotH = H - padT - padB;
+
+      const maxBar = Math.max(40, ...quarters.map(q => Math.max(q.rev, Math.abs(q.ebitda))));
+      const minBar = Math.min(-25, ...quarters.map(q => q.ebitda));
+      const barSpan = maxBar - minBar;
+      const yBar = v => padT + ((maxBar - v) / barSpan) * plotH;
+      const yZero = yBar(0);
+
+      const minCf = Math.min(-110, ...quarters.map(q => q.cf));
+      const maxCf = Math.max(30, ...quarters.map(q => q.cf));
+      const cfSpan = maxCf - minCf;
+      const yCf = v => padT + ((maxCf - v) / cfSpan) * plotH;
+
+      const step = plotW / 12;
+      const barW = step * 0.34;
+
+      const barsSvg = quarters.map((q, i) => {
+        const cx = padL + i * step + step * 0.5;
+        const revH = Math.max(1, yZero - yBar(q.rev));
+        const ebTop = q.ebitda >= 0 ? yBar(q.ebitda) : yZero;
+        const ebH = Math.max(1, Math.abs(yBar(q.ebitda) - yZero));
+        const ebColor = q.ebitda >= 0 ? '#10B981' : '#FF441F';
+        return `
+          <rect x="${(cx - barW - 1).toFixed(1)}" y="${yBar(q.rev).toFixed(1)}" width="${barW.toFixed(1)}" height="${revH.toFixed(1)}" rx="3" fill="#00C2E8" opacity="0.88">
+            <title>${q.q} Выручка: ${fmtNum(q.rev,1)} млн ₽</title>
+          </rect>
+          <rect x="${(cx + 1).toFixed(1)}" y="${ebTop.toFixed(1)}" width="${barW.toFixed(1)}" height="${ebH.toFixed(1)}" rx="3" fill="${ebColor}" opacity="0.88">
+            <title>${q.q} EBITDA: ${fmtNum(q.ebitda,1)} млн ₽</title>
+          </rect>
+          <text x="${cx.toFixed(1)}" y="${H - 12}" text-anchor="middle" font-size="10" fill="var(--text-muted)" font-weight="700">${q.q}</text>
+        `;
+      }).join('');
+
+      const cfPts = quarters.map((q, i) => {
+        const cx = padL + i * step + step * 0.5;
+        return `${cx.toFixed(1)},${yCf(q.cf).toFixed(1)}`;
+      }).join(' ');
+
+      const cfDots = quarters.map((q, i) => {
+        const cx = padL + i * step + step * 0.5;
+        return `<circle cx="${cx.toFixed(1)}" cy="${yCf(q.cf).toFixed(1)}" r="3.5" fill="var(--text-main)"><title>${q.q} Накопл. CF: ${fmtNum(q.cf,1)} млн ₽</title></circle>`;
+      }).join('');
+
+      return `
+        <svg viewBox="0 0 ${W} ${H}" style="width:100%; height:auto; display:block;" role="img" aria-label="Поквартальная динамика Q1-Q12">
+          <line x1="${padL}" y1="${yZero.toFixed(1)}" x2="${W - padR}" y2="${yZero.toFixed(1)}" stroke="var(--border-strong)" stroke-width="1.2" />
+          <line x1="${padL}" y1="${padT}" x2="${W - padR}" y2="${padT}" stroke="var(--border)" stroke-dasharray="3 3" />
+          <line x1="${padL}" y1="${H - padB}" x2="${W - padR}" y2="${H - padB}" stroke="var(--border)" stroke-dasharray="3 3" />
+          <text x="${padL - 6}" y="${padT + 4}" text-anchor="end" font-size="9.5" fill="var(--text-muted)">${Math.round(maxBar)}м</text>
+          <text x="${padL - 6}" y="${yZero + 3}" text-anchor="end" font-size="9.5" fill="var(--text-muted)">0</text>
+          <text x="${W - padR + 6}" y="${padT + 4}" text-anchor="start" font-size="9.5" fill="var(--text-muted)">CF ${Math.round(maxCf)}м</text>
+          <text x="${W - padR + 6}" y="${H - padB}" text-anchor="start" font-size="9.5" fill="var(--text-muted)">CF ${Math.round(minCf)}м</text>
+          ${barsSvg}
+          <polyline fill="none" stroke="var(--text-main)" stroke-width="2.2" points="${cfPts}" />
+          ${cfDots}
+        </svg>
+      `;
+    }
+
+    function renderFinanceTab() {
+      const meta = getScopeMeta();
+      const totalPlan = state.budgetItems.reduce((s, i) => s + i.plan, 0);
+      const totalActual = state.budgetItems.reduce((s, i) => s + i.actual, 0);
+      const eac = state.budgetItems.reduce((s, i) => s + Math.max(i.plan, i.actual), 0);
+      const variance = meta.budgetLimit - eac;
+
+      const fm = computeFinancialModel();
+      const p = state.finParams;
+
+      return `
+        <div class="stack-md">
+          <!-- TOP BLOCK: MVP BUDGET CONTROL -->
+          <div class="card card-pad stack-sm">
+            <div class="between">
+              <div>
+                <div class="eyebrow">КОНТРОЛЬ БЮДЖЕТА MVP · 7 МЕСЯЦЕВ (БЕЗ НДС)</div>
+                <h2 class="h2">План 24,86 млн ₽ · Лимит ${fmtNum(meta.budgetLimit, 2)} млн ₽ · Резерв ${fmtNum(Math.max(0, meta.budgetLimit - totalPlan), 2)} млн ₽ (22,3%)</h2>
+              </div>
+              <div class="row">
+                <span class="badge b-cyan mono">Освоено: ${fmtNum(totalActual, 2)} млн ₽</span>
+                <span class="badge ${variance >= 0 ? 'b-green' : 'b-orange-solid'} mono">Прогноз EAC: ${fmtNum(eac, 2)} млн ₽ (${variance >= 0 ? `+${fmtNum(variance,2)} резерв` : `${fmtNum(variance,2)} перерасход`})</span>
+              </div>
+            </div>
+
+            <div class="table-wrap">
+              <table class="tbl">
+                <thead>
+                  <tr>
+                    <th>Статья бюджета MVP</th>
+                    <th>План (млн ₽)</th>
+                    <th style="width: 260px;">Факт освоения (ползунок)</th>
+                    <th>Факт (млн ₽)</th>
+                    <th>Остаток плана</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${state.budgetItems.map(b => {
+                    const rem = b.plan - b.actual;
+                    return `
+                      <tr class="${rem < 0 ? 'row-alert' : ''}">
+                        <td class="fw-700">${esc(b.name)}</td>
+                        <td class="mono">${fmtNum(b.plan, 2)}</td>
+                        <td>
+                          <input type="range" class="full-range" min="0" max="${b.maxSlider}" step="0.05" value="${b.actual}" oninput="updateBudgetActual('${b.id}', Number(this.value))" />
+                        </td>
+                        <td class="mono fw-800">${fmtNum(b.actual, 2)}</td>
+                        <td class="mono fw-700" style="color:${rem < 0 ? 'var(--orange)' : 'var(--green-text)'};">${rem >= 0 ? fmtNum(rem, 2) : fmtNum(rem, 2)}</td>
+                      </tr>
+                    `;
+                  }).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- BOTTOM BLOCK: 36-MONTH FINMODEL & SENSITIVITY -->
+          <div class="card card-pad stack-md">
+            <div class="between">
+              <div>
+                <div class="eyebrow">ФИНМОДЕЛЬ 36 МЕСЯЦЕВ · [ДОПУЩЕНИЕ]</div>
+                <h2 class="h2">Сценарии масштабирования и калькулятор чувствительности</h2>
+              </div>
+              <div class="seg-track">
+                <button type="button" class="seg-btn ${state.finScenario==='pess'?'active':''}" onclick="setFinScenario('pess')">Пессимистичный (14 БЦ)</button>
+                <button type="button" class="seg-btn ${state.finScenario==='base'?'active':''}" onclick="setFinScenario('base')">Базовый (28 БЦ)</button>
+                <button type="button" class="seg-btn ${state.finScenario==='opt'?'active':''}" onclick="setFinScenario('opt')">Оптимистичный (40 БЦ)</button>
+              </div>
+            </div>
+
+            <!-- 4 Sensitivity Sliders -->
+            <div class="grid-4">
+              <div class="subtle" style="padding: 11px 13px;">
+                <div class="between text-xs"><span class="fw-700">Тариф SaaS</span><span class="mono fw-800" style="color: ${p.tariff <= 9 ? 'var(--orange)' : 'var(--cyan-text)'};">${p.tariff} ₽/м²/мес</span></div>
+                <input type="range" class="full-range" min="8" max="16" step="1" value="${p.tariff}" oninput="state.finParams.tariff=Number(this.value); render();" />
+                <div class="between text-11 text-muted mono"><span>8 ₽ (демпинг)</span><span>12 ₽</span><span>16 ₽</span></div>
+              </div>
+              <div class="subtle" style="padding: 11px 13px;">
+                <div class="between text-xs"><span class="fw-700">CAC (привлечение)</span><span class="mono fw-800" style="color: var(--cyan-text);">${fmtNum(p.cac, 1)} млн ₽</span></div>
+                <input type="range" class="full-range" min="1.5" max="3.6" step="0.1" value="${p.cac}" oninput="state.finParams.cac=Number(this.value); render();" />
+                <div class="between text-11 text-muted mono"><span>1,5м (портф.)</span><span>2,4м</span><span>3,6м</span></div>
+              </div>
+              <div class="subtle" style="padding: 11px 13px;">
+                <div class="between text-xs"><span class="fw-700">Годовой Churn</span><span class="mono fw-800" style="color: var(--cyan-text);">${p.churn}% / год</span></div>
+                <input type="range" class="full-range" min="5" max="15" step="1" value="${p.churn}" oninput="state.finParams.churn=Number(this.value); render();" />
+                <div class="between text-11 text-muted mono"><span>5%</span><span>8%</span><span>15%</span></div>
+              </div>
+              <div class="subtle" style="padding: 11px 13px;">
+                <div class="between text-xs"><span class="fw-700">Ср. площадь БЦ</span><span class="mono fw-800" style="color: var(--cyan-text);">${p.avgArea} тыс. м²</span></div>
+                <input type="range" class="full-range" min="25" max="60" step="1" value="${p.avgArea}" oninput="state.finParams.avgArea=Number(this.value); render();" />
+                <div class="between text-11 text-muted mono"><span>25к</span><span>42к</span><span>60к</span></div>
+              </div>
+            </div>
+
+            <!-- Calculated Unit Economics Cards -->
+            <div class="grid-4">
+              <div class="subtle" style="padding:12px;"><div class="eyebrow">ARPA / ACV (1 БЦ)</div><div class="fw-800 mono" style="font-size:17px; margin-top:4px;">${fmtNum(fm.arpa, 3)} / ${fmtNum(fm.acv, 2)} млн</div><div class="text-11 text-muted">SaaS GM: <strong style="color:${fm.saasGmPct>=80?'var(--green-text)':'var(--amber-text)'};">${fmtNum(fm.saasGmPct, 1)}%</strong></div></div>
+              <div class="subtle" style="padding:12px;"><div class="eyebrow">LTV (3Г) / LTV:CAC</div><div class="fw-800 mono" style="font-size:17px; margin-top:4px;">${fmtNum(fm.ltv3yTotal, 1)} млн · ${fmtNum(fm.ltvCacTotal, 1)}x</div><div class="text-11 text-muted">Чистый SaaS: ${fmtNum(fm.ltvCacSaas, 1)}x · Payback: <strong>${fmtNum(fm.paybackNet, 1)} мес.</strong></div></div>
+              <div class="subtle" style="padding:12px;"><div class="eyebrow">EBITDA &gt; 0 / ПОРОГ OPEX</div><div class="fw-800 mono" style="font-size:17px; margin-top:4px; color:${fm.beQuarter.startsWith('Q')?'var(--green-text)':'var(--orange)'};">${fm.beQuarter}</div><div class="text-11 text-muted">Покрытие фикс. OPEX: <strong>${fm.bcsForOpex} БЦ</strong></div></div>
+              <div class="subtle" style="padding:12px;"><div class="eyebrow">M36: БЦ / ARR / ПИК CF</div><div class="fw-800 mono" style="font-size:17px; margin-top:4px;">${fm.actM36} БЦ · ${fmtNum(fm.arrM36, 1)}м</div><div class="text-11 text-muted">Пик CF: <strong style="color:var(--orange);">${fmtNum(fm.minCf, 1)} млн ₽</strong></div></div>
+            </div>
+
+            <!-- Inline SVG Quarterly Chart -->
+            <div class="subtle" style="padding: 14px;">
+              <div class="between" style="margin-bottom: 8px;">
+                <span class="fw-800 text-xs">Поквартальная динамика Q1–Q12 (Выручка за 36м: ${fmtNum(fm.totalRev, 1)} млн ₽)</span>
+                <div class="row text-11">
+                  <span class="row" style="gap:4px;"><span class="dot" style="background:#00C2E8;"></span>Выручка</span>
+                  <span class="row" style="gap:4px;"><span class="dot" style="background:#10B981;"></span>EBITDA (+)</span>
+                  <span class="row" style="gap:4px;"><span class="dot" style="background:#FF441F;"></span>EBITDA (-)</span>
+                  <span class="row" style="gap:4px;"><span class="dot" style="background:var(--text-main);"></span>Накопл. CF</span>
+                </div>
+              </div>
+              ${renderFinanceChartSvg(fm.quarters)}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function updateBudgetActual(id, val) {
+      const b = state.budgetItems.find(x => x.id === id);
+      if (b) b.actual = val;
+      render();
+    }
+
+    // =========================================================================
+    // 11. TAB 6: KPI, ГИПОТЕЗЫ И РИСКИ
+    // =========================================================================
+    function renderKpiTab() {
+      const redList = state.metrics.filter(m => m.checkRed(m.value));
+      const closedQ = state.contradictions.filter(q => q.closed).length;
+
+      return `
+        <div class="stack-md">
+          ${redList.length > 0 ? `
+            <div style="padding: 13px 16px; border-radius: 12px; background: var(--orange-soft); border: 1.5px solid var(--orange);" class="between">
+              <div class="text-xs fw-700" style="color: var(--orange);">
+                ⚠ Governance Red Flag (${redList.length}): пробит стоп-сигнал по метрикам — ${redList.map(m => m.name).join('; ')}. Требуется внеплановый Steering Committee!
+              </div>
+              <span class="badge b-orange-solid">RED FLAG</span>
+            </div>
+          ` : ''}
+
+          <div class="card card-pad between">
+            <div class="seg-track">
+              <button type="button" class="seg-btn ${state.kpiSubTab==='metrics'?'active':''}" onclick="state.kpiSubTab='metrics'; render();">Дерево метрик (14 KPI)</button>
+              <button type="button" class="seg-btn ${state.kpiSubTab==='hypotheses'?'active':''}" onclick="state.kpiSubTab='hypotheses'; render();">Реестр гипотез (H-01..H-08)</button>
+              <button type="button" class="seg-btn ${state.kpiSubTab==='contradictions'?'active':''}" onclick="state.kpiSubTab='contradictions'; render();">12 противоречий ТЗ (${closedQ}/12)</button>
+              <button type="button" class="seg-btn ${state.kpiSubTab==='risks'?'active':''}" onclick="state.kpiSubTab='risks'; render();">Реестр рисков (Топ-10)</button>
+            </div>
+            <span class="text-11 text-muted">Все стартовые ориентиры калибруются после 5-дн. замера W1–W2 [Допущение]</span>
+          </div>
+
+          ${state.kpiSubTab === 'metrics' ? renderMetricsSubTab() : ''}
+          ${state.kpiSubTab === 'hypotheses' ? renderHypothesesSubTab() : ''}
+          ${state.kpiSubTab === 'contradictions' ? renderContradictionsSubTab() : ''}
+          ${state.kpiSubTab === 'risks' ? renderRisksSubTab() : ''}
+        </div>
+      `;
+    }
+
+    function renderMetricsSubTab() {
+      return `
+        <div class="card" style="overflow:hidden;">
+          <div class="table-wrap">
+            <table class="tbl">
+              <thead>
+                <tr>
+                  <th>Ветка</th>
+                  <th>Метрика (KPI)</th>
+                  <th>Baseline [Доп.]</th>
+                  <th>Цель пилота</th>
+                  <th>Red Flag</th>
+                  <th style="width: 210px;">Факт пилота (симулятор)</th>
+                  <th>Статус</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${state.metrics.map(m => {
+                  const isRed = m.checkRed(m.value);
+                  return `
+                    <tr class="${isRed ? 'row-alert' : ''}">
+                      <td><span class="badge ${m.branch==='North Star'?'b-cyan':'b-muted'}">${m.branch}</span></td>
+                      <td class="fw-700">${esc(m.name)}</td>
+                      <td class="mono text-muted">${m.baseline}</td>
+                      <td class="mono fw-700" style="color: var(--green-text);">${m.target}</td>
+                      <td class="mono text-11" style="color: var(--orange);">${m.redFlagLabel}</td>
+                      <td>
+                        <div class="row" style="flex-wrap: nowrap;">
+                          <input type="range" class="full-range" min="${m.min}" max="${m.max}" step="${m.step}" value="${m.value}" oninput="updateMetricVal('${m.id}', Number(this.value))" />
+                          <span class="mono fw-800" style="min-width: 58px; text-align:right; color:${isRed?'var(--orange)':'var(--text-main)'};">${m.value} ${m.unit}</span>
+                        </div>
+                      </td>
+                      <td><span class="badge ${isRed ? 'b-orange-solid' : 'b-green'}">${isRed ? 'RED FLAG' : 'В НОРМЕ'}</span></td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function updateMetricVal(id, val) {
+      const m = state.metrics.find(x => x.id === id);
+      if (m) m.value = val;
+      render();
+    }
+
+    function renderHypothesesSubTab() {
+      const statuses = ['В проверке', 'Подтверждена', 'Опровергнута'];
+      return `
+        <div class="grid-2">
+          ${state.hypotheses.map(h => {
+            const bCls = h.status === 'Подтверждена' ? 'b-green' : h.status === 'Опровергнута' ? 'b-orange' : 'b-amber';
+            return `
+              <div class="card card-pad stack-xs">
+                <div class="between">
+                  <div class="row">
+                    <span class="mono fw-800" style="color: var(--cyan-text);">${h.id}</span>
+                    <span class="badge ${h.priority==='Топ-5'?'b-orange':'b-muted'}">${h.priority}</span>
+                  </div>
+                  <span class="badge ${bCls}">${h.status}</span>
+                </div>
+                <div class="text-xs fw-700" style="line-height: 1.45;">${esc(h.text)}</div>
+                <div class="text-11 text-muted">Порог успеха: <strong style="color: var(--text-main);">${esc(h.threshold)}</strong></div>
+                <div class="row" style="padding-top: 8px; border-top: 1px solid var(--border);">
+                  ${statuses.map(st => `
+                    <button type="button" class="btn btn-xs ${h.status === st ? 'btn-dark' : 'btn-outline'}" onclick="setHypStatus('${h.id}','${st}')">${st}</button>
+                  `).join('')}
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
+    }
+
+    function setHypStatus(id, st) {
+      const h = state.hypotheses.find(x => x.id === id);
+      if (h) h.status = st;
+      render();
+    }
+
+    function renderContradictionsSubTab() {
+      return `
+        <div class="card card-pad stack-xs">
+          <div class="eyebrow" style="margin-bottom: 6px;">ТРЕКЕР ЗАКРЫТИЯ 12 ПРОТИВОРЕЧИЙ ТЗ ДО СТАРТА РАЗРАБОТКИ</div>
+          ${state.contradictions.map(q => `
+            <label class="check-row ${q.closed ? '' : 'failed'}">
+              <input type="checkbox" ${q.closed ? 'checked' : ''} onchange="toggleContradiction('${q.id}', this.checked)" />
+              <div style="flex:1;">
+                <div class="fw-700 text-xs"><span class="mono" style="color:var(--cyan-text);">${q.id}</span> · ${esc(q.title)}</div>
+                <div class="text-11 text-muted" style="margin-top:2px;">Решение: ${esc(q.resolution)}</div>
+              </div>
+              <span class="badge ${q.closed ? 'b-green' : 'b-orange'}">${q.closed ? 'Закрыто' : 'Открыто'}</span>
+            </label>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function toggleContradiction(id, val) {
+      const q = state.contradictions.find(x => x.id === id);
+      if (q) q.closed = val;
+      render();
+    }
+
+    function renderRisksSubTab() {
+      return `
+        <div class="card" style="overflow:hidden;">
+          <div class="table-wrap">
+            <table class="tbl">
+              <thead>
+                <tr>
+                  <th>ID / Тип</th>
+                  <th>Риск</th>
+                  <th>P × I</th>
+                  <th>Митигация и Fallback</th>
+                  <th>Статус</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${state.risks.map(r => {
+                  const score = r.prob * r.imp;
+                  return `
+                    <tr>
+                      <td style="white-space:nowrap;">
+                        <div class="mono fw-800">${r.id}</div>
+                        <div class="text-11 text-muted">${r.cat}</div>
+                        ${r.stopRelease ? '<span class="badge b-orange" style="margin-top:3px; font-size:9.5px;">Стоп-релиз</span>' : ''}
+                      </td>
+                      <td class="fw-700">${esc(r.title)}</td>
+                      <td class="mono fw-800" style="color:${score>=15?'var(--orange)':'var(--amber-text)'};">${r.prob}×${r.imp} = ${score}</td>
+                      <td class="text-xs text-muted">${esc(r.mitigation)}</td>
+                      <td>
+                        <select class="select select-compact" onchange="setRiskStatus('${r.id}', this.value)">
+                          ${['В работе','Под контролем','Снижен','Эскалация'].map(st => `<option ${r.status===st?'selected':''}>${st}</option>`).join('')}
+                        </select>
+                      </td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function setRiskStatus(id, st) {
+      const r = state.risks.find(x => x.id === id);
+      if (r) r.status = st;
+      render();
+    }
+
+    // =========================================================================
+    // 12. MODALS & MASTER RENDER
+    // =========================================================================
+    function openModal(id) { document.getElementById(id).classList.add('open'); }
+    function closeModal(id, e) { if (e && e.target !== e.currentTarget) return; document.getElementById(id).classList.remove('open'); }
+
+    function render() {
+      renderHeader();
+      const main = document.getElementById('app-main');
+      if (state.activeTab === 'overview') main.innerHTML = renderOverviewTab();
+      else if (state.activeTab === 'backlog') main.innerHTML = renderBacklogTab();
+      else if (state.activeTab === 'gantt') main.innerHTML = renderGanttTab();
+      else if (state.activeTab === 'team') main.innerHTML = renderTeamTab();
+      else if (state.activeTab === 'finance') main.innerHTML = renderFinanceTab();
+      else if (state.activeTab === 'kpi') main.innerHTML = renderKpiTab();
+    }
+
+    window.addEventListener('DOMContentLoaded', render);
+  </script>
+</body>
+</html>
