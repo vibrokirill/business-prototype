@@ -1,0 +1,2084 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PropTechApp Integration Hub — Mock-эмулятор Legacy-СКУД (ACL v1.0)</title>
+  <style>
+    /* ===================================================================== */
+    /* 1. DESIGN SYSTEM TOKENS: DARK (DEFAULT) & LIGHT                       */
+    /* ===================================================================== */
+    :root,
+    [data-theme="dark"] {
+      --bg-page: #121417;
+      --bg-card: #1B1E23;
+      --bg-subtle: #16191D;
+      --bg-muted: #23272F;
+      --bg-header: #16181D;
+      --border-color: #2A2F38;
+      --border-strong: #39404D;
+      --text-main: #F3F5F8;
+      --text-muted: #9AA3B2;
+      --text-dim: #697386;
+
+      --accent-orange: #FF441F;
+      --accent-orange-hover: #FF5B3A;
+      --accent-orange-soft: rgba(255, 68, 31, 0.16);
+      --accent-orange-border: rgba(255, 68, 31, 0.44);
+
+      --accent-cyan: #00C2E8;
+      --accent-cyan-hover: #26D2F5;
+      --accent-cyan-soft: rgba(0, 194, 232, 0.15);
+      --accent-cyan-border: rgba(0, 194, 232, 0.42);
+
+      --accent-green: #10B981;
+      --accent-green-soft: rgba(16, 185, 129, 0.15);
+      --accent-green-border: rgba(16, 185, 129, 0.42);
+
+      --accent-amber: #F59E0B;
+      --accent-amber-soft: rgba(245, 158, 11, 0.15);
+      --accent-amber-border: rgba(245, 158, 11, 0.40);
+
+      --code-bg: #0E1013;
+      --seg-track: #101216;
+      --seg-active-bg: #262B34;
+      --shadow-card: 0 4px 18px rgba(0, 0, 0, 0.30);
+    }
+
+    [data-theme="light"] {
+      --bg-page: #F2F4F7;
+      --bg-card: #FFFFFF;
+      --bg-subtle: #F7F9FB;
+      --bg-muted: #EAECEF;
+      --bg-header: #FFFFFF;
+      --border-color: #E2E6EC;
+      --border-strong: #CBD2DC;
+      --text-main: #181B20;
+      --text-muted: #5A6373;
+      --text-dim: #8892A2;
+
+      --accent-orange: #FF441F;
+      --accent-orange-hover: #E03512;
+      --accent-orange-soft: rgba(255, 68, 31, 0.10);
+      --accent-orange-border: rgba(255, 68, 31, 0.36);
+
+      --accent-cyan: #009FC0;
+      --accent-cyan-hover: #0086A3;
+      --accent-cyan-soft: rgba(0, 194, 232, 0.12);
+      --accent-cyan-border: rgba(0, 194, 232, 0.38);
+
+      --accent-green: #059669;
+      --accent-green-soft: rgba(16, 185, 129, 0.12);
+      --accent-green-border: rgba(16, 185, 129, 0.36);
+
+      --accent-amber: #D97706;
+      --accent-amber-soft: rgba(245, 158, 11, 0.12);
+      --accent-amber-border: rgba(245, 158, 11, 0.36);
+
+      --code-bg: #F3F5F8;
+      --seg-track: #E7EBF0;
+      --seg-active-bg: #FFFFFF;
+      --shadow-card: 0 2px 10px rgba(16, 24, 40, 0.05);
+    }
+
+    /* ===================================================================== */
+    /* 2. RESET & BASE TYPOGRAPHY                                            */
+    /* ===================================================================== */
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      -webkit-font-smoothing: antialiased;
+      transition: background-color 0.2s ease, color 0.2s ease;
+      overflow-x: hidden;
+    }
+
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .tabular { font-variant-numeric: tabular-nums; }
+
+    .app-shell {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1460px;
+      margin: 0 auto;
+      padding: 0 16px;
+    }
+    @media (min-width: 640px) { .container { padding: 0 24px; } }
+
+    /* ===================================================================== */
+    /* 3. HEADER, BRIDGE STATUS, CHANNEL SWITCH & THEME TOGGLE               */
+    /* ===================================================================== */
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background-color: var(--bg-header);
+      border-bottom: 1px solid var(--border-color);
+      transition: background-color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .header-inner {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 0;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .brand-logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: var(--bg-muted);
+      border: 1px solid var(--border-strong);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .brand-title-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .brand-title {
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text-main);
+    }
+
+    .brand-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .bridge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 11px;
+      border-radius: 9px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-color);
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+    .bridge-pill.connected {
+      background: var(--accent-cyan-soft);
+      border-color: var(--accent-cyan-border);
+      color: var(--accent-cyan);
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .dot-pulse { animation: pulseDot 1.35s ease-in-out infinite; }
+    @keyframes pulseDot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.84); }
+    }
+
+    /* Compact Dark/Light Theme Switch */
+    .theme-switch {
+      position: relative;
+      width: 48px;
+      height: 26px;
+      border-radius: 9999px;
+      background: var(--seg-track);
+      border: 1px solid var(--border-strong);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      padding: 2px;
+    }
+    .theme-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #262B34;
+      color: #00C2E8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform: translateX(0);
+      transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s ease;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+    }
+    [data-theme="light"] .theme-thumb {
+      transform: translateX(22px);
+      background: #FFFFFF;
+      color: #FF441F;
+    }
+
+    /* ===================================================================== */
+    /* 4. CARDS, BADGES, BUTTONS, INPUTS & GRIDS                             */
+    /* ===================================================================== */
+    .main-content {
+      flex: 1;
+      padding: 20px 0 32px;
+    }
+
+    .card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      box-shadow: var(--shadow-card);
+      transition: background-color 0.2s ease, border-color 0.2s ease;
+    }
+    .card-pad { padding: 18px 20px; }
+
+    .subtle {
+      background-color: var(--bg-subtle);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+    }
+
+    .eyebrow {
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      color: var(--accent-cyan);
+    }
+    .section-title {
+      font-size: 15.5px;
+      font-weight: 800;
+      margin: 2px 0 0;
+      color: var(--text-main);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1.3;
+      white-space: nowrap;
+    }
+    .b-cyan { background: var(--accent-cyan-soft); color: var(--accent-cyan); border: 1px solid var(--accent-cyan-border); }
+    .b-orange { background: var(--accent-orange-soft); color: var(--accent-orange); border: 1px solid var(--accent-orange-border); }
+    .b-orange-solid { background: var(--accent-orange); color: #FFFFFF; border: 1px solid var(--accent-orange); }
+    .b-green { background: var(--accent-green-soft); color: var(--accent-green); border: 1px solid var(--accent-green-border); }
+    .b-amber { background: var(--accent-amber-soft); color: var(--accent-amber); border: 1px solid var(--accent-amber-border); }
+    .b-muted { background: var(--bg-muted); color: var(--text-muted); border: 1px solid var(--border-color); }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 8px 14px;
+      border-radius: 9px;
+      border: 1px solid transparent;
+      font-family: inherit;
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    .btn:active:not(:disabled) { transform: scale(0.985); }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn-sm { padding: 6px 10px; font-size: 11.5px; border-radius: 7px; }
+    .btn-lg { padding: 11px 16px; font-size: 13.5px; border-radius: 10px; }
+    .btn-full { width: 100%; }
+
+    .btn-orange { background: var(--accent-orange); color: #FFFFFF; }
+    .btn-orange:hover:not(:disabled) { background: var(--accent-orange-hover); }
+
+    .btn-cyan { background: var(--accent-cyan); color: #0B1418; }
+    .btn-cyan:hover:not(:disabled) { background: var(--accent-cyan-hover); }
+
+    .btn-green { background: var(--accent-green); color: #FFFFFF; }
+    .btn-green:hover:not(:disabled) { opacity: 0.92; }
+
+    .btn-outline { background: transparent; border-color: var(--border-strong); color: var(--text-main); }
+    .btn-outline:hover:not(:disabled) { background: var(--bg-muted); border-color: var(--accent-cyan); }
+
+    .btn-danger-outline { background: transparent; border-color: var(--accent-orange-border); color: var(--accent-orange); }
+    .btn-danger-outline:hover:not(:disabled) { background: var(--accent-orange-soft); }
+
+    .input, .select {
+      width: 100%;
+      padding: 9px 12px;
+      border-radius: 9px;
+      border: 1px solid var(--border-strong);
+      background: var(--bg-subtle);
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+    }
+    .input:focus, .select:focus {
+      outline: none;
+      border-color: var(--accent-cyan);
+      background: var(--bg-card);
+    }
+
+    /* Layout Helpers */
+    .stack-xs { display: flex; flex-direction: column; gap: 6px; }
+    .stack-sm { display: flex; flex-direction: column; gap: 10px; }
+    .stack-md { display: flex; flex-direction: column; gap: 18px; }
+    .row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .between { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+
+    .grid-top {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+    @media (min-width: 1120px) {
+      .grid-top { grid-template-columns: 420px 1fr; }
+    }
+
+    .grid-mid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+    @media (min-width: 1120px) {
+      .grid-mid { grid-template-columns: 420px 1fr; }
+    }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    @media (max-width: 520px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    @media (min-width: 768px) { .kpi-strip { grid-template-columns: repeat(4, 1fr); } }
+
+    .kpi-tile {
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+    }
+    .kpi-label { font-size: 11px; color: var(--text-muted); font-weight: 600; }
+    .kpi-val { font-size: 20px; font-weight: 800; margin-top: 4px; }
+
+    /* ===================================================================== */
+    /* 5. TURNSTILE VISUAL INDICATOR                                         */
+    /* ===================================================================== */
+    .turnstile-lamp {
+      border-radius: 12px;
+      padding: 18px 16px;
+      border: 2px solid var(--border-strong);
+      background: var(--bg-subtle);
+      text-align: center;
+      transition: all 0.2s ease;
+    }
+    .turnstile-lamp.granted {
+      border-color: var(--accent-green);
+      background: var(--accent-green-soft);
+      box-shadow: 0 0 22px rgba(16, 185, 129, 0.20);
+    }
+    .turnstile-lamp.denied {
+      border-color: var(--accent-orange);
+      background: var(--accent-orange-soft);
+      box-shadow: 0 0 22px rgba(255, 68, 31, 0.22);
+    }
+
+    .lamp-ring {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      margin: 0 auto 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid var(--border-strong);
+      background: var(--bg-card);
+      color: var(--text-muted);
+    }
+    .granted .lamp-ring { border-color: var(--accent-green); background: var(--accent-green); color: #FFFFFF; }
+    .denied .lamp-ring { border-color: var(--accent-orange); background: var(--accent-orange); color: #FFFFFF; }
+
+    .lamp-title { font-size: 15px; font-weight: 800; letter-spacing: 0.02em; }
+    .granted .lamp-title { color: var(--accent-green); }
+    .denied .lamp-title { color: var(--accent-orange); }
+
+    .lamp-code {
+      display: inline-block;
+      margin-top: 7px;
+      padding: 3px 9px;
+      border-radius: 6px;
+      background: var(--code-bg);
+      border: 1px solid var(--border-color);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .dir-seg {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px;
+      background: var(--seg-track);
+      padding: 3px;
+      border-radius: 9px;
+      border: 1px solid var(--border-color);
+    }
+    .dir-btn {
+      padding: 7px 10px;
+      border-radius: 7px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .dir-btn.active {
+      background: var(--seg-active-bg);
+      color: var(--text-main);
+    }
+
+    /* ===================================================================== */
+    /* 6. RAM TABLE                                                          */
+    /* ===================================================================== */
+    .table-wrap { width: 100%; overflow-x: auto; }
+    table.tbl { width: 100%; border-collapse: collapse; font-size: 12.5px; text-align: left; }
+    table.tbl th {
+      padding: 10px 12px;
+      font-size: 10.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      background: var(--bg-subtle);
+      border-bottom: 1px solid var(--border-color);
+      white-space: nowrap;
+    }
+    table.tbl td {
+      padding: 11px 12px;
+      border-bottom: 1px solid var(--border-color);
+      vertical-align: middle;
+    }
+    table.tbl tr.drift-row { background: var(--accent-orange-soft); }
+    table.tbl tr:last-child td { border-bottom: none; }
+
+    /* ===================================================================== */
+    /* 7. CHAOS ENGINEERING PANEL                                            */
+    /* ===================================================================== */
+    .slider-row {
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-color);
+    }
+    input[type="range"] {
+      width: 100%;
+      margin-top: 8px;
+      accent-color: var(--accent-orange);
+      cursor: pointer;
+    }
+
+    .check-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 11px 13px;
+      border-radius: 10px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-color);
+      cursor: pointer;
+      transition: border-color 0.15s ease;
+    }
+    .check-card.active-warn {
+      border-color: var(--accent-orange-border);
+      background: var(--accent-orange-soft);
+    }
+    .check-card.active-cyan {
+      border-color: var(--accent-cyan-border);
+      background: var(--accent-cyan-soft);
+    }
+    .check-card input[type="checkbox"] {
+      margin-top: 2px;
+      width: 16px;
+      height: 16px;
+      accent-color: var(--accent-orange);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    /* ===================================================================== */
+    /* 8. QA TEST RUNNER                                                     */
+    /* ===================================================================== */
+    .qa-card {
+      border: 1px solid var(--border-color);
+      border-radius: 11px;
+      background: var(--bg-subtle);
+      overflow: hidden;
+    }
+    .qa-card.pass { border-color: var(--accent-green-border); }
+    .qa-card.fail { border-color: var(--accent-orange); }
+    .qa-card.running { border-color: var(--accent-cyan); }
+
+    .qa-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px 14px;
+      cursor: pointer;
+    }
+    .qa-body {
+      border-top: 1px solid var(--border-color);
+      background: var(--code-bg);
+      padding: 11px 14px;
+      font-size: 11.5px;
+    }
+    .qa-assert {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 3px 0;
+      line-height: 1.45;
+    }
+
+    /* ===================================================================== */
+    /* 9. WIRE INSPECTOR                                                     */
+    /* ===================================================================== */
+    .wire-feed {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 440px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+    .wire-entry {
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      background: var(--bg-subtle);
+      overflow: hidden;
+    }
+    .wire-summary {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 10px 14px;
+      cursor: pointer;
+      font-size: 12px;
+      user-select: none;
+    }
+    .wire-summary::-webkit-details-marker { display: none; }
+    .wire-entry[open] .wire-summary { border-bottom: 1px solid var(--border-color); }
+
+    pre.json-pre {
+      margin: 0;
+      padding: 12px 14px;
+      background: var(--code-bg);
+      color: var(--text-main);
+      font-size: 11.5px;
+      line-height: 1.45;
+      overflow-x: auto;
+    }
+
+    /* ===================================================================== */
+    /* 10. TOASTS & FOOTER                                                   */
+    /* ===================================================================== */
+    .toast-stack {
+      position: fixed;
+      right: 16px;
+      bottom: 20px;
+      z-index: 60;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-width: 360px;
+      width: calc(100% - 32px);
+      pointer-events: none;
+    }
+    .toast {
+      pointer-events: auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border-strong);
+      border-left-width: 4px;
+      border-radius: 10px;
+      padding: 11px 14px;
+      font-size: 12px;
+      box-shadow: 0 10px 26px rgba(0, 0, 0, 0.35);
+    }
+
+    .footer {
+      margin-top: auto;
+      border-top: 1px solid var(--border-color);
+      background: var(--bg-card);
+      padding: 12px 0;
+      font-size: 11.5px;
+      color: var(--text-muted);
+    }
+
+    .text-muted { color: var(--text-muted); }
+    .text-xs { font-size: 12px; }
+    .text-11 { font-size: 11px; }
+    .fw-700 { font-weight: 700; }
+    .fw-800 { font-weight: 800; }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <!-- =================================================================== -->
+    <!-- 1. HEADER                                                           -->
+    <!-- =================================================================== -->
+    <header class="header">
+      <div class="container header-inner">
+        <!-- Geometric SVG Logo + Title -->
+        <div class="brand">
+          <div class="brand-logo" aria-hidden="true">
+            <svg width="26" height="26" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- Geometric Building / Hub Nodes in #FF441F and #00C2E8 -->
+              <rect x="4" y="10" width="8" height="14" rx="2" fill="#FF441F" />
+              <rect x="14" y="4" width="10" height="20" rx="2" fill="#00C2E8" fill-opacity="0.22" stroke="#00C2E8" stroke-width="2" />
+              <path d="M17.5 9H20.5M17.5 13H20.5M17.5 17H20.5" stroke="#00C2E8" stroke-width="2" stroke-linecap="round" />
+              <circle cx="8" cy="14" r="1.5" fill="#FFFFFF" />
+              <path d="M8 10V6.5C8 5.67 8.67 5 9.5 5H14" stroke="#FF441F" stroke-width="1.8" stroke-linecap="round" />
+            </svg>
+          </div>
+          <div>
+            <div class="brand-title-row">
+              <span class="brand-title">PropTechApp Integration Hub</span>
+              <span class="badge b-cyan">Mock-эмулятор Legacy-СКУД (ACL v1.0)</span>
+            </div>
+            <div class="brand-sub">Инженерный стенд контрактного тестирования и симуляции контроллера СКУД</div>
+          </div>
+        </div>
+
+        <!-- Bridge Status + Online/Offline Quick Switch + Compact Theme Toggle -->
+        <div class="header-controls">
+          <div id="bridge-pill" class="bridge-pill" title="Двусторонний обмен командами с основной платформой PropTechApp">
+            <span class="dot" style="background: var(--text-dim);"></span>
+            <span>Мост PropTechApp (BroadcastChannel): Ожидание</span>
+          </div>
+
+          <button type="button" id="btn-acs-channel" class="btn btn-sm" onclick="toggleAcsOnline()"></button>
+
+          <button
+            type="button"
+            class="theme-switch"
+            onclick="toggleTheme()"
+            role="switch"
+            aria-label="Переключить тёмную или светлую тему"
+            title="Тёмная / Светлая тема"
+          >
+            <span class="theme-thumb" id="theme-thumb"></span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- =================================================================== -->
+    <!-- MAIN WORKSPACE                                                      -->
+    <!-- =================================================================== -->
+    <main class="main-content">
+      <div class="container stack-md">
+
+        <!-- KPI / Telemetry Strip -->
+        <section class="kpi-strip" id="kpi-strip"></section>
+
+        <!-- ROW 1: VIRTUAL TURNSTILE + CONTROLLER RAM & RECONCILIATION -->
+        <section class="grid-top">
+          <!-- 2. Виртуальный турникет (Симулятор КПП) -->
+          <div class="card card-pad stack-sm" id="turnstile-panel"></div>
+
+          <!-- 3. Локальная память контроллера (RAM СКУД) и Reconciliation -->
+          <div class="card" id="ram-panel" style="overflow: hidden;"></div>
+        </section>
+
+        <!-- ROW 2: CHAOS ENGINEERING + QA AUTOMATED TEST RUNNER -->
+        <section class="grid-mid">
+          <!-- 4. Панель Chaos-инжиниринга (Fault Injection) -->
+          <div class="card card-pad stack-sm" id="chaos-panel"></div>
+
+          <!-- 5. QA-раннер интеграционных и контрактных автотестов (6 тестов) -->
+          <div class="card card-pad stack-sm" id="qa-panel"></div>
+        </section>
+
+        <!-- ROW 3: LIVE WIRE INSPECTOR -->
+        <section class="card card-pad stack-sm" id="wire-panel"></section>
+
+      </div>
+    </main>
+
+    <!-- =================================================================== -->
+    <!-- FOOTER                                                              -->
+    <!-- =================================================================== -->
+    <footer class="footer">
+      <div class="container between">
+        <span>PropTechApp Integration Hub · Mock-эмулятор Legacy-СКУД (ACL v1.0). СКУД является единственным источником истины по физическому проходу (152-ФЗ).</span>
+        <span class="mono">Contract ACL v1.0 · Offline-Ready RAM</span>
+      </div>
+    </footer>
+  </div>
+
+  <div class="toast-stack" id="toast-stack"></div>
+
+  <!-- ===================================================================== -->
+  <!-- APPLICATION LOGIC                                                     -->
+  <!-- ===================================================================== -->
+  <script>
+    // =========================================================================
+    // 1. TECHNICAL BRIDGE CONSTANTS (COMPATIBLE WITH PROPTECHAPP PROTOTYPE)
+    // =========================================================================
+    const BRIDGE_CHANNEL_NAME = 'lovit_acs_bridge_v1';
+    const STORAGE_KEY_PRIMARY = 'lovit_acs_bridge_v1_msg';
+    const STORAGE_KEY_COMPAT = 'lovit_acs_bridge_msg';
+
+    // =========================================================================
+    // 2. INITIAL PRE-POPULATED DATA (5 REALISTIC PASSES)
+    // =========================================================================
+    const INITIAL_RAM_PASSES = [
+      {
+        id: 'QR-2611-0901',
+        guestName: 'Смирнова Елена Викторовна',
+        company: 'ООО «ТехноВектор»',
+        qrToken: 'QR-ACTIVE-0901',
+        status: 'ACTIVE',
+        syncedAt: '13:52:14',
+        idempotencyKey: 'idem-a10f-0901',
+        drifted: false,
+      },
+      {
+        id: 'QR-2611-0902',
+        guestName: 'Коновалов Андрей Сергеевич',
+        company: 'ООО «ТехноВектор»',
+        qrToken: 'QR-ACTIVE-0902',
+        status: 'ACTIVE',
+        syncedAt: '10:15:02',
+        idempotencyKey: 'idem-b24c-0902',
+        drifted: false,
+      },
+      {
+        id: 'QR-2611-0906',
+        guestName: 'Белозёрова Ольга Дмитриевна',
+        company: 'АО «Прайм Консалтинг»',
+        qrToken: 'QR-VIP-0906',
+        status: 'ACTIVE',
+        syncedAt: '12:40:18',
+        idempotencyKey: 'idem-c39d-0906',
+        drifted: false,
+      },
+      {
+        id: 'QR-2611-0904',
+        guestName: 'Кузнецова Наталья Игоревна',
+        company: 'ООО «ТехноВектор»',
+        qrToken: 'QR-REV-0904',
+        status: 'REVOKED',
+        syncedAt: '11:12:44',
+        idempotencyKey: 'idem-d48e-0904',
+        drifted: false,
+      },
+      {
+        id: 'QR-2611-0907',
+        guestName: 'Лавров Иван Сергеевич',
+        company: 'Бюро «Вектор Права»',
+        qrToken: 'QR-USED-0907',
+        status: 'USED',
+        syncedAt: '09:55:41',
+        idempotencyKey: 'idem-e57f-0907',
+        drifted: false,
+      },
+    ];
+
+    // =========================================================================
+    // 3. REACTIVE STATE
+    // =========================================================================
+    const state = {
+      theme: 'dark',
+      acsOnline: true,
+
+      // Bridge heartbeat status
+      bridgeConnected: false,
+      bridgeLastSeen: null,
+      bridgeLastPongTs: 0,
+
+      // Controller RAM & Platform Expected Snapshot (for Reconciliation)
+      ram: JSON.parse(JSON.stringify(INITIAL_RAM_PASSES)),
+      platformExpected: JSON.parse(JSON.stringify(INITIAL_RAM_PASSES)),
+      processedIdemKeys: new Map(INITIAL_RAM_PASSES.map(p => [p.idempotencyKey, p.id])),
+
+      // Telemetry
+      totalProcessed: 14,
+      syncErrors: 0,
+      duplicatesBlocked: 1,
+      revokeLatenciesSec: [0.4, 0.5, 0.7, 0.6],
+
+      // Virtual Turnstile
+      turnstileInput: 'QR-ACTIVE-0901',
+      turnstileDirection: 'ENTRY', // 'ENTRY' | 'EXIT'
+      turnstileStatus: {
+        mode: 'IDLE', // 'IDLE' | 'GRANTED' | 'DENIED'
+        title: 'ОЖИДАНИЕ СКАНИРОВАНИЯ',
+        code: 'TURNSTILE_READY',
+        details: 'Введите QR-токен или ID пропуска и нажмите «Сканировать QR».',
+        offlineLocal: false,
+      },
+
+      // Chaos Engineering (Fault Injection)
+      chaos: {
+        latencyMs: 350,            // 0..4000 ms
+        failureRatePct: 0,         // 0..100 %
+        offlineMode: false,        // synced with state.acsOnline
+        revokeTimeout: false,      // > 60s -> REVOKE_FAILED
+        enforceIdempotency: true,  // Idempotency-Key deduplication
+      },
+
+      // QA Runner (6 Contract & Integration Tests)
+      qaRunningAll: false,
+      qaTests: [
+        {
+          id: 'CT-01',
+          title: 'CT-01: Выдача гостевого пропуска (PENDING_SYNC → ACK → ACTIVE) и валидация отсутствия паспортных ПДн (152-ФЗ)',
+          status: 'IDLE',
+          durationMs: null,
+          expanded: false,
+          logs: [],
+        },
+        {
+          id: 'CT-02',
+          title: 'CT-02: Идемпотентность по Idempotency-Key (повторный запрос не создаёт дубль в RAM)',
+          status: 'IDLE',
+          durationMs: null,
+          expanded: false,
+          logs: [],
+        },
+        {
+          id: 'CT-03',
+          title: 'CT-03: Однократный проход по гостевому QR (ACTIVE → USED) и блокировка повторного прохода',
+          status: 'IDLE',
+          durationMs: null,
+          expanded: false,
+          logs: [],
+        },
+        {
+          id: 'CT-04',
+          title: 'CT-04: Отзыв действующего пропуска (p95 ≤ 60с) и 0 проходов после отзыва',
+          status: 'IDLE',
+          durationMs: null,
+          expanded: false,
+          logs: [],
+        },
+        {
+          id: 'CT-05',
+          title: 'CT-05: Аварийный режим Offline (генерация REVOKE_FAILED + сохранение локального прохода активных пропусков в RAM)',
+          status: 'IDLE',
+          durationMs: null,
+          expanded: false,
+          logs: [],
+        },
+        {
+          id: 'CT-06',
+          title: 'CT-06: Фоновая сверка Reconciliation (обнаружение и устранение расхождений между платформой и контроллером)',
+          status: 'IDLE',
+          durationMs: null,
+          expanded: false,
+          logs: [],
+        },
+      ],
+
+      // Wire Inspector
+      wireFilter: 'ALL', // 'ALL' | 'ISSUE' | 'REVOKE' | 'TURNSTILE' | 'RECONCILE' | 'BRIDGE'
+      wireLog: [
+        {
+          id: 'PKT-002',
+          time: '13:52:14',
+          direction: 'OUT',
+          category: 'ISSUE',
+          command: 'ISSUE_ACK',
+          status: '200 OK',
+          latencyMs: 340,
+          payload: {
+            event: 'ISSUE_ACK',
+            passId: 'QR-2611-0901',
+            qrToken: 'QR-ACTIVE-0901',
+            statusInRam: 'ACTIVE',
+            piiCompliance152FZ: 'VERIFIED_NO_PASSPORT',
+          },
+        },
+        {
+          id: 'PKT-001',
+          time: '13:52:13',
+          direction: 'IN',
+          category: 'ISSUE',
+          command: 'ISSUE_PASS',
+          status: '202 ACCEPTED',
+          latencyMs: 12,
+          payload: {
+            command: 'ISSUE_PASS',
+            passId: 'QR-2611-0901',
+            guestName: 'Смирнова Елена Викторовна',
+            company: 'ООО «ТехноВектор»',
+            idempotencyKey: 'idem-a10f-0901',
+          },
+        },
+      ],
+    };
+
+    // =========================================================================
+    // 4. UTILITIES
+    // =========================================================================
+    function nowTime() {
+      return new Date().toTimeString().split(' ')[0];
+    }
+
+    function genIdemKey(prefix = 'idem') {
+      return `${prefix}-${Math.random().toString(16).slice(2, 7)}-${Date.now().toString().slice(-4)}`;
+    }
+
+    function escHtml(str) {
+      return String(str ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    }
+
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    function showToast(title, message, tone = 'cyan') {
+      const stack = document.getElementById('toast-stack');
+      const colors = {
+        cyan: 'var(--accent-cyan)',
+        orange: 'var(--accent-orange)',
+        green: 'var(--accent-green)',
+        amber: 'var(--accent-amber)',
+      };
+      const el = document.createElement('div');
+      el.className = 'toast';
+      el.style.borderLeftColor = colors[tone] || colors.cyan;
+      el.innerHTML = `<div class="fw-700">${escHtml(title)}</div><div class="text-muted" style="margin-top:3px;">${escHtml(message)}</div>`;
+      stack.appendChild(el);
+      setTimeout(() => {
+        el.style.opacity = '0';
+        el.style.transition = 'opacity 0.25s ease';
+        setTimeout(() => el.remove(), 260);
+      }, 3600);
+    }
+
+    function pushWire(entry) {
+      const id = `PKT-${String(state.wireLog.length + 1).padStart(3, '0')}`;
+      state.wireLog.unshift({
+        id,
+        time: nowTime(),
+        ...entry,
+      });
+      if (state.wireLog.length > 80) state.wireLog.pop();
+    }
+
+    function calcErrorRate() {
+      if (!state.totalProcessed) return '0.0';
+      return ((state.syncErrors / state.totalProcessed) * 100).toFixed(1);
+    }
+
+    function calcRevokeP95() {
+      const sorted = [...state.revokeLatenciesSec].sort((a, b) => a - b);
+      if (!sorted.length) return '0.0';
+      const idx = Math.min(sorted.length - 1, Math.ceil(sorted.length * 0.95) - 1);
+      return sorted[idx].toFixed(1);
+    }
+
+    // =========================================================================
+    // 5. BROADCASTCHANNEL & LOCALSTORAGE BRIDGE (100% COMPATIBLE)
+    // =========================================================================
+    let bridgeChannel = null;
+    try {
+      if (typeof BroadcastChannel !== 'undefined') {
+        bridgeChannel = new BroadcastChannel(BRIDGE_CHANNEL_NAME);
+        bridgeChannel.onmessage = (ev) => handleBridgeIncoming(ev.data);
+      }
+    } catch (e) { /* fallback to localStorage */ }
+
+    window.addEventListener('storage', (ev) => {
+      if ((ev.key === STORAGE_KEY_PRIMARY || ev.key === STORAGE_KEY_COMPAT) && ev.newValue) {
+        try {
+          const msg = JSON.parse(ev.newValue);
+          if (msg && msg.source !== 'PROPTECH_ACS_MOCK') {
+            handleBridgeIncoming(msg);
+          }
+        } catch (e) { /* ignore malformed storage payload */ }
+      }
+    });
+
+    function emitBridge(type, payload = {}) {
+      const envelope = {
+        source: 'PROPTECH_ACS_MOCK',
+        type,
+        payload,
+        timestamp: new Date().toISOString(),
+      };
+      try { if (bridgeChannel) bridgeChannel.postMessage(envelope); } catch (e) {}
+      const serialized = JSON.stringify({ ...envelope, _nonce: Math.random() });
+      try { localStorage.setItem(STORAGE_KEY_PRIMARY, serialized); } catch (e) {}
+      try { localStorage.setItem(STORAGE_KEY_COMPAT, serialized); } catch (e) {}
+    }
+
+    function markBridgeAlive() {
+      const wasConnected = state.bridgeConnected;
+      state.bridgeConnected = true;
+      state.bridgeLastSeen = nowTime();
+      state.bridgeLastPongTs = Date.now();
+      if (!wasConnected) {
+        showToast('Мост PropTechApp подключён', 'Установлена двусторонняя связь в реальном времени.', 'cyan');
+        renderHeader();
+      }
+    }
+
+    function handleBridgeIncoming(msg) {
+      if (!msg || msg.source === 'PROPTECH_ACS_MOCK') return;
+      const type = msg.type || msg.command;
+      const data = msg.payload || msg;
+
+      if (type === 'BRIDGE_PING' || type === 'PING') {
+        markBridgeAlive();
+        emitBridge('BRIDGE_PONG', { hub: 'PropTechApp Integration Hub', online: state.acsOnline });
+        return;
+      }
+
+      if (type === 'BRIDGE_PONG' || type === 'PONG') {
+        markBridgeAlive();
+        return;
+      }
+
+      markBridgeAlive();
+
+      if (type === 'ISSUE_PASS' || type === 'ACS_ISSUE_PASS') {
+        handleIssueCommand(data, { fromBridge: true });
+      } else if (type === 'REVOKE_PASS' || type === 'ACS_REVOKE_PASS') {
+        handleRevokeCommand(data, { fromBridge: true });
+      } else if (type === 'RECONCILE_REQUEST' || type === 'ACS_RECONCILE_REQ') {
+        handleReconcileCommand(data, { fromBridge: true });
+      }
+    }
+
+    // Automatic heartbeat every 3.5 seconds
+    setInterval(() => {
+      emitBridge('BRIDGE_PING', { hub: 'PropTechApp Integration Hub' });
+      if (state.bridgeConnected && Date.now() - state.bridgeLastPongTs > 8500) {
+        state.bridgeConnected = false;
+        renderHeader();
+      }
+    }, 3500);
+
+    // =========================================================================
+    // 6. CORE ACL COMMAND HANDLERS (ISSUE, REVOKE, RECONCILE)
+    // =========================================================================
+    function handleIssueCommand(raw = {}, opts = {}) {
+      const passId = raw.passId || `QR-2611-${Math.floor(1000 + Math.random() * 8999)}`;
+      const guestName = raw.guestFullName || raw.guestName || 'Гость БЦ';
+      const company = raw.company || 'ООО «ТехноВектор»';
+      const qrToken = raw.qrToken || raw.qrCode || `QR-ACT-${passId.slice(-4)}`;
+      const idempotencyKey = raw.idempotencyKey || genIdemKey('iss');
+      const delayMs = opts.delayMs !== undefined ? opts.delayMs : state.chaos.latencyMs;
+      const forceOnline = opts.forceOnline === true;
+      const isOffline = forceOnline ? false : !state.acsOnline;
+      const enforceIdem = opts.enforceIdempotency !== undefined ? opts.enforceIdempotency : state.chaos.enforceIdempotency;
+      const failChance = opts.failChance !== undefined ? opts.failChance : state.chaos.failureRatePct;
+
+      state.totalProcessed++;
+
+      pushWire({
+        direction: 'IN',
+        category: 'ISSUE',
+        command: 'ISSUE_PASS',
+        status: '202 RECEIVED',
+        latencyMs: 6,
+        payload: {
+          command: 'ISSUE_PASS',
+          passId,
+          guestName,
+          company,
+          qrToken,
+          idempotencyKey,
+          passportNumber: raw.passportNumber,
+          passportScan: raw.passportScan,
+        },
+      });
+
+      // 152-FZ Guard: reject forbidden passport PII fields
+      if (raw.passportNumber || raw.passportScan || raw.passportSeries) {
+        state.syncErrors++;
+        const errPayload = {
+          event: 'ISSUE_FAILED',
+          command: 'ACS_ISSUE_PASS',
+          passId,
+          errorCode: 'PII_POLICY_152FZ_VIOLATION',
+          message: 'Отклонено по 152-ФЗ: передача паспортных данных в MVP запрещена.',
+        };
+        pushWire({ direction: 'OUT', category: 'ISSUE', command: 'ISSUE_FAILED', status: '422 152-FZ', latencyMs: 12, payload: errPayload });
+        emitBridge('ACS_ISSUE_FAIL', errPayload);
+        render();
+        return Promise.resolve({ ok: false, code: 'PII_POLICY_152FZ_VIOLATION', payload: errPayload });
+      }
+
+      // Idempotency-Key check
+      if (enforceIdem && state.processedIdemKeys.has(idempotencyKey)) {
+        state.duplicatesBlocked++;
+        const existingId = state.processedIdemKeys.get(idempotencyKey);
+        const existing = state.ram.find(p => p.id === existingId);
+        const replayPayload = {
+          event: 'ISSUE_ACK',
+          passId: existingId,
+          qrToken: existing ? existing.qrToken : qrToken,
+          qrCode: existing ? existing.qrToken : qrToken,
+          statusInRam: existing ? existing.status : 'ACTIVE',
+          idempotentReplay: true,
+          idempotencyKey,
+        };
+        pushWire({ direction: 'OUT', category: 'ISSUE', command: 'ISSUE_ACK', status: '409 IDEMPOTENT_REPLAY', latencyMs: 14, payload: replayPayload });
+        emitBridge('ACS_ISSUE_ACK', replayPayload);
+        if (!opts.silent) showToast('Дубль отражён (Idempotency)', `Ключ ${idempotencyKey} уже обработан — 0 дублей в RAM.`, 'cyan');
+        render();
+        return Promise.resolve({ ok: true, idempotentReplay: true, payload: replayPayload });
+      }
+
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          const randomFail = !isOffline && failChance > 0 && Math.random() * 100 < failChance;
+          if (isOffline || randomFail) {
+            state.syncErrors++;
+            const failPayload = {
+              event: 'ISSUE_FAILED',
+              command: 'ACS_ISSUE_PASS',
+              passId,
+              errorCode: isOffline ? 'CHANNEL_OFFLINE' : 'FAULT_INJECTION_ERROR',
+              message: isOffline
+                ? 'Канал СКУД в режиме Offline. Пропуск не записан в RAM.'
+                : `Искусственный сбой синхронизации (Chaos ${failChance}%).`,
+              idempotencyKey,
+            };
+            pushWire({ direction: 'OUT', category: 'ISSUE', command: 'ISSUE_FAILED', status: '503 FAILED', latencyMs: delayMs, payload: failPayload });
+            emitBridge('ACS_ISSUE_FAIL', failPayload);
+            if (!opts.silent) showToast('ISSUE_FAILED', failPayload.message, 'orange');
+            render();
+            resolve({ ok: false, code: failPayload.errorCode, payload: failPayload });
+            return;
+          }
+
+          const rec = {
+            id: passId,
+            guestName,
+            company,
+            qrToken,
+            status: 'ACTIVE',
+            syncedAt: nowTime(),
+            idempotencyKey,
+            drifted: false,
+          };
+
+          state.ram.unshift({ ...rec });
+          state.platformExpected.unshift({ ...rec });
+          state.processedIdemKeys.set(idempotencyKey, passId);
+
+          const ackPayload = {
+            event: 'ISSUE_ACK',
+            passId,
+            qrToken,
+            qrCode: qrToken,
+            statusInRam: 'ACTIVE',
+            syncedAt: rec.syncedAt,
+            idempotencyKey,
+            piiCompliance152FZ: 'VERIFIED_NO_PASSPORT',
+          };
+
+          pushWire({ direction: 'OUT', category: 'ISSUE', command: 'ISSUE_ACK', status: '200 ACK', latencyMs: delayMs, payload: ackPayload });
+          emitBridge('ACS_ISSUE_ACK', ackPayload);
+          if (!opts.silent) showToast('ISSUE_ACK · Записано в RAM', `Пропуск ${guestName} (${qrToken}) активирован в СКУД.`, 'green');
+          render();
+          resolve({ ok: true, record: rec, payload: ackPayload });
+        }, delayMs);
+      });
+    }
+
+    function handleRevokeCommand(raw = {}, opts = {}) {
+      const passId = raw.passId;
+      const idempotencyKey = raw.idempotencyKey || genIdemKey('rev');
+      const delayMs = opts.delayMs !== undefined ? opts.delayMs : state.chaos.latencyMs;
+      const isOffline = opts.forceOffline !== undefined ? opts.forceOffline : !state.acsOnline;
+      const isRevokeTimeout = opts.forceTimeout !== undefined ? opts.forceTimeout : state.chaos.revokeTimeout;
+
+      state.totalProcessed++;
+
+      pushWire({
+        direction: 'IN',
+        category: 'REVOKE',
+        command: 'REVOKE_PASS',
+        status: '202 RECEIVED',
+        latencyMs: 6,
+        payload: { command: 'REVOKE_PASS', passId, reason: raw.reason || 'Отзыв пропуска', idempotencyKey },
+      });
+
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          if (isOffline || isRevokeTimeout) {
+            state.syncErrors++;
+            state.revokeLatenciesSec.push(61.0);
+            const failPayload = {
+              event: 'REVOKE_FAILED',
+              command: 'ACS_REVOKE_PASS',
+              passId,
+              errorCode: 'REVOKE_FAILED',
+              signalRAlert: 'CRITICAL_KPP_MANUAL_BLOCK',
+              message: isOffline
+                ? 'Канал СКУД Offline: отзыв не доставлен, инициирован критический алерт на КПП.'
+                : 'Таймаут отзыва > 60с: сгенерирован REVOKE_FAILED для Поста Охраны.',
+              idempotencyKey,
+            };
+            pushWire({ direction: 'OUT', category: 'REVOKE', command: 'REVOKE_FAILED', status: '504 REVOKE_FAILED', latencyMs: isRevokeTimeout ? 60500 : delayMs, payload: failPayload });
+            emitBridge('ACS_REVOKE_FAIL', failPayload);
+            if (!opts.silent) showToast('REVOKE_FAILED → Алерт на КПП', failPayload.message, 'orange');
+            render();
+            resolve({ ok: false, code: 'REVOKE_FAILED', payload: failPayload });
+            return;
+          }
+
+          const ramRec = state.ram.find(p => p.id === passId || p.qrToken === passId);
+          const expRec = state.platformExpected.find(p => p.id === passId || p.qrToken === passId);
+          if (ramRec) {
+            ramRec.status = 'REVOKED';
+            ramRec.syncedAt = nowTime();
+            ramRec.drifted = false;
+          }
+          if (expRec) expRec.status = 'REVOKED';
+
+          const sec = Number(Math.max(0.1, delayMs / 1000).toFixed(2));
+          state.revokeLatenciesSec.push(sec);
+
+          const ackPayload = {
+            event: 'REVOKE_ACK',
+            action: 'REVOKED',
+            passId: ramRec ? ramRec.id : passId,
+            statusInRam: 'REVOKED',
+            revokeDurationSec: sec,
+            idempotencyKey,
+          };
+          pushWire({ direction: 'OUT', category: 'REVOKE', command: 'REVOKE_ACK', status: '200 REVOKED', latencyMs: delayMs, payload: ackPayload });
+          emitBridge('ACS_REVOKE_ACK', ackPayload);
+          if (!opts.silent) showToast('REVOKE_ACK', `Пропуск ${ackPayload.passId} отозван в RAM за ${sec} с.`, 'amber');
+          render();
+          resolve({ ok: true, durationSec: sec, payload: ackPayload });
+        }, delayMs);
+      });
+    }
+
+    function handleReconcileCommand(raw = {}, opts = {}) {
+      const idempotencyKey = raw.idempotencyKey || genIdemKey('rec');
+      const delayMs = opts.delayMs !== undefined ? opts.delayMs : Math.min(state.chaos.latencyMs, 600);
+      const isOffline = opts.forceOnline ? false : !state.acsOnline;
+
+      state.totalProcessed++;
+
+      pushWire({
+        direction: 'IN',
+        category: 'RECONCILE',
+        command: 'RECONCILE_REQUEST',
+        status: '202 RECEIVED',
+        latencyMs: 5,
+        payload: { command: 'RECONCILE_REQUEST', idempotencyKey },
+      });
+
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          if (isOffline) {
+            state.syncErrors++;
+            const err = { event: 'RECONCILE_FAILED', errorCode: 'CHANNEL_OFFLINE', message: 'Сверка невозможна в режиме Offline.' };
+            pushWire({ direction: 'OUT', category: 'RECONCILE', command: 'RECONCILE_FAILED', status: '503 OFFLINE', latencyMs: delayMs, payload: err });
+            if (!opts.silent) showToast('Сверка невозможна (Offline)', 'Переведите канал СКУД в Online.', 'orange');
+            render();
+            resolve({ ok: false, payload: err });
+            return;
+          }
+
+          const repaired = [];
+          state.platformExpected.forEach(exp => {
+            const ramRec = state.ram.find(r => r.id === exp.id);
+            if (!ramRec) {
+              state.ram.push({ ...exp, drifted: false, syncedAt: nowTime() });
+              repaired.push({ passId: exp.id, action: 'RESTORED_TO_RAM', status: exp.status });
+            } else if (ramRec.status !== exp.status || ramRec.drifted) {
+              const prev = ramRec.status;
+              ramRec.status = exp.status;
+              ramRec.drifted = false;
+              ramRec.syncedAt = nowTime();
+              repaired.push({ passId: exp.id, ramWas: prev, restoredTo: exp.status });
+            }
+          });
+
+          const resPayload = {
+            event: 'RECONCILE_RESULT',
+            checkedCount: state.platformExpected.length,
+            driftsFound: repaired.length,
+            fixedCount: repaired.length,
+            repaired,
+            syncedAt: nowTime(),
+          };
+          pushWire({ direction: 'OUT', category: 'RECONCILE', command: 'RECONCILE_RESULT', status: '200 SYNCED', latencyMs: delayMs, payload: resPayload });
+          emitBridge('RECONCILE_RESULT', resPayload);
+          if (!opts.silent) {
+            showToast(
+              repaired.length ? `Сверка: устранено ${repaired.length}` : 'Сверка: 0 расхождений',
+              repaired.length ? 'Память контроллера приведена в соответствие с БД платформы.' : 'Все записи RAM совпадают с эталоном.',
+              repaired.length ? 'green' : 'cyan'
+            );
+          }
+          render();
+          resolve({ ok: true, driftsFound: repaired.length, payload: resPayload });
+        }, delayMs);
+      });
+    }
+
+    // =========================================================================
+    // 7. VIRTUAL TURNSTILE LOGIC
+    // =========================================================================
+    function scanTurnstile(tokenOverride = null, opts = {}) {
+      const query = (tokenOverride !== null ? tokenOverride : state.turnstileInput).trim().toUpperCase();
+      if (!query) return { granted: false, code: 'EMPTY_TOKEN' };
+
+      const dir = opts.direction || state.turnstileDirection;
+      const rec = state.ram.find(p => p.qrToken.toUpperCase() === query || p.id.toUpperCase() === query);
+      const isOffline = !state.acsOnline;
+
+      let granted = false;
+      let title = 'ОТКАЗ ДОСТУПА';
+      let code = 'DENY_NOT_FOUND_IN_RAM';
+      let details = `Пропуск «${query}» не найден в локальной RAM контроллера (возможен неподтверждённый PENDING_SYNC).`;
+
+      if (rec) {
+        if (rec.status === 'ACTIVE') {
+          granted = true;
+          rec.status = 'USED';
+          rec.syncedAt = nowTime();
+          const exp = state.platformExpected.find(e => e.id === rec.id);
+          if (exp) exp.status = 'USED';
+
+          title = 'ПРОХОД РАЗРЕШЁН';
+          code = dir === 'ENTRY' ? 'OK_ENTRY_PASS_USED' : 'OK_EXIT_PASS_USED';
+          details = `${rec.guestName} (${rec.company}) — направление: ${dir === 'ENTRY' ? 'Вход' : 'Выход'}. Гостевой QR погашен (ACTIVE → USED).`;
+        } else if (rec.status === 'USED') {
+          code = 'DENY_ALREADY_USED';
+          details = `Повторный проход запрещён: гостевой пропуск ${rec.guestName} (${rec.id}) уже имеет статус USED.`;
+        } else if (rec.status === 'REVOKED') {
+          code = 'DENY_REVOKED';
+          details = `Доступ заблокирован: пропуск ${rec.guestName} (${rec.id}) отозван (REVOKED).`;
+        }
+      }
+
+      state.turnstileStatus = {
+        mode: granted ? 'GRANTED' : 'DENIED',
+        title,
+        code,
+        details,
+        offlineLocal: isOffline && granted,
+      };
+
+      const eventPayload = {
+        event: granted ? 'PASS_USED' : 'ACCESS_DENIED',
+        passId: rec ? rec.id : null,
+        qrToken: rec ? rec.qrToken : query,
+        qrCode: rec ? rec.qrToken : query,
+        direction: dir,
+        granted,
+        decision: granted ? 'ACCESS_GRANTED' : 'ACCESS_DENIED',
+        reasonCode: code,
+        offlineLocalRam: isOffline,
+      };
+
+      pushWire({
+        direction: 'OUT',
+        category: 'TURNSTILE',
+        command: granted ? 'PASS_USED' : 'TURNSTILE_DENY',
+        status: granted ? '200 GRANTED' : '403 DENIED',
+        latencyMs: isOffline ? 0 : 28,
+        payload: eventPayload,
+      });
+
+      // Notify PropTechApp over bridge when online (and also send event payload)
+      if (!isOffline) {
+        emitBridge('TURNSTILE_PASS_EVENT', eventPayload);
+      }
+
+      render();
+      return { granted, code, payload: eventPayload };
+    }
+
+    function quickScanFromRam(qrToken) {
+      state.turnstileInput = qrToken;
+      scanTurnstile(qrToken);
+    }
+
+    function localRevokeFromRam(passId) {
+      const rec = state.ram.find(p => p.id === passId);
+      if (!rec) return;
+      rec.status = 'REVOKED';
+      rec.syncedAt = nowTime();
+      const exp = state.platformExpected.find(e => e.id === passId);
+      if (exp) exp.status = 'REVOKED';
+
+      const payload = { event: 'REVOKE_ACK', action: 'REVOKED', passId: rec.id, statusInRam: 'REVOKED', source: 'LOCAL_CONTROLLER' };
+      pushWire({ direction: 'OUT', category: 'REVOKE', command: 'REVOKE_ACK', status: '200 LOCAL_REVOKED', latencyMs: 15, payload });
+      if (state.acsOnline) emitBridge('ACS_REVOKE_ACK', payload);
+      showToast('Отозвано локально в RAM', `Пропуск ${rec.guestName} (${rec.id}) переведён в REVOKED.`, 'amber');
+      render();
+    }
+
+    function simulateDrift() {
+      const target = state.ram.find(p => !p.drifted) || state.ram[0];
+      if (!target) return;
+      const exp = state.platformExpected.find(e => e.id === target.id);
+      const expectedStatus = exp ? exp.status : 'ACTIVE';
+      target.status = expectedStatus === 'ACTIVE' ? 'REVOKED' : 'ACTIVE';
+      target.drifted = true;
+
+      pushWire({
+        direction: 'IN',
+        category: 'RECONCILE',
+        command: 'DRIFT_SIMULATED',
+        status: 'DRIFT',
+        latencyMs: 4,
+        payload: { passId: target.id, expectedInPlatformDB: expectedStatus, actualInControllerRAM: target.status },
+      });
+      showToast('Смоделировано расхождение', `Для ${target.id} статус в RAM изменён на ${target.status} (в БД: ${expectedStatus}). Запустите Reconciliation!`, 'orange');
+      render();
+    }
+
+    // =========================================================================
+    // 8. QA CONTRACT & INTEGRATION TEST RUNNER (CT-01 .. CT-06)
+    // =========================================================================
+    async function runTest(testId) {
+      const tc = state.qaTests.find(t => t.id === testId);
+      if (!tc || tc.status === 'RUNNING') return;
+
+      tc.status = 'RUNNING';
+      tc.expanded = true;
+      tc.logs = [];
+      const t0 = performance.now();
+      render();
+
+      try {
+        if (testId === 'CT-01') {
+          // 1) Validate 152-FZ rejection of passport data
+          const badRes = await handleIssueCommand({
+            passId: 'CT01-PII-TEST',
+            guestName: 'Тест 152-ФЗ',
+            passportNumber: '4510 123456',
+          }, { delayMs: 80, forceOnline: true, failChance: 0, silent: true });
+          tc.logs.push({ ok: !badRes.ok && badRes.code === 'PII_POLICY_152FZ_VIOLATION', text: 'Проверка 152-ФЗ: запрос с паспортными ПДн отклонён (422 PII_POLICY_152FZ_VIOLATION).' });
+          render();
+          await sleep(180);
+
+          // 2) Valid issue PENDING_SYNC -> ACK -> ACTIVE
+          const goodId = `CT01-${Math.floor(100 + Math.random() * 899)}`;
+          const okRes = await handleIssueCommand({
+            passId: goodId,
+            guestName: 'Тестовый Гость CT-01',
+            company: 'ООО «ТехноВектор»',
+          }, { delayMs: 180, forceOnline: true, failChance: 0, silent: true });
+          const inRam = state.ram.some(r => r.id === goodId && r.status === 'ACTIVE');
+          tc.logs.push({ ok: okRes.ok && inRam, text: `Выдача ${goodId} без паспортных ПДн: PENDING_SYNC → ISSUE_ACK → ACTIVE в RAM.` });
+        }
+
+        if (testId === 'CT-02') {
+          const idemKey = genIdemKey('ct02');
+          const countBefore = state.ram.length;
+          const r1 = await handleIssueCommand({
+            passId: `CT02-${Math.floor(100 + Math.random() * 899)}`,
+            guestName: 'Гость Идемпотентность',
+            idempotencyKey: idemKey,
+          }, { delayMs: 140, forceOnline: true, failChance: 0, enforceIdempotency: true, silent: true });
+          tc.logs.push({ ok: r1.ok && !r1.idempotentReplay, text: `Запрос #1 с ключом ${idemKey} принят (200 ACK). RAM: ${countBefore} → ${state.ram.length}.` });
+          render();
+          await sleep(180);
+
+          const r2 = await handleIssueCommand({
+            passId: r1.payload.passId,
+            guestName: 'Гость Идемпотентность',
+            idempotencyKey: idemKey,
+          }, { delayMs: 100, forceOnline: true, failChance: 0, enforceIdempotency: true, silent: true });
+          const noDupe = state.ram.length === countBefore + 1;
+          tc.logs.push({ ok: r2.idempotentReplay === true && noDupe, text: `Повторный запрос #2 с тем же ключом → 409 IDEMPOTENT_REPLAY, дублей в RAM: 0.` });
+        }
+
+        if (testId === 'CT-03') {
+          const passId = `CT03-${Math.floor(100 + Math.random() * 899)}`;
+          const qrToken = `QR-CT03-${passId.slice(-3)}`;
+          await handleIssueCommand({ passId, guestName: 'Гость Однократный Проход', qrToken }, { delayMs: 120, forceOnline: true, failChance: 0, silent: true });
+          const first = scanTurnstile(qrToken, { direction: 'ENTRY' });
+          tc.logs.push({ ok: first.granted && first.code === 'OK_ENTRY_PASS_USED', text: `Первый проход по ${qrToken} → ПРОХОД РАЗРЕШЁН, статус переведён в USED.` });
+          render();
+          await sleep(180);
+
+          const second = scanTurnstile(qrToken, { direction: 'ENTRY' });
+          tc.logs.push({ ok: !second.granted && second.code === 'DENY_ALREADY_USED', text: `Повторная попытка по ${qrToken} → ОТКАЗ ДОСТУПА (DENY_ALREADY_USED).` });
+        }
+
+        if (testId === 'CT-04') {
+          const passId = `CT04-${Math.floor(100 + Math.random() * 899)}`;
+          const qrToken = `QR-CT04-${passId.slice(-3)}`;
+          await handleIssueCommand({ passId, guestName: 'Гость Отзыв 60с', qrToken }, { delayMs: 120, forceOnline: true, failChance: 0, silent: true });
+          const rev = await handleRevokeCommand({ passId, reason: 'CT-04 Test' }, { delayMs: 160, forceOffline: false, forceTimeout: false, silent: true });
+          tc.logs.push({ ok: rev.ok && rev.durationSec <= 60, text: `Отзыв ${passId} выполнен за ${rev.durationSec} с (норматив p95 ≤ 60 с).` });
+          render();
+          await sleep(160);
+
+          const afterRev = scanTurnstile(qrToken, { direction: 'ENTRY' });
+          tc.logs.push({ ok: !afterRev.granted && afterRev.code === 'DENY_REVOKED', text: `Проход после отзыва заблокирован (0 проходов, код ${afterRev.code}).` });
+        }
+
+        if (testId === 'CT-05') {
+          const passId = `CT05-${Math.floor(100 + Math.random() * 899)}`;
+          const qrToken = `QR-CT05-${passId.slice(-3)}`;
+          await handleIssueCommand({ passId, guestName: 'Гость Offline RAM', qrToken }, { delayMs: 100, forceOnline: true, failChance: 0, silent: true });
+
+          const prevOnline = state.acsOnline;
+          state.acsOnline = false;
+          state.chaos.offlineMode = true;
+
+          const revFail = await handleRevokeCommand({ passId }, { delayMs: 120, forceOffline: true, silent: true });
+          tc.logs.push({ ok: !revFail.ok && revFail.code === 'REVOKE_FAILED', text: `В режиме Offline команда отзыва сгенерировала REVOKE_FAILED (сигнал на КПП).` });
+          render();
+          await sleep(180);
+
+          const localPass = scanTurnstile(qrToken, { direction: 'ENTRY' });
+          tc.logs.push({ ok: localPass.granted, text: `При обрыве облака активный пропуск ${qrToken} из локальной RAM открыл турникет.` });
+
+          state.acsOnline = prevOnline;
+          state.chaos.offlineMode = !prevOnline;
+        }
+
+        if (testId === 'CT-06') {
+          const target = state.ram[0];
+          const exp = state.platformExpected.find(e => e.id === target.id);
+          const expectedStatus = exp ? exp.status : 'ACTIVE';
+          target.status = expectedStatus === 'ACTIVE' ? 'REVOKED' : 'ACTIVE';
+          target.drifted = true;
+          tc.logs.push({ ok: true, text: `Создано расхождение для ${target.id}: в БД=${expectedStatus}, в RAM=${target.status}.` });
+          render();
+          await sleep(180);
+
+          const recon = await handleReconcileCommand({}, { delayMs: 160, forceOnline: true, silent: true });
+          const fixedNow = state.ram.find(r => r.id === target.id).status === expectedStatus;
+          tc.logs.push({ ok: recon.ok && recon.driftsFound >= 1 && fixedNow, text: `Сверка Reconciliation обнаружила расхождений: ${recon.driftsFound} и восстановила ${expectedStatus}.` });
+        }
+
+        const allOk = tc.logs.length > 0 && tc.logs.every(l => l.ok);
+        tc.status = allOk ? 'PASS' : 'FAIL';
+        tc.durationMs = Math.round(performance.now() - t0);
+      } catch (err) {
+        tc.status = 'FAIL';
+        tc.logs.push({ ok: false, text: `Ошибка выполнения: ${err.message}` });
+      }
+      render();
+    }
+
+    async function runAllTests() {
+      if (state.qaRunningAll) return;
+      state.qaRunningAll = true;
+      render();
+      for (const tc of state.qaTests) {
+        await runTest(tc.id);
+        await sleep(150);
+      }
+      state.qaRunningAll = false;
+      const passed = state.qaTests.filter(t => t.status === 'PASS').length;
+      showToast(
+        `QA-раннер: ${passed} / ${state.qaTests.length} PASS`,
+        passed === state.qaTests.length ? 'Все контрактные и интеграционные тесты успешно пройдены.' : 'Есть проваленные проверки — раскройте карточку теста.',
+        passed === state.qaTests.length ? 'green' : 'orange'
+      );
+      render();
+    }
+
+    // =========================================================================
+    // 9. CONTROLS & SYNC ACTIONS
+    // =========================================================================
+    function toggleTheme() {
+      state.theme = state.theme === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', state.theme);
+      renderHeader();
+    }
+
+    function toggleAcsOnline() {
+      state.acsOnline = !state.acsOnline;
+      state.chaos.offlineMode = !state.acsOnline;
+      pushWire({
+        direction: 'OUT',
+        category: 'BRIDGE',
+        command: state.acsOnline ? 'CHANNEL_ONLINE' : 'CHANNEL_OFFLINE',
+        status: state.acsOnline ? '200 ONLINE' : '503 OFFLINE',
+        latencyMs: 2,
+        payload: { acsOnline: state.acsOnline, localRamActive: true },
+      });
+      showToast(
+        state.acsOnline ? 'Канал СКУД: Online' : 'Канал СКУД: Offline',
+        state.acsOnline ? 'Штатный обмен командами восстановлен.' : 'Облачный канал разорван. Локальная RAM контроллера продолжает работу.',
+        state.acsOnline ? 'green' : 'orange'
+      );
+      render();
+    }
+
+    function setChaosOffline(checked) {
+      state.chaos.offlineMode = checked;
+      state.acsOnline = !checked;
+      render();
+    }
+
+    // =========================================================================
+    // 10. RENDER FUNCTIONS
+    // =========================================================================
+    function renderHeader() {
+      // Theme thumb icon
+      document.getElementById('theme-thumb').innerHTML = state.theme === 'dark'
+        ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>'
+        : '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>';
+
+      // Bridge pill
+      const bp = document.getElementById('bridge-pill');
+      if (state.bridgeConnected) {
+        bp.className = 'bridge-pill connected';
+        bp.innerHTML = `<span class="dot dot-pulse" style="background: var(--accent-cyan);"></span><span>Мост PropTechApp (BroadcastChannel): Подключён (${state.bridgeLastSeen})</span>`;
+      } else {
+        bp.className = 'bridge-pill';
+        bp.innerHTML = `<span class="dot" style="background: var(--text-dim);"></span><span>Мост PropTechApp (BroadcastChannel): Автономный</span>`;
+      }
+
+      // Online / Offline Switch
+      const btn = document.getElementById('btn-acs-channel');
+      if (state.acsOnline) {
+        btn.className = 'btn btn-sm btn-outline';
+        btn.innerHTML = '<span class="dot" style="background: var(--accent-green);"></span><span>СКУД: Online</span>';
+      } else {
+        btn.className = 'btn btn-sm btn-orange';
+        btn.innerHTML = '<span class="dot dot-pulse" style="background: #FFFFFF;"></span><span>СКУД: Offline (Аварийный)</span>';
+      }
+    }
+
+    function renderKpiStrip() {
+      const activeInRam = state.ram.filter(p => p.status === 'ACTIVE').length;
+      const errRate = calcErrorRate();
+      const p95 = calcRevokeP95();
+      document.getElementById('kpi-strip').innerHTML = `
+        <div class="kpi-tile">
+          <div class="kpi-label">Пропусков в RAM контроллера</div>
+          <div class="kpi-val mono">${state.ram.length} <span class="text-xs text-muted">(${activeInRam} ACTIVE)</span></div>
+        </div>
+        <div class="kpi-tile">
+          <div class="kpi-label">Доля ошибок синхронизации</div>
+          <div class="kpi-val mono" style="color: ${Number(errRate) > 0.5 ? 'var(--accent-orange)' : 'var(--accent-cyan)'};">${errRate}%</div>
+        </div>
+        <div class="kpi-tile">
+          <div class="kpi-label">p95 времени отзыва (норма ≤ 60с)</div>
+          <div class="kpi-val mono" style="color: ${Number(p95) > 60 ? 'var(--accent-orange)' : 'var(--accent-green)'};">${p95} с</div>
+        </div>
+        <div class="kpi-tile">
+          <div class="kpi-label">Отражено дублей (Idempotency)</div>
+          <div class="kpi-val mono" style="color: var(--accent-cyan);">${state.duplicatesBlocked}</div>
+        </div>
+      `;
+    }
+
+    function renderTurnstilePanel() {
+      const st = state.turnstileStatus;
+      const lampCls = st.mode === 'GRANTED' ? 'granted' : st.mode === 'DENIED' ? 'denied' : '';
+      const icon = st.mode === 'GRANTED'
+        ? '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'
+        : st.mode === 'DENIED'
+          ? '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>'
+          : '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM20 14v3M14 20h7"/></svg>';
+
+      document.getElementById('turnstile-panel').innerHTML = `
+        <div class="between">
+          <div>
+            <div class="eyebrow">СИМУЛЯТОР КПП</div>
+            <h2 class="section-title">Виртуальный турникет</h2>
+          </div>
+          <span class="badge ${state.acsOnline ? 'b-cyan' : 'b-orange'} mono">
+            ${state.acsOnline ? 'ONLINE' : 'OFFLINE · LOCAL RAM'}
+          </span>
+        </div>
+
+        <div class="turnstile-lamp ${lampCls}">
+          <div class="lamp-ring">${icon}</div>
+          <div class="lamp-title">${st.title}</div>
+          <div class="lamp-code mono">${st.code}</div>
+          <p class="text-xs text-muted" style="margin: 8px 0 0; line-height: 1.45;">${escHtml(st.details)}</p>
+          ${st.offlineLocal ? `<div class="badge b-cyan" style="margin-top: 8px;">Локальный проход из RAM при обрыве облака</div>` : ''}
+        </div>
+
+        <div class="stack-xs">
+          <label class="eyebrow" style="color: var(--text-muted);" for="qr-scan-input">QR-токен или ID пропуска</label>
+          <input
+            id="qr-scan-input"
+            class="input mono"
+            value="${escHtml(state.turnstileInput)}"
+            oninput="state.turnstileInput = this.value"
+            placeholder="Например: QR-ACTIVE-0901 или QR-2611-0901"
+          />
+        </div>
+
+        <div class="stack-xs">
+          <span class="eyebrow" style="color: var(--text-muted);">Направление прохода</span>
+          <div class="dir-seg">
+            <button type="button" class="dir-btn ${state.turnstileDirection === 'ENTRY' ? 'active' : ''}" onclick="state.turnstileDirection='ENTRY'; renderTurnstilePanel();">→ Вход</button>
+            <button type="button" class="dir-btn ${state.turnstileDirection === 'EXIT' ? 'active' : ''}" onclick="state.turnstileDirection='EXIT'; renderTurnstilePanel();">← Выход</button>
+          </div>
+        </div>
+
+        <button type="button" class="btn btn-orange btn-lg btn-full" onclick="scanTurnstile()">
+          Сканировать QR
+        </button>
+
+        <div class="subtle text-11 text-muted" style="padding: 10px 12px; line-height: 1.45;">
+          Однократный гостевой проход: при успешном сканировании <span class="mono">ACTIVE → USED</span> и событие <span class="mono">PASS_USED</span> уходит по мосту в PropTechApp. Повторное сканирование <span class="mono">USED</span> или <span class="mono">REVOKED</span> блокируется.
+        </div>
+      `;
+    }
+
+    function renderRamBadge(status) {
+      if (status === 'ACTIVE') return '<span class="badge b-green mono">ACTIVE</span>';
+      if (status === 'USED') return '<span class="badge b-cyan mono">USED</span>';
+      if (status === 'REVOKED') return '<span class="badge b-orange mono">REVOKED</span>';
+      return `<span class="badge b-muted mono">${status}</span>`;
+    }
+
+    function renderRamPanel() {
+      const drifts = state.ram.filter(r => r.drifted).length;
+      document.getElementById('ram-panel').innerHTML = `
+        <div class="card-pad between" style="border-bottom: 1px solid var(--border-color);">
+          <div>
+            <div class="eyebrow">ЛОКАЛЬНАЯ ПАМЯТЬ КОНТРОЛЛЕРА (RAM СКУД)</div>
+            <h2 class="section-title">
+              Реестр пропусков (${state.ram.length})
+              ${drifts > 0 ? `<span class="badge b-orange" style="margin-left: 6px;">Расхождений: ${drifts}</span>` : ''}
+            </h2>
+          </div>
+          <div class="row">
+            <button type="button" class="btn btn-danger-outline btn-sm" onclick="simulateDrift()">
+              Симулировать расхождение БД ↔ СКУД
+            </button>
+            <button type="button" class="btn btn-cyan btn-sm" onclick="handleReconcileCommand()">
+              Запустить сверку (Reconciliation)
+            </button>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th>ID пропуска</th>
+                <th>ФИО гостя</th>
+                <th>QR-токен</th>
+                <th>Статус</th>
+                <th>Синхронизация</th>
+                <th style="text-align: right;">Действия</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${state.ram.map(p => {
+                const exp = state.platformExpected.find(e => e.id === p.id);
+                return `
+                  <tr class="${p.drifted ? 'drift-row' : ''}">
+                    <td class="mono fw-700" style="white-space: nowrap;">
+                      ${escHtml(p.id)}
+                      ${p.drifted ? '<div class="text-11" style="color: var(--accent-orange);">⚠ Drift</div>' : ''}
+                    </td>
+                    <td>
+                      <div class="fw-700">${escHtml(p.guestName)}</div>
+                      <div class="text-11 text-muted">${escHtml(p.company)}</div>
+                    </td>
+                    <td class="mono" style="white-space: nowrap;">${escHtml(p.qrToken)}</td>
+                    <td>
+                      ${renderRamBadge(p.status)}
+                      ${p.drifted && exp ? `<div class="text-11 text-muted" style="margin-top: 3px;">В БД: ${exp.status}</div>` : ''}
+                    </td>
+                    <td class="mono text-11 text-muted" style="white-space: nowrap;">${escHtml(p.syncedAt)}</td>
+                    <td style="text-align: right; white-space: nowrap;">
+                      <div class="row" style="justify-content: flex-end;">
+                        <button type="button" class="btn btn-outline btn-sm" onclick="quickScanFromRam('${escHtml(p.qrToken)}')">
+                          Просканировать на турникете
+                        </button>
+                        ${p.status === 'ACTIVE' ? `
+                          <button type="button" class="btn btn-danger-outline btn-sm" onclick="localRevokeFromRam('${escHtml(p.id)}')">
+                            Отозвать локально
+                          </button>
+                        ` : ''}
+                      </div>
+                    </td>
+                  </tr>
+                `;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function renderChaosPanel() {
+      const c = state.chaos;
+      document.getElementById('chaos-panel').innerHTML = `
+        <div>
+          <div class="eyebrow" style="color: var(--accent-orange);">FAULT INJECTION</div>
+          <h2 class="section-title">Панель Chaos-инжиниринга</h2>
+        </div>
+
+        <div class="slider-row">
+          <div class="between text-xs">
+            <span class="fw-700">Искусственная задержка ответа</span>
+            <span class="mono fw-800" style="color: var(--accent-cyan);">${c.latencyMs} мс</span>
+          </div>
+          <input
+            type="range"
+            min="0"
+            max="4000"
+            step="50"
+            value="${c.latencyMs}"
+            oninput="state.chaos.latencyMs = Number(this.value); renderChaosPanel();"
+          />
+          <div class="between text-11 text-muted mono"><span>0 мс</span><span>2000 мс</span><span>4000 мс</span></div>
+        </div>
+
+        <div class="slider-row">
+          <div class="between text-xs">
+            <span class="fw-700">Вероятность сбоя синхронизации</span>
+            <span class="mono fw-800" style="color: ${c.failureRatePct > 0 ? 'var(--accent-orange)' : 'var(--accent-green)'};">${c.failureRatePct}%</span>
+          </div>
+          <input
+            type="range"
+            min="0"
+            max="100"
+            step="5"
+            value="${c.failureRatePct}"
+            oninput="state.chaos.failureRatePct = Number(this.value); renderChaosPanel();"
+          />
+          <div class="between text-11 text-muted mono"><span>0%</span><span>50%</span><span>100%</span></div>
+        </div>
+
+        <label class="check-card ${c.offlineMode ? 'active-warn' : ''}">
+          <input type="checkbox" ${c.offlineMode ? 'checked' : ''} onchange="setChaosOffline(this.checked)" />
+          <div>
+            <div class="text-xs fw-700">Обрыв канала связи (Offline)</div>
+            <div class="text-11 text-muted" style="margin-top: 2px;">Команды выдачи и отзыва возвращают сбой; активные пропуска в RAM продолжают открывать турникет.</div>
+          </div>
+        </label>
+
+        <label class="check-card ${c.revokeTimeout ? 'active-warn' : ''}">
+          <input type="checkbox" ${c.revokeTimeout ? 'checked' : ''} onchange="state.chaos.revokeTimeout = this.checked; renderChaosPanel();" />
+          <div>
+            <div class="text-xs fw-700">Таймаут отзыва (&gt; 60с → REVOKE_FAILED)</div>
+            <div class="text-11 text-muted" style="margin-top: 2px;">Принудительно генерирует сбой отзыва для проверки критического алерта на Посту Охраны.</div>
+          </div>
+        </label>
+
+        <label class="check-card ${c.enforceIdempotency ? 'active-cyan' : ''}">
+          <input type="checkbox" ${c.enforceIdempotency ? 'checked' : ''} onchange="state.chaos.enforceIdempotency = this.checked; renderChaosPanel();" />
+          <div>
+            <div class="text-xs fw-700">Проверка Idempotency-Key (защита от дублей)</div>
+            <div class="text-11 text-muted" style="margin-top: 2px;">Повторная доставка пакета с тем же ключом не создаёт дубликат записи в RAM.</div>
+          </div>
+        </label>
+      `;
+    }
+
+    function renderQaPanel() {
+      const passed = state.qaTests.filter(t => t.status === 'PASS').length;
+      document.getElementById('qa-panel').innerHTML = `
+        <div class="between">
+          <div>
+            <div class="eyebrow">CONTRACT &amp; INTEGRATION QA RUNNER</div>
+            <h2 class="section-title">Интеграционные и контрактные автотесты (${passed} / ${state.qaTests.length})</h2>
+          </div>
+          <button type="button" class="btn btn-orange btn-sm" ${state.qaRunningAll ? 'disabled' : ''} onclick="runAllTests()">
+            ${state.qaRunningAll ? 'Выполняются тесты...' : 'Запустить все тесты'}
+          </button>
+        </div>
+
+        <div class="stack-xs">
+          ${state.qaTests.map(tc => {
+            const cls = tc.status === 'PASS' ? 'pass' : tc.status === 'FAIL' ? 'fail' : tc.status === 'RUNNING' ? 'running' : '';
+            const badge = tc.status === 'PASS'
+              ? `<span class="badge b-green mono">PASS${tc.durationMs ? ` · ${tc.durationMs} мс` : ''}</span>`
+              : tc.status === 'FAIL'
+                ? '<span class="badge b-orange-solid mono">FAIL</span>'
+                : tc.status === 'RUNNING'
+                  ? '<span class="badge b-cyan mono">RUNNING...</span>'
+                  : '<span class="badge b-muted mono">ОЖИДАНИЕ</span>';
+
+            return `
+              <div class="qa-card ${cls}">
+                <div class="qa-head" onclick="toggleQaExpand('${tc.id}')">
+                  <div class="text-xs fw-700" style="flex: 1; min-width: 220px;">${escHtml(tc.title)}</div>
+                  <div class="row" onclick="event.stopPropagation()">
+                    ${badge}
+                    <button type="button" class="btn btn-outline btn-sm" ${tc.status === 'RUNNING' ? 'disabled' : ''} onclick="runTest('${tc.id}')">
+                      Запустить
+                    </button>
+                  </div>
+                </div>
+                ${tc.expanded ? `
+                  <div class="qa-body">
+                    ${tc.logs.length === 0
+                      ? '<div class="text-muted">Нажмите «Запустить», чтобы выполнить проверку.</div>'
+                      : tc.logs.map(l => `
+                          <div class="qa-assert">
+                            <span class="mono fw-700" style="color: ${l.ok ? 'var(--accent-green)' : 'var(--accent-orange)'};">${l.ok ? '[PASS]' : '[FAIL]'}</span>
+                            <span>${escHtml(l.text)}</span>
+                          </div>
+                        `).join('')
+                    }
+                  </div>
+                ` : ''}
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
+    }
+
+    function toggleQaExpand(id) {
+      const tc = state.qaTests.find(t => t.id === id);
+      if (tc) {
+        tc.expanded = !tc.expanded;
+        renderQaPanel();
+      }
+    }
+
+    function renderWirePanel() {
+      const filtered = state.wireFilter === 'ALL'
+        ? state.wireLog
+        : state.wireLog.filter(w => w.category === state.wireFilter);
+
+      document.getElementById('wire-panel').innerHTML = `
+        <div class="between">
+          <div>
+            <div class="eyebrow">LIVE WIRE INSPECTOR (gRPC / JSON ACL)</div>
+            <h2 class="section-title">Поток входящих и исходящих пакетов (${filtered.length})</h2>
+          </div>
+          <div class="row">
+            <select class="select" style="width: auto; padding: 6px 10px; font-size: 12px;" onchange="state.wireFilter = this.value; renderWirePanel();" aria-label="Фильтр событий">
+              <option value="ALL" ${state.wireFilter === 'ALL' ? 'selected' : ''}>Все события</option>
+              <option value="ISSUE" ${state.wireFilter === 'ISSUE' ? 'selected' : ''}>Выдача (ISSUE)</option>
+              <option value="REVOKE" ${state.wireFilter === 'REVOKE' ? 'selected' : ''}>Отзыв (REVOKE)</option>
+              <option value="TURNSTILE" ${state.wireFilter === 'TURNSTILE' ? 'selected' : ''}>Турникет (PASS_USED)</option>
+              <option value="RECONCILE" ${state.wireFilter === 'RECONCILE' ? 'selected' : ''}>Сверка (RECONCILE)</option>
+              <option value="BRIDGE" ${state.wireFilter === 'BRIDGE' ? 'selected' : ''}>Канал / Мост</option>
+            </select>
+            <button type="button" class="btn btn-outline btn-sm" onclick="clearWire()">
+              Очистить лог
+            </button>
+          </div>
+        </div>
+
+        <div class="wire-feed">
+          ${filtered.length === 0 ? `
+            <div class="subtle text-xs text-muted" style="padding: 20px; text-align: center;">
+              Пакетов по выбранному фильтру пока нет.
+            </div>
+          ` : filtered.map((item, idx) => {
+            const dirCls = item.direction === 'IN' ? 'b-cyan' : 'b-muted';
+            const stCls = item.status.includes('503') || item.status.includes('504') || item.status.includes('403') || item.status.includes('422') || item.status.includes('DRIFT')
+              ? 'b-orange'
+              : item.status.includes('409')
+                ? 'b-amber'
+                : 'b-green';
+            return `
+              <details class="wire-entry" ${idx === 0 ? 'open' : ''}>
+                <summary class="wire-summary">
+                  <div class="row">
+                    <span class="badge ${dirCls} mono">${item.direction}</span>
+                    <span class="mono fw-700">${escHtml(item.command)}</span>
+                    <span class="badge ${stCls} mono">${escHtml(item.status)}</span>
+                  </div>
+                  <div class="row mono text-11 text-muted">
+                    <span>${item.id}</span>
+                    <span>·</span>
+                    <span>${item.latencyMs} мс</span>
+                    <span>·</span>
+                    <span>${item.time}</span>
+                    <span>▾</span>
+                  </div>
+                </summary>
+                <pre class="json-pre mono">${escHtml(JSON.stringify(item.payload, null, 2))}</pre>
+              </details>
+            `;
+          }).join('')}
+        </div>
+      `;
+    }
+
+    function clearWire() {
+      state.wireLog = [];
+      showToast('Wire Inspector очищен', 'Лента трафика сброшена.', 'cyan');
+      renderWirePanel();
+    }
+
+    // =========================================================================
+    // 11. MASTER RENDER & INIT
+    // =========================================================================
+    function render() {
+      renderHeader();
+      renderKpiStrip();
+      renderTurnstilePanel();
+      renderRamPanel();
+      renderChaosPanel();
+      renderQaPanel();
+      renderWirePanel();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      render();
+      emitBridge('BRIDGE_PING', { hub: 'PropTechApp Integration Hub', startup: true });
+    });
+  </script>
+</body>
+</html>
