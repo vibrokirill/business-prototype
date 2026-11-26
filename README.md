@@ -1,7 +1,10 @@
 # Lovit Business — Интерактивный продуктовый прототип (B2B2C PropTech)
 
 > **Демо-стенд (GitHub Pages):
-> ** `(https://vibrokirill.github.io/business-prototype/proptechapp_pm_control_plane_product_manager_team_lead)`
+* [Главная страница прототипа](https://github.io)
+* [Макет системы контроля доступа (СКУД)](https://github.io)
+* [Панель управления PO]([https://github.io](https://vibrokirill.github.io/business-prototype/proptechapp_pm_control_plane_product_manager_team_lead))
+
 
 Интерактивный кликабельный Discovery-прототип платформы управления многоарендным бизнес-центром класса A/B+ (пилотные параметры: 42 000 м², 55 компаний-арендаторов, 420 машино-мест) поверх действующей legacy-СКУД без замены оборудования.
 
